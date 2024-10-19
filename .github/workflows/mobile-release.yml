@@ -1,7 +1,7 @@
 name: Android
 on:
   push:
-    branches: [ main ]
+    branches: [ whut ]
 
   workflow_dispatch:
 jobs:
@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {install: false}
+          - {install: true}
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -22,14 +22,14 @@ jobs:
           haxe-version: 4.3.6
 
       - name: Restore Previous Cache
-        id: cache-debug-build-android-restore
+        id: cache-debug-build-android-restore-whut
         uses: actions/cache/restore@main
         with:
           path: |
             /home/runner/haxelib/
             export/release/android/haxe/
             export/release/android/obj/
-          key: cache-android-build-new
+          key: cache-android-whut
 
       - name: Setup Haxelib
         run: haxelib setup ~/haxelib
@@ -89,14 +89,14 @@ jobs:
             }
 
       - name: Save Current Cache
-        id: cache-release-build-android-save
+        id: cache-release-build-android-save-whut
         uses: actions/cache/save@main
         with:
           path: |
             /home/runner/haxelib/
             export/release/android/haxe/
             export/release/android/obj/
-          key: cache-android-build-new
+          key: cache-android-whut
 
       - name: Upload Artifact
         uses: actions/upload-artifact@main
