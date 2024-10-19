@@ -292,6 +292,9 @@ class FunkinLua {
 		set("getVar", function(varName:String) {
 			return MusicBeatState.getVariables().get(varName);
 		});
+		set('removeVar', function(varName:String) {
+			return MusicBeatState.getVariables().remove(varName);
+		});
 
 		set("addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) {
 			var luaPath:String = findScript(luaFile);
