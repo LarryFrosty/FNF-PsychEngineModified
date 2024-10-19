@@ -163,16 +163,6 @@ class LoadingState extends MusicBeatState
 		}
 
 		#if PSYCH_WATERMARKS // PSYCH LOADING SCREEN
-		#if android
-		var justTouched:Bool = false;
-		for (touch in FlxG.touches.list) {
-			if (touch.justPressed) {
-				justTouched = true;
-				break;
-			}
-		}
-		#end
-
 		timePassed += elapsed;
 		shakeFl += elapsed * 3000;
 		var dots:String = '';
@@ -189,7 +179,7 @@ class LoadingState extends MusicBeatState
 
 		if(!spawnedPessy)
 		{
-			if(!transitioning && (controls.ACCEPT #if android || justTouched #end))
+			if(!transitioning && controls.ACCEPT)
 			{
 				shakeMult = 1;
 				FlxG.sound.play(Paths.sound('cancelMenu'));

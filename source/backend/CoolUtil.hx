@@ -30,7 +30,7 @@ class CoolUtil
 	{
 		var hideChars = ~/[\t\n\r]/;
 		var color:String = hideChars.split(color).join('').trim();
-		if(color.startsWith('0x')) color = color.substring(color.length - (color.length >= 10 ? 8 : 6));
+		if(color.startsWith('0x')) color = color.substring(color.length - 6);
 
 		var colorNum:Null<FlxColor> = FlxColor.fromString(color);
 		if(colorNum == null) colorNum = FlxColor.fromString('#$color');
@@ -158,14 +158,5 @@ class CoolUtil
 			default:
 				text.borderStyle = NONE;
 		}
-	}
-
-	public static function showPopUp(message:String, title:String):Void
-	{
-		#if android
-		AndroidTools.showAlertDialog(title, message, {name: "OK", func: null}, null);
-		#else
-		FlxG.stage.window.alert(message, title);
-		#end
 	}
 }

@@ -41,9 +41,7 @@ class ControlsSubState extends MusicBeatSubstate
 		[false],
 		[false, 'DEBUG'],
 		[false, 'Key 1', 'debug_1', 'Debug Key #1'],
-		[false, 'Key 2', 'debug_2', 'Debug Key #2'],
-		[false, 'WINDOW'],
-		[false, 'Fullscreen', 'fullscreen', 'Fullscreen Toggel']
+		[false, 'Key 2', 'debug_2', 'Debug Key #2']
 	];
 	var curOptions:Array<Int>;
 	var curOptionsValid:Array<Int>;
@@ -64,8 +62,6 @@ class ControlsSubState extends MusicBeatSubstate
 	
 	public function new()
 	{
-		controls.isInSubstate = true;
-
 		super();
 
 		#if DISCORD_ALLOWED
@@ -286,7 +282,6 @@ class ControlsSubState extends MusicBeatSubstate
 		{
 			if(FlxG.keys.justPressed.ESCAPE || FlxG.gamepads.anyJustPressed(B))
 			{
-				controls.isInSubstate = false;
 				close();
 				return;
 			}

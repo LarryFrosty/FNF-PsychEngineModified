@@ -39,24 +39,11 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangeAutoPause;
 
-		var option:Option = new Option('Pop Up Score',
-			"If unchecked, hitting notes won't make \"sick\", \"good\".. and combo popups\n(Useful for low end " + Main.platform + ").",
-			'popUpRating',
-			BOOL);
-		addOption(option);
-
 		var option:Option = new Option('Disable Reset Button',
 			"If checked, pressing Reset won't do anything.",
 			'noReset',
 			BOOL);
 		addOption(option);
-
-		var option:Option = new Option('Game Over Vibration',
-			"If checked, your device will vibrate at game over.",
-			'gameOverVibration',
-			BOOL);
-		addOption(option);
-		option.onChange = onChangeVibration;
 
 		var option:Option = new Option('Hitsound Volume',
 			'Funny notes does \"Tick!\" when you hit them.',
@@ -134,10 +121,4 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 
 	function onChangeAutoPause()
 		FlxG.autoPause = ClientPrefs.data.autoPause;
-
-	function onChangeVibration()
-	{
-		if(ClientPrefs.data.gameOverVibration)
-			lime.ui.Haptic.vibrate(0, 500);
-	}
 }

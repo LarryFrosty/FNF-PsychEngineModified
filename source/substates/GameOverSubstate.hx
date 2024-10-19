@@ -9,7 +9,6 @@ import flixel.math.FlxPoint;
 
 import states.StoryMenuState;
 import states.FreeplayState;
-import lime.ui.Haptic;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
@@ -60,9 +59,6 @@ class GameOverSubstate extends MusicBeatSubstate
 	{
 		instance = this;
 
-		if (ClientPrefs.data.gameOverVibration)
-			Haptic.vibrate(0, 500);
-
 		Conductor.songPosition = 0;
 
 		if(boyfriend == null)
@@ -82,7 +78,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollow.setPosition(boyfriend.getGraphicMidpoint().x + boyfriend.cameraPosition[0], boyfriend.getGraphicMidpoint().y + boyfriend.cameraPosition[1]);
-		FlxG.camera.focusOn(FlxPoint.weak(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
+		FlxG.camera.focusOn(new FlxPoint(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
 		FlxG.camera.follow(camFollow, LOCKON, 0.01);
 		add(camFollow);
 		
@@ -132,9 +128,6 @@ class GameOverSubstate extends MusicBeatSubstate
 				neneKnife.animation.play('anim', true);
 			}
 		}
-
-		addTouchPad('NONE', 'A_B');
-		addTouchPadCamera();
 
 		super.create();
 	}

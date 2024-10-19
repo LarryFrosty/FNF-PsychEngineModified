@@ -11,13 +11,11 @@ import psychlua.FunkinLua;
 
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
-import crowplexus.hscript.Expr.Error as IrisError;
 
 class HScript extends Iris
 {
 	public var filePath:String;
 	public var modFolder:String;
-	public var returnValue:Dynamic = null;
 
 	#if LUA_ALLOWED
 	public var parentLua:FunkinLua;
@@ -30,11 +28,6 @@ class HScript extends Iris
 		}
 	}
 
-	public function errorCaught(e:IrisError, ?funcName:String) {
-		var header:String = (funcName != null ? '$origin: $funcName' : origin); 
-		PlayState.instance.addTextToDebug('ERROR ($header) - ${e.toString()}', FlxColor.RED);  
-	}
-
 	public static function initHaxeModuleCode(parent:FunkinLua, code:String, ?varsToBring:Any = null)
 	{
 		var hs:HScript = try parent.hscript catch (e) null;
@@ -42,30 +35,20 @@ class HScript extends Iris
 		{
 			trace('initializing haxe interp for: ${parent.scriptName}');
 			parent.hscript = new HScript(parent, code, varsToBring);
-			return parent.hscript.returnValue;
 		}
 		else
 		{
-			hs.varsToBring = varsToBring;
-			var prevCode:String = hs.scriptCode;
 			try
 			{
-				if (hs.scriptCode != code) {
-					hs.scriptCode = code;
-					hs.parse(true); 
-				} 
-				hs.returnValue = hs.execute(); 
-				return hs.returnValue;
+				hs.scriptCode = code;
+				hs.varsToBring = varsToBring;
+				hs.execute();
 			}
-			catch(e:IrisError)
+			catch(e:Dynamic)
 			{
-				hs.errorCaught(e); 
-				hs.returnValue = null; 
-				hs.scriptCode = prevCode; 
-				return e;
+				FunkinLua.luaTrace('ERROR (${hs.origin}) - $e', false, false, FlxColor.RED);
 			}
 		}
-		return null;
 	}
 	#end
 
@@ -87,7 +70,7 @@ class HScript extends Iris
 		#end
 
 		filePath = file;
-		if (filePath != null && filePath.length > 0 && parent == null)
+		if (filePath != null && filePath.length > 0)
 		{
 			this.origin = filePath;
 			#if MODS_ALLOWED
@@ -106,16 +89,12 @@ class HScript extends Iris
 				scriptThing = File.getContent(f);
 			}
 		}
+		this.scriptCode = scriptThing;
 
 		preset();
-		this.scriptCode = scriptThing;
 		this.varsToBring = varsToBring;
-		try {
-			this.returnValue = execute();
-		} catch (e:IrisError) { 
-			this.errorCaught(e); 
-			this.returnValue = e; 
-		}
+
+		execute();
 	}
 
 	var varsToBring(default, set):Any = null;
@@ -123,12 +102,6 @@ class HScript extends Iris
 		super.preset();
 
 		// Some very commonly used classes
-		set('Type', Type); 
-		set('Reflect', Reflect); 
-		#if sys 
-		set('File', sys.io.File); 
-		set('FileSystem', sys.FileSystem); 
-		#end
 		set('FlxG', flixel.FlxG);
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
@@ -364,11 +337,12 @@ class HScript extends Iris
 
 		try
 		{
-			return call(funcToRun, funcArgs);
+			final callValue:IrisCall = call(funcToRun, funcArgs);
+			return callValue.returnValue;
 		}
-		catch(e:IrisError)
+		catch(e:Dynamic)
 		{
-			errorCaught(e, funcToRun);
+			trace('ERROR ${funcToRun}: $e');
 		}
 		return null;
 	}
@@ -380,23 +354,20 @@ class HScript extends Iris
 
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua) {
-		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
+		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):IrisCall {
 			#if HSCRIPT_ALLOWED
-			final retVal:Dynamic = initHaxeModuleCode(funk, codeToRun, varsToBring); 
-			if (Std.isOfType(retVal, IrisError)) return null;
-			if (funcToRun == null) { 
-				return (LuaUtils.typeSupported(retVal)) ? retVal : null;
-			}
+			initHaxeModuleCode(funk, codeToRun, varsToBring);
 			try
 			{
-				final retCall:IrisCall = funk.hscript.executeCode(funcToRun, funcArgs); 
-				if (retCall != null) { 
-					return (LuaUtils.typeSupported(retCall.returnValue)) ? retCall.returnValue : null;
+				final retVal:IrisCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				if (retVal != null)
+				{
+					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 				}
 			}
-			catch(e:IrisError)
+			catch(e:Dynamic)
 			{
-				funk.hscript.errorCaught(e, funcToRun);
+				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
 			}
 
 			#else
@@ -410,13 +381,14 @@ class HScript extends Iris
 			try
 			{
 				final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
-				if (retVal != null) {
-					return (LuaUtils.typeSupported(retVal.returnValue)) ? retVal.returnValue : null;
+				if (retVal != null)
+				{
+					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 				}
 			}
-			catch(e:IrisError)
+			catch(e:Dynamic)
 			{
-				funk.hscript.errorCaught(e, funcToRun);
+				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
 			}
 			return null;
 			#else
@@ -455,35 +427,16 @@ class HScript extends Iris
 	}
 	#end
 
-	override function call(func:String, ?args:Array<Dynamic>):IrisCall {
-		if (interp == null) {
-			#if IRIS_DEBUG
-			trace('[Iris:call()]: $interpErrStr, so functions cannot be called.');
-			#end
-			return null;
-		}
-
-		args ??= [];
-
-		var funcVar:Dynamic = interp.variables.get(func); // function signature
-		var isFunction:Bool = false;
-		try {
-			isFunction = funcVar != null && Reflect.isFunction(funcVar);
-			if (!isFunction)
-				throw 'Tried to call a non-function, for "$func"';
-			// throw "Variable not found or not callable, for \"" + fun + "\"";
-
-			final ret = Reflect.callMethod(null, funcVar, args);
-			return {funName: func, signature: funcVar, returnValue: ret};
-		}
-		// @formatter:off
-		#if hscriptPos
-		catch (e:IrisError) {
-			errorCaught(e, func);
-		}
-		#end
-		return {funName: func, signature: isFunction ? funcVar : null, returnValue: null};
+	override public function set(name:String, value:Dynamic, allowOverride:Bool = false):Void {
+		// should always override by default
+		super.set(name, value, true);
 	}
+
+	/*override function irisPrint(v):Void
+	{
+		FunkinLua.luaTrace('ERROR (${this.origin}:${interp.posInfos().lineNumber}): ${v}');
+		trace('[${ruleSet.name}:${interp.posInfos().lineNumber}]: ${v}\n');
+	}*/
 
 	override public function destroy()
 	{
