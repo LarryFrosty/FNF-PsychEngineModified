@@ -95,7 +95,7 @@ class NoteSplash extends FlxSprite
 		else
 		{
 			var oldConfig:Dynamic = parseTxt('$path') ?? {anim: 'note splash', minFps: 22, maxFps: 26, offsets: [[0, 0]]}
-			var animName:String = oldConfig.anim
+			var animName:String = oldConfig.anim;
 			var failedToFind:Bool = false;
 			while (true)
 			{
