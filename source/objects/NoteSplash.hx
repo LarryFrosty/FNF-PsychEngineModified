@@ -71,10 +71,10 @@ class NoteSplash extends FlxSprite
 		}
 
 		var path:String = 'images/$texture';
-		if (configs.exists('$path.json')) this.config = configs.get(path);
+		if (configs.exists('$path.json')) this.config = configs.get('$path.json');
 		else if (Paths.fileExists('$path.json', TEXT))
 		{
-			var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile(path));
+			var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile('$path.json'));
 			if (config != null)
 			{
 				/*for (i in Reflect.fields(config.animations))
@@ -94,7 +94,7 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			var oldConfig:Dynamic = parseTxt('$path') ?? {anim: 'note splash', fps: [22, 26], offsets: [[0, 0]]}
+			var oldConfig:Dynamic = parseTxt(path) ?? {anim: 'note splash', fps: [22, 26], offsets: [[0, 0]]}
 			var animName:String = oldConfig.anim;
 			var failedToFind:Bool = false;
 			while (true)
