@@ -148,7 +148,7 @@ class NoteSplash extends FlxSprite
 
 		if (randomize)
 		{
-			var animArray<Int> = [];
+			var animArray:Array<Int> = [];
 
 			for (i in 0...maxAnims)
 			{
