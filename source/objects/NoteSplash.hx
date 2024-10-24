@@ -94,7 +94,7 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			var oldConfig:Dynamic = parseTxt('$path') ?? {anim: 'note splash', minFps: 22, maxFps: 26, offsets: [[0, 0]]}
+			var oldConfig:Dynamic = parseTxt('$path') ?? {anim: 'note splash', fps: [22, 26], offsets: [[0, 0]]}
 			var animName:String = oldConfig.anim;
 			var failedToFind:Bool = false;
 			while (true)
@@ -118,8 +118,8 @@ class NoteSplash extends FlxSprite
 				{
 					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length); 
 					var offsets:Array<Float> = oldConfig.offsets[FlxMath.wrap(data, 0, oldConfig.offsets.length-1)];
-					var fps:Array<Float> = [oldConfig.minFps, oldConfig.maxFps];
-					var anim:String = col + (animNum > 0 ? animNum+1 : '');
+					var fps:Array<Int> = oldConfig.fps;
+					var anim:String = animNum > 0 ? col + (animNum+1) : col;
 					addAnimationToConfig(tempConfig, 1, anim, '$animName $col ${animNum+1}', fps, offsets, [], data);
 				}
 			}
@@ -129,7 +129,7 @@ class NoteSplash extends FlxSprite
 		}
 	}
 
-	public function setupNoteSplash(x:Float, y:Float, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
+	public function spawnSplashNote(x:Float = 0, y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
 	{
 		if (note != null && note.noteSplashData.disabled)
 			return;
@@ -149,19 +149,12 @@ class NoteSplash extends FlxSprite
 
 		if (randomize)
 		{
-			var datas:Int = 0;
-			var animArray:Array<Int> = [];
-
-			while (true)
+			for (i in 0...maxAnims)
 			{
-				var data:Int = noteData % Note.colArray.length + (datas * Note.colArray.length); 
-				if (!noteDataMap.exists(data) || !animation.exists(noteDataMap[data]))
-					break;
+				var data:Int = noteData % Note.colArray.length + (i * Note.colArray.length); 
 
 				if (!animArray.contains(data))
 					animArray.push(data);
-
-				datas++;
 			}
 
 			if (animArray.length > 1)
@@ -226,7 +219,7 @@ class NoteSplash extends FlxSprite
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
 		var conf = config.animations.get(anim);
-		var offsets = conf?.offsets ?? null; // checks if conf is not null, then checks if conf.offsets is not null and returns it, otherwise returns null
+		var offsets = conf?.offsets ?? null;
 		if(offsets != null) offset.set(offsets[0], offsets[1]);
 		//else offset.set(10, 10);
 
@@ -321,8 +314,7 @@ class NoteSplash extends FlxSprite
 
 		var config:Dynamic = {
 			anim: configFile[0],
-			minFps: Std.parseInt(framerates[0]),
-			maxFps: Std.parseInt(framerates[1]), // keeping the old fps format just in case
+			fps: [Std.parseInt(framerates[0]), Std.parseInt(framerates[1])],
 			offsets: offs
 		};
 		return config;
