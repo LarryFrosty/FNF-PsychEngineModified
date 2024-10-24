@@ -117,10 +117,9 @@ class NoteSplash extends FlxSprite
 				for (i => col in Note.colArray)
 				{
 					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length); 
-					var offsets:Array<Float> = oldConfig.offsets[FlxMath.wrap(data, 0, oldConfig.offsets.length-1)];
-					var fps:Array<Int> = oldConfig.fps;
+					var offsets:Array<Float> = oldConfig.offsets[FlxMath.wrap(data, 0, Std.int(oldConfig.offsets.length-1))];
 					var anim:String = animNum > 0 ? col + (animNum+1) : col;
-					addAnimationToConfig(tempConfig, 1, anim, '$animName $col ${animNum+1}', fps, offsets, [], data);
+					addAnimationToConfig(tempConfig, 1, anim, '$animName $col ${animNum+1}', oldConfig.fps, offsets, [], data);
 				}
 			}
 
@@ -129,7 +128,7 @@ class NoteSplash extends FlxSprite
 		}
 	}
 
-	public function spawnSplashNote(x:Float = 0, y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
+	public function spawnSplashNote(?x:Float = 0, ?y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
 	{
 		if (note != null && note.noteSplashData.disabled)
 			return;
@@ -149,6 +148,8 @@ class NoteSplash extends FlxSprite
 
 		if (randomize)
 		{
+			var animArray<Int> = [];
+
 			for (i in 0...maxAnims)
 			{
 				var data:Int = noteData % Note.colArray.length + (i * Note.colArray.length); 

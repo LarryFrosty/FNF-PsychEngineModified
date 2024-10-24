@@ -664,7 +664,7 @@ class NoteSplashEditorState extends MusicBeatState
                         }
 
                         splash.babyArrow = strum;
-                        splash.spawnSplashNote(0, 0, null, int);
+                        splash.spawnSplashNote(0, 0, int);
                         splash.alpha = 1;
                         splashes.add(splash);
                     }
@@ -695,7 +695,7 @@ class NoteSplashEditorState extends MusicBeatState
         if (name != null && splash.animation.exists(name) && noteData > -1)
         {
             splash.babyArrow = strums.members[noteData % 4];
-            splash.spawnSplashNote(0, 0, null, noteData, false);
+            splash.spawnSplashNote(0, 0, noteData, null, false);
             splash.alpha = 1;
             splashes.add(splash);
         }
