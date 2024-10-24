@@ -33,7 +33,7 @@ class NoteSplashEditorState extends MusicBeatState
     override function create()
     {
         if (imageSkin == null)
-            imageSkin =  NoteSplash.DEFAULT_SKIN + NoteSplash.getSplashSkinPostfix();
+            imageSkin =  NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix();
 
         FlxG.mouse.visible = true;
 
@@ -91,7 +91,7 @@ class NoteSplashEditorState extends MusicBeatState
         add(strums);
         add(splashes);
 
-        splash = new NoteSplash(imageSkin); // this cannot be recycled 
+        splash = new NoteSplash(0, 0, imageSkin); // this cannot be recycled 
         splash.alpha = .0;
         splashes.add(splash);
 
@@ -100,7 +100,7 @@ class NoteSplashEditorState extends MusicBeatState
 
         parseRGB();
 
-        addProperitiesTab();
+        addPropertiesTab();
         addAnimTab();
         addShadersTab();
 
@@ -330,7 +330,7 @@ class NoteSplashEditorState extends MusicBeatState
 
     var imageInputText:PsychUIInputText;
     var scaleNumericStepper:PsychUINumericStepper;
-    function addProperitiesTab()
+    function addPropertiesTab()
     {
         var ui = properUI.getTab("Properties").menu;
 
@@ -664,7 +664,7 @@ class NoteSplashEditorState extends MusicBeatState
                         }
 
                         splash.babyArrow = strum;
-                        splash.spawnSplashNote(null, int);
+                        splash.spawnSplashNote(0, 0, null, int);
                         splash.alpha = 1;
                         splashes.add(splash);
                     }
@@ -695,7 +695,7 @@ class NoteSplashEditorState extends MusicBeatState
         if (name != null && splash.animation.exists(name) && noteData > -1)
         {
             splash.babyArrow = strums.members[noteData % 4];
-            splash.spawnSplashNote(null, noteData, false);
+            splash.spawnSplashNote(0, 0, null, noteData, false);
             splash.alpha = 1;
             splashes.add(splash);
         }
