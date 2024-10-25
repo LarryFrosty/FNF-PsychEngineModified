@@ -303,7 +303,7 @@ class NoteSplash extends FlxSprite
 
 	public static function parseTxt(skin:String)
 	{
-		var path:String = Paths.getPath('images/$skin.txt', TEXT);
+		var path:String = Paths.getPath('$skin.txt', TEXT);
 		var configFile:Array<String> = CoolUtil.coolTextFile(path);
 		if(configFile.length < 1) return null;
 		
