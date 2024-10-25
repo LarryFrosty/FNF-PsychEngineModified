@@ -77,18 +77,20 @@ class NoteSplash extends FlxSprite
 			var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile('$path.json'));
 			if (config != null)
 			{
-				/*for (i in Reflect.fields(config.animations))
-				{
-					tempConfig.animations.set(i, Reflect.field(config.animations, i));
-				}*/
-
-				this.config = {
-					animations: config.animations,
+				var tempConfig:NoteSplashConfig = {
+					animations: new Map(),
 					scale: config.scale,
 					allowRGB: config.allowRGB,
 					allowPixel: config.allowPixel,
 					rgb: config.rgb
 				}
+
+				for (i in Reflect.fields(config.animations))
+				{
+					tempConfig.animations.set(i, Reflect.field(config.animations, i));
+				}
+
+				this.config = tempConfig;
 				configs.set('$path.json', this.config);
 			}
 		}
