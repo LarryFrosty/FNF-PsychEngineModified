@@ -271,13 +271,13 @@ class ReflectionFunctions
 			newArray.push(parseInstances(val));
 		return newArray;
 	}
-	public static function parseInstances(arg:Dynamic)
+	public static function parseInstances(arg:Dynamic):Dynamic
 	{
 		if (Std.isOfType(arg, Array)) {
-			parseInstanceArray(arg);
+			return parseInstanceArray(arg);
 		}
 		else {
-			parseSingleInstance(arg);
+			return parseSingleInstance(arg);
 		}
 	}
 	
