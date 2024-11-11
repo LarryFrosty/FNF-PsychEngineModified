@@ -41,7 +41,7 @@ jobs:
             echo Downloading Gradle...
             wget https://services.gradle.org/distributions/gradle-8.0-bin.zip
             echo Unzipping...
-            unzip gradle-8.0-bin.zip -d /home/runner && mv /home/runner/gradle-8.0 /home/runner/.gradle
+            mkdir -p /home/runner/.gradle/wrapper/dists/gradle-8.0-bin/90cnw93cvbtalezasaz0blq0a && unzip gradle-8.0-bin.zip -d /home/runner && mv /home/runner/gradle-8.0 /home/runner/.gradle/wrapper/dists/gradle-8.0-bin/90cnw93cvbtalezasaz0blq0a
             echo Done!
 
       - name: Install Libraries
