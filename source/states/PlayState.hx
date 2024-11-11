@@ -3152,7 +3152,7 @@ class PlayState extends MusicBeatState
 		for (script in hscriptArray)
 			if(script != null)
 			{
-				script.executeFunction('onDestroy');
+				script.run('onDestroy');
 				script.destroy();
 			}
 
@@ -3311,17 +3311,17 @@ class PlayState extends MusicBeatState
 
 	public function initHScript(file:String)
 	{
-		var newScript:HScript = null;
-		newScript = new HScript(null, file);
-		newScript.executeFunction('onCreate');
-		if(Std.isOfType(newScript.returnValue, IrisError))
-		{
-			addTextToDebug('ERROR ON LOADING ($file) - ${newScript.returnValue.toString()}', FlxColor.RED);
+		var newScript:HScript = new HScript(null, file);
+		
+		try {
+			newScript.parse(true);
+			newScript.run('onCreate');
+			hscriptArray.push(newScript);
+			trace('initialized hscript interp successfully: $file');
+		} catch (e:crowplexus.hscript.Expr.Error) {
+			newScript.errorCaught(e);
 			newScript.destroy();
-			return;
 		}
-		trace('initialized hscript interp successfully: $file');
-		hscriptArray.push(newScript);
 	}
 	#end
 
@@ -3393,23 +3393,13 @@ class PlayState extends MusicBeatState
 			if(script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
 				continue;
 
-			try
-			{
-				var callValue:IrisCall = script.call(funcToCall, args);
-				var myValue:Dynamic = callValue.returnValue;
-
-				if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-				{
-					returnVal = myValue;
-					break;
-				}
-
-				if(myValue != null && !excludeValues.contains(myValue))
-					returnVal = myValue;
-			}
-			catch(e:IrisError)
-			{
-				addTextToDebug('ERROR (${script.origin}: $funcToCall) - ${e.toString()}', FlxColor.RED);
+			var callValue:Dynamic = script.run(funcToCall, args);
+			if (callValue == null) continue;
+			if (!excludeValues.contains(callValue)) {
+				if ((callValue == LuaUtils.Function_StopHScript || callValue == LuaUtils.Function_StopAll) && !ignoreStops)
+					return callValue;
+				if (callValue != null && !excludeValues.contains(callValue))
+					returnVal = callValue;
 			}
 		}
 		#end
