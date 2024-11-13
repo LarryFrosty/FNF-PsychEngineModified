@@ -177,10 +177,7 @@
 	<!-- Do whatever you want I'm tired uninstall and install everytime -->
 	<certificate path="key.keystore" password="psychengine" alias="psychport" alias-password="psychengine" if="android" unless="debug" />
 
-	<section if="android">
-		<architecture name="arm64" exclude="armv7" />
-		<android gradle-version="8.0" />
-	</section>
+	<architecture name="arm64" exclude="armv7" if="android"/>
 
 	<!--Macro fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />
