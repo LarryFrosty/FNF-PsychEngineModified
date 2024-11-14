@@ -283,31 +283,24 @@ class ReflectionFunctions
 	
 	public static function parseSingleInstance(arg:Dynamic)
 	{
-		if(arg != null)
+		var argStr:String = cast arg;
+		if(argStr != null && argStr.length > instanceStr.length)
 		{
-			var args:Array<Dynamic> = cast arg;
-			for (ind => str in args)
+			var index:Int = argStr.indexOf('::');
+			if(index > -1)
 			{
-				if (str.length > instanceStr.length)
-				{
-				var argStr:String = str;
-				var index:Int = argStr.indexOf('::');
-				if(index > -1)
-				{
-					argStr = argStr.substring(index+2);
-					//trace('Op1: $argStr');
-					var lastIndex:Int = argStr.lastIndexOf('::');
+				argStr = argStr.substring(index+2);
+				//trace('Op1: $argStr');
+				var lastIndex:Int = argStr.lastIndexOf('::');
 
-					var split:Array<String> = (lastIndex > -1) ? argStr.substring(0, lastIndex).split('.') : argStr.split('.');
-					args[ind] = (lastIndex > -1) ? Type.resolveClass(argStr.substring(lastIndex+2)) : PlayState.instance;
-					for (j in 0...split.length)
-					{
-						//trace('Op2: ${Type.getClass(args[i])}, ${split[j]}');
-						args[ind] = LuaUtils.getVarInArray(args, split[j].trim());
-						//trace('Op3: ${args[i] != null ? Type.getClass(args[i]) : null}');
-					}
+				var split:Array<String> = (lastIndex > -1) ? argStr.substring(0, lastIndex).split('.') : argStr.split('.');
+				arg = (lastIndex > -1) ? Type.resolveClass(argStr.substring(lastIndex+2)) : PlayState.instance;
+				for (j in 0...split.length)
+				{
+					//trace('Op2: ${Type.getClass(args[i])}, ${split[j]}');
+					arg = LuaUtils.getVarInArray(arg, split[j].trim());
+					//trace('Op3: ${args[i] != null ? Type.getClass(args[i]) : null}');
 				}
-			}
 			}
 		}
 		return arg;
