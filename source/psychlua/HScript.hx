@@ -25,58 +25,16 @@ class HScript extends Iris
 	#end
 
 	public function errorCaught(e:IrisError, ?funcName:String) {
-		#if LUA_ALLOWED if (parentLua != null && FunkinLua.getBool('luaDebugMode')) #end
-		PlayState.instance.addTextToDebug(errorToString(e, funcName, this), executed ? FlxColor.RED : 0xffb30000);
-	}
-	public static function hscriptLog(severity:ErrorSeverity, x:Dynamic, ?pos:haxe.PosInfos) {
-		var message:String = Std.string(x);
-		var origin:String = pos?.fileName ?? 'hscript';
-		#if hscriptPos
-		if (pos.lineNumber != -1) {
-			origin += ':' + pos.lineNumber;
+		#if LUA_ALLOWED
+		if (parentLua != null) {
+			FunkinLua.lastCalledScript = parentLua;
+			FunkinLua.luaTrace(HScriptTools.errorToString(e, funcName, this), executed ? FlxColor.RED : 0xffb30000);
+			return;
 		}
 		#end
-		var fullTrace:String = '($origin) - $message';
-		var color:FlxColor;
-		switch (severity) {
-			case FATAL:
-				color = 0xff800000;
-				fullTrace = 'FATAL ' + fullTrace;
-			case ERROR:
-				color = FlxColor.RED;
-				fullTrace = 'ERROR ' + fullTrace;
-			case WARN:
-				color = FlxColor.YELLOW;
-				fullTrace = 'WARNING ' + fullTrace;
-			default:
-				color = FlxColor.CYAN;
-		}
-		PlayState.instance.addTextToDebug(fullTrace, color);
+		PlayState.instance.addTextToDebug(HScriptTools.errorToString(e, funcName, this), executed ? FlxColor.RED : 0xffb30000);
 	}
-	public static function errorToString(e:IrisError, ?funcName:String, ?instance:HScript) {
-		var message = switch (#if hscriptPos e.e #else e #end) {
-			case EInvalidChar(c): "Invalid character: '" + (StringTools.isEof(c) ? "EOF" : String.fromCharCode(c)) + "' (" + c + ")";
-			case EUnexpected(s): "Unexpected token: \"" + s + "\"";
-			case EUnterminatedString: "Unterminated string";
-			case EUnterminatedComment: "Unterminated comment";
-			case EInvalidPreprocessor(str): "Invalid preprocessor (" + str + ")";
-			case EUnknownVariable(v): "Unknown variable: " + v;
-			case EInvalidIterator(v): "Invalid iterator: " + v;
-			case EInvalidOp(op): "Invalid operator: " + op;
-			case EInvalidAccess(f): "Invalid access to field " + f;
-			case ECustom(msg): msg;
-			default: "Unknown Error";
-		};
-		var mainHeader:String = 'ERROR';
-		if (instance != null && !instance.executed) mainHeader = 'ERROR ON LOADING';
-		var scriptHeader:String = #if hscriptPos e.origin #else (instance != null ? instance.origin : 'HScript') #end;
-		if (funcName != null) scriptHeader += ':$funcName';
-		var lineHeader:String = #if hscriptPos ':${e.line}' #else '' #end;
-		if (instance == null #if LUA_ALLOWED || instance.parentLua == null #end)
-			return '$mainHeader ($scriptHeader$lineHeader) - $message';
-		else
-			return '$mainHeader ($scriptHeader) - HScript$lineHeader: $message';
-	}
+
 	public var origin:String;
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
 	{
@@ -350,12 +308,13 @@ class HScript extends Iris
 		}
 	}
 
-	public override function execute() {
+	override function execute() {
 		var result = super.execute();
 		executed = true;
 		return result;
 	}
-	public override function parse(force:Bool = false) {
+
+	override function parse(force:Bool = false) {
 		executed = false;
 		return super.parse(force);
 	}
@@ -377,13 +336,13 @@ class HScript extends Iris
 				if (!exists(func)) {
 					if (!safe) {
 						#if LUA_ALLOWED
-						if (parentLua != null)
+						if (parentLua != null) {
+							FunkinLua.lastCalledScript = parentLua;
 							FunkinLua.luaTrace('$origin - No function in HScript named "$func"!', false, false, FlxColor.RED);
-						else
-							PlayState.instance.addTextToDebug('$origin - No function named "$func"!', FlxColor.RED);
-						#else
-						PlayState.instance.addTextToDebug('$origin - No function named "func"!', FlxColor.RED);
+							return null;
+						}
 						#end
+						PlayState.instance.addTextToDebug('$origin - No function named "func"!', FlxColor.RED);
 					}
 					return null;
 				}
@@ -421,11 +380,15 @@ class HScript extends Iris
 		// This function is unnecessary because import already exists in HScript as a native feature
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
 			if (funk.hscript == null) funk.initHaxeModule();
-			
-			var cls:Dynamic = Type.resolveClass('$libPackage.$libName');
-			if (cls == null) cls = Type.resolveEnum('$libPackage.$libName');
+
+			var str:String = '';
+			if (libPackage != null && libPackage.length > 0) str  += '$libPackage.';
+			str += libName;
+
+			var cls:Dynamic = Type.resolveClass(str);
+			if (cls == null) cls = Type.resolveEnum(str);
 			if (cls == null) {
-				FunkinLua.luaTrace('addHaxeLibrary: Class "$libPackage.$libName" wasn\'t found!', false, false, FlxColor.RED);
+				FunkinLua.luaTrace('addHaxeLibrary: Class "$str" wasn\'t found!', false, false, FlxColor.RED);
 				return false;
 			} else {
 				funk.hscript.set(libName, cls);
@@ -459,6 +422,59 @@ class HScript extends Iris
 		}
 
 		return varsToBring = values;
+	}
+}
+
+class HScriptTools {
+	public static function hscriptLog(severity:ErrorSeverity, x:Dynamic, ?pos:haxe.PosInfos) {
+		var message:String = Std.string(x);
+		var origin:String = pos?.fileName ?? 'hscript';
+		#if hscriptPos
+		if (pos.lineNumber != -1) {
+			origin += ':' + pos.lineNumber;
+		}
+		#end
+		var fullTrace:String = '($origin) - $message';
+		var color:FlxColor;
+		switch (severity) {
+			case FATAL:
+				color = 0xff800000;
+				fullTrace = 'FATAL ' + fullTrace;
+			case ERROR:
+				color = FlxColor.RED;
+				fullTrace = 'ERROR ' + fullTrace;
+			case WARN:
+				color = FlxColor.YELLOW;
+				fullTrace = 'WARNING ' + fullTrace;
+			default:
+				color = FlxColor.CYAN;
+		}
+		PlayState.instance.addTextToDebug(fullTrace, color);
+	}
+
+	public static function errorToString(e:IrisError, ?funcName:String, ?instance:HScript) {
+		var message = switch (#if hscriptPos e.e #else e #end) {
+			case EInvalidChar(c): "Invalid character: '" + (StringTools.isEof(c) ? "EOF" : String.fromCharCode(c)) + "' (" + c + ")";
+			case EUnexpected(s): "Unexpected token: \"" + s + "\"";
+			case EUnterminatedString: "Unterminated string";
+			case EUnterminatedComment: "Unterminated comment";
+			case EInvalidPreprocessor(str): "Invalid preprocessor (" + str + ")";
+			case EUnknownVariable(v): "Unknown variable: " + v;
+			case EInvalidIterator(v): "Invalid iterator: " + v;
+			case EInvalidOp(op): "Invalid operator: " + op;
+			case EInvalidAccess(f): "Invalid access to field " + f;
+			case ECustom(msg): msg;
+			default: "Unknown Error";
+		};
+		var mainHeader:String = 'ERROR';
+		if (instance != null && !instance.executed) mainHeader = 'ERROR ON LOADING';
+		var scriptHeader:String = (instance != null ? instance.origin : 'HScript');
+		if (funcName != null) scriptHeader += ':$funcName';
+		var lineHeader:String = #if hscriptPos ':${e.line}' #else '' #end;
+		if (instance == null #if LUA_ALLOWED || instance.parentLua == null #end)
+			return '$mainHeader ($scriptHeader$lineHeader) - $message';
+		else
+			return '$mainHeader ($scriptHeader) - HScript$lineHeader: $message';
 	}
 }
 
