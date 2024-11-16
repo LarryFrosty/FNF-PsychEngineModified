@@ -71,7 +71,6 @@ class HScript extends Iris
 		}
 
 		preset();
-		Iris.logLevel = hscriptLog;
 		this.scriptCode = scriptThing;
 		this.varsToBring = varsToBring;
 	}
