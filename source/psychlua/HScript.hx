@@ -28,7 +28,7 @@ class HScript extends Iris
 		#if LUA_ALLOWED
 		if (parentLua != null) {
 			FunkinLua.lastCalledScript = parentLua;
-			FunkinLua.luaTrace(HScriptTools.errorToString(e, funcName, this), executed ? FlxColor.RED : 0xffb30000);
+			FunkinLua.luaTrace(HScriptTools.errorToString(e, funcName, this), false, false, executed ? FlxColor.RED : 0xffb30000);
 			return;
 		}
 		#end
@@ -427,7 +427,8 @@ class HScript extends Iris
 class HScriptTools {
 	public static function hscriptLog(severity:ErrorSeverity, x:Dynamic, ?pos:haxe.PosInfos) {
 		var message:String = Std.string(x);
-		var origin:String = pos?.fileName ?? 'hscript';
+		var instance:HScript = cast(Iris.instances.get(pos?.fileName), HScript);
+		var origin:String = instance?.origin ?? 'hscript';
 		#if hscriptPos
 		if (pos.lineNumber != -1) {
 			origin += ':' + pos.lineNumber;
@@ -448,6 +449,13 @@ class HScriptTools {
 			default:
 				color = FlxColor.CYAN;
 		}
+		#if LUA_ALLOWED
+		if (instance.parentLua != null) {
+			FunkinLua.lastCalledScript = instance.parentLua;
+			FunkinLua.luaTrace(fullTrace, false, false, color);
+			return;
+		}
+		#end
 		PlayState.instance.addTextToDebug(fullTrace, color);
 	}
 
