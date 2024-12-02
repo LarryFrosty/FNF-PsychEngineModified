@@ -238,6 +238,7 @@ class Character extends FlxSprite
 				else addOffset(anim.anim, 0, 0);
 			}
 		}
+		if(ghost != null) copyGhostValues();
 		#if flxanimate
 		if(isAnimateAtlas) copyAtlasValues();
 		#end
