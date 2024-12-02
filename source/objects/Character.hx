@@ -247,7 +247,7 @@ class Character extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		if(ghost != null) ghost.update();
+		if(ghost != null) ghost.update(elapsed);
 		#if flxanimate if(isAnimateAtlas) atlas.update(elapsed); #end
 
 		if(debugMode || (!isAnimateAtlas && animation.curAnim == null) #if flxanimate || (isAnimateAtlas && (atlas.anim.curInstance == null || atlas.anim.curSymbol == null)) #end)
@@ -321,7 +321,7 @@ class Character extends FlxSprite
 		if (ghostTween != null)
 			ghostTween.cancel();
 
-		ghost.color = FlxColor.fromRGB(healthColorArray[0] + 50, healthColorArray[1] + 50, boyfriend.healthColorArray[2] + 50);
+		ghost.color = FlxColor.fromRGB(healthColorArray[0] + 50, healthColorArray[1] + 50, healthColorArray[2] + 50);
 		ghostTween = FlxTween.tween(ghost, {alpha: 0}, 0.75, {onComplete: (twn)->ghostTween = null});
 	}
 
