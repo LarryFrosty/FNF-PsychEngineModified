@@ -74,6 +74,9 @@ class Character extends FlxSprite
 	public var hasMissAnimations:Bool = false;
 	public var vocalsFile:String = '';
 
+	public var ghost:FlxSprite;
+	var ghostTween:FlxTween;
+
 	//Used on Character Editor
 	public var imageFile:String = '';
 	public var jsonScale:Float = 1;
@@ -156,7 +159,12 @@ class Character extends FlxSprite
 
 		if(!isAnimateAtlas)
 		{
-			frames = Paths.getMultiAtlas(json.image.split(','));
+			ghost = new FlxSprite(x, y);
+			ghost.frames = frames = Paths.getMultiAtlas(json.image.split(','));
+			ghost.animation.copyFrom(animation);
+			ghost.antialiasing = true;
+			ghost.blend = HARDLIGHT;
+			ghost.alpha = 0;
 		}
 		#if flxanimate
 		else
@@ -238,6 +246,7 @@ class Character extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
+		if(ghost != null) ghost.update();
 		#if flxanimate if(isAnimateAtlas) atlas.update(elapsed); #end
 
 		if(debugMode || (!isAnimateAtlas && animation.curAnim == null) #if flxanimate || (isAnimateAtlas && (atlas.anim.curInstance == null || atlas.anim.curSymbol == null)) #end)
@@ -301,6 +310,18 @@ class Character extends FlxSprite
 			playAnim('$name-loop');
 
 		super.update(elapsed);
+	}
+
+	public function playGhostAnim(animToPlay:String)
+	{
+		ghost.animation.play(animToPlay, true);
+		ghost.alpha = 0.8;
+
+		if (ghostTween != null)
+			ghostTween.cancel();
+
+		ghost.color = FlxColor.fromRGB(healthColorArray[0] + 50, healthColorArray[1] + 50, boyfriend.healthColorArray[2] + 50);
+		ghostTween = FlxTween.tween(ghost, {alpha: 0}, 0.75, {onComplete: (twn)->ghostTween = null});
 	}
 
 	inline public function isAnimationNull():Bool
@@ -483,6 +504,12 @@ class Character extends FlxSprite
 			color = FlxColor.BLACK;
 		}
 
+		if(ghost != null)
+		{
+			copyGhostValues();
+			ghost.draw();
+		}
+
 		if(isAnimateAtlas)
 		{
 			if(atlas.anim.curInstance != null)
@@ -534,8 +561,27 @@ class Character extends FlxSprite
 		}
 	}
 
+	public function copyGhostValues()
+	{
+		@:privateAccess
+		{
+			ghost.cameras = cameras;
+			ghost.scrollFactor = scrollFactor;
+			ghost.scale = scale;
+			ghost.offset = offset;
+			ghost.origin = origin;
+			ghost.x = x;
+			ghost.y = y;
+			ghost.angle = angle;
+			ghost.visible = visible;
+			ghost.flipX = flipX;
+			ghost.flipY = flipY;
+		}
+	}
+
 	public override function destroy()
 	{
+		ghost = FlxDestroyUtil.destroy(ghost);
 		atlas = FlxDestroyUtil.destroy(atlas);
 		super.destroy();
 	}
