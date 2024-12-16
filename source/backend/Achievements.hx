@@ -22,13 +22,6 @@ typedef Achievement =
 	@:optional var ID:Int; 
 }
 
-enum abstract AchievementOp(String)
-{
-	var GET = 'get';
-	var SET = 'set';
-	var ADD = 'add';
-}
-
 class Achievements {
 	public static function init()
 	{
@@ -40,7 +33,6 @@ class Achievements {
 		createAchievement('week5_nomiss',			{name: "Missless Christmas", description: "Beat Week 5 on Hard with no Misses."});
 		createAchievement('week6_nomiss',			{name: "Highscore!!", description: "Beat Week 6 on Hard with no Misses."});
 		createAchievement('week7_nomiss',			{name: "God Effing Damn It!", description: "Beat Week 7 on Hard with no Misses."});
-		createAchievement('weekend1_nomiss',		{name: "Just a Friendly Sparring", description: "Beat Weekend 1 on Hard with no Misses."});
 		createAchievement('ur_bad',					{name: "What a Funkin' Disaster!", description: "Complete a Song with a rating lower than 20%."});
 		createAchievement('ur_good',				{name: "Perfectionist", description: "Complete a Song with a rating of 100%."});
 		createAchievement('roadkill_enthusiast',	{name: "Roadkill Enthusiast", description: "Watch the Henchmen die 50 times.", maxScore: 50, maxDecimals: 0});
@@ -49,7 +41,6 @@ class Achievements {
 		createAchievement('two_keys',				{name: "Just the Two of Us", description: "Finish a Song pressing only two keys."});
 		createAchievement('toastie',				{name: "Toaster Gamer", description: "Have you tried to run the game on a toaster?"});
 		createAchievement('debugger',				{name: "Debugger", description: "Beat the \"Test\" Stage from the Chart Editor.", hidden: true});
-		createAchievement('pessy_easter_egg',		{name: "Engine Gal Pal", description: "Teehee, you found me~!", hidden: true});
 		
 		//dont delete this thing below
 		_originalLength = _sortID + 1;
@@ -94,15 +85,16 @@ class Achievements {
 	}
 	
 	public static function getScore(name:String):Float
-		return _scoreFunc(name, GET);
+		return _scoreFunc(name, 0);
 
 	public static function setScore(name:String, value:Float, saveIfNotUnlocked:Bool = true):Float
-		return _scoreFunc(name, SET, value, saveIfNotUnlocked);
+		return _scoreFunc(name, 1, value, saveIfNotUnlocked);
 
 	public static function addScore(name:String, value:Float = 1, saveIfNotUnlocked:Bool = true):Float
-		return _scoreFunc(name, ADD, value, saveIfNotUnlocked);
+		return _scoreFunc(name, 2, value, saveIfNotUnlocked);
 
-	static function _scoreFunc(name:String, mode:AchievementOp, addOrSet:Float = 1, saveIfNotUnlocked:Bool = true):Float
+	//mode 0 = get, 1 = set, 2 = add
+	static function _scoreFunc(name:String, mode:Int = 0, addOrSet:Float = 1, saveIfNotUnlocked:Bool = true):Float
 	{
 		if(!variables.exists(name))
 			variables.set(name, 0);
@@ -117,9 +109,8 @@ class Achievements {
 			var val = addOrSet;
 			switch(mode)
 			{
-				case GET: return variables.get(name); //get
-				case ADD: val += variables.get(name); //add
-				default:
+				case 0: return variables.get(name); //get
+				case 2: val += variables.get(name); //add
 			}
 
 			if(val >= achievement.maxScore)
@@ -237,7 +228,7 @@ class Achievements {
 						{
 							var errorTitle = 'Mod name: ' + Mods.currentModDirectory != null ? Mods.currentModDirectory : "None";
 							var errorMsg = 'Achievement #${i+1} is invalid.';
-							CoolUtil.showPopUp(errorMsg, errorTitle);
+							SUtil.showPopUp(errorMsg, errorTitle);
 							continue;
 						}
 
@@ -246,7 +237,7 @@ class Achievements {
 						{
 							var errorTitle = 'Error on Achievement: ' + (achieve.name != null ? achieve.name : achieve.save);
 							var errorMsg = 'Missing valid "save" value.';
-							CoolUtil.showPopUp(errorMsg, errorTitle);
+							SUtil.showPopUp(errorMsg, errorTitle);
 							continue;
 						}
 						key = key.trim();
@@ -258,7 +249,7 @@ class Achievements {
 			} catch(e:Dynamic) {
 				var errorTitle = 'Mod name: ' + Mods.currentModDirectory != null ? Mods.currentModDirectory : "None";
 				var errorMsg = 'Error loading achievements.json: $e';
-				CoolUtil.showPopUp(errorMsg, errorTitle);
+				SUtil.showPopUp(errorMsg, errorTitle);
 			}
 		}
 		return retVal;
@@ -277,7 +268,7 @@ class Achievements {
 			}
 			return getScore(name);
 		});
-		funk.set("setAchievementScore", function(name:String, ?value:Float = 0, ?saveIfNotUnlocked:Bool = true):Float
+		funk.set("setAchievementScore", function(name:String, ?value:Float = 1, ?saveIfNotUnlocked:Bool = true):Float
 		{
 			if(!achievements.exists(name))
 			{

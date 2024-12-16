@@ -1,6 +1,7 @@
 package backend;
 
 import backend.Song;
+import backend.Section;
 import objects.Note;
 
 typedef BPMChangeEvent =
@@ -135,10 +136,8 @@ class Conductor
 	}
 
 	public static function set_bpm(newBPM:Float):Float {
-		bpm = newBPM;
-		crochet = calculateCrochet(bpm);
+		crochet = calculateCrochet(newBPM);
 		stepCrochet = crochet / 4;
-
 		return bpm = newBPM;
 	}
 }

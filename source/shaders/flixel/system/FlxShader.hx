@@ -3,7 +3,7 @@ package shaders.flixel.system;
 import flixel.system.FlxAssets.FlxShader as OriginalFlxShader;
 
 /**
- * A modded FlxShader that allows using GLSL Es 300 and GLSL 330
+ * An improved FlxShader
  * @author Mihai Alexandru (M.A. Jigsaw)
  */
 class FlxShader extends OriginalFlxShader
@@ -51,7 +51,7 @@ class FlxShader extends OriginalFlxShader
 		@:privateAccess
 		var gl = __context.gl;
 
-		#if lime_opengles
+		#if android
 		var prefix = "#version 300 es\n";
 		#else
 		var prefix = "#version 330\n";
@@ -69,7 +69,7 @@ class FlxShader extends OriginalFlxShader
 			+ "#endif\n\n";
 		#end
 
-		#if lime_opengles
+		#if android
 		prefix += 'out vec4 output_FragColor;\n';
 		var vertex = prefix
 			+ glVertexSource.replace("attribute", "in")

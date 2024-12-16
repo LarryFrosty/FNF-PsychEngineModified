@@ -1,76 +1,80 @@
 package mobile.states;
 
-#if mobile
-import states.TitleState;
+import flixel.addons.transition.FlxTransitionableState;
 import lime.utils.Assets as LimeAssets;
-import openfl.utils.Assets as OpenFLAssets;
+import openfl.utils.Assets as OpenflAssets;
 import flixel.addons.util.FlxAsyncLoop;
 import openfl.utils.ByteArray;
+import openfl.system.System;
+import states.TitleState;
 import haxe.io.Path;
+#if (target.threaded)
+import sys.thread.Thread;
+#end
 
-/**
- * ...
- * @author: Karim Akra
- */
 class CopyState extends MusicBeatState
 {
-	private static final textFilesExtensions:Array<String> = ['ini', 'txt', 'xml', 'hxs', 'hx', 'lua', 'json', 'frag', 'vert'];
-	public static final IGNORE_FOLDER_FILE_NAME:String = "ignore.txt";
-	private static var directoriesToIgnore:Array<String> = [];
 	public static var locatedFiles:Array<String> = [];
 	public static var maxLoopTimes:Int = 0;
+	public static var to:String = '';
 
 	public var loadingImage:FlxSprite;
 	public var bottomBG:FlxSprite;
 	public var loadedText:FlxText;
 	public var copyLoop:FlxAsyncLoop;
 
-	var failedFilesStack:Array<String> = [];
-	var failedFiles:Array<String> = [];
-	var shouldCopy:Bool = false;
-	var canUpdate:Bool = true;
 	var loopTimes:Int = 0;
+	var failedFiles:Array<String> = [];
+	var canUpdate:Bool = true;
+	var shouldCopy:Bool = false;
+
+	static final textFilesExtensions:Array<String> = ['txt', 'xml', 'lua', 'hx', 'json', 'frag', 'vert'];
 
 	override function create()
 	{
 		locatedFiles = [];
 		maxLoopTimes = 0;
 		checkExistingFiles();
-		if (maxLoopTimes <= 0)
+		if (maxLoopTimes > 0)
 		{
-			MusicBeatState.switchState(new TitleState());
-			return;
+			shouldCopy = true;
+			SUtil.showPopUp("Seems like you have some missing files that are necessary to run the game\nPress OK to begin the copy process", "Notice!");
+
+			add(new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, 0xffcaff4d));
+
+			loadingImage = new FlxSprite(0, 0, Paths.image('funkay'));
+			loadingImage.setGraphicSize(0, FlxG.height);
+			loadingImage.updateHitbox();
+			loadingImage.screenCenter();
+			add(loadingImage);
+
+			bottomBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
+			bottomBG.alpha = 0.6;
+			add(bottomBG);
+
+			loadedText = new FlxText(bottomBG.x, bottomBG.y + 4, FlxG.width, '', 16);
+			loadedText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
+			add(loadedText);
+
+			#if (target.threaded)
+			Thread.create(() -> {
+			#end
+				var ticks:Int = 15;
+				if (maxLoopTimes <= 15)
+					ticks = 1;
+				copyLoop = new FlxAsyncLoop(maxLoopTimes, copyAsset, ticks);
+				add(copyLoop);
+				copyLoop.start();
+			#if (target.threaded)
+			});
+			#end
 		}
-
-		#if (!ios || !iphoneos || !iphonesim)
-		CoolUtil.showPopUp("Seems like you have some missing files that are necessary to run the game\nPress OK to begin the copy process", "Notice!");
-		#end
-
-		shouldCopy = true;
-
-		add(new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, 0xffcaff4d));
-
-		loadingImage = new FlxSprite(0, 0, Paths.image('funkay'));
-		loadingImage.setGraphicSize(0, FlxG.height);
-		loadingImage.updateHitbox();
-		loadingImage.screenCenter();
-		add(loadingImage);
-
-		bottomBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
-		bottomBG.alpha = 0.6;
-		add(bottomBG);
-
-		loadedText = new FlxText(bottomBG.x, bottomBG.y + 4, FlxG.width, '', 16);
-		loadedText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
-		add(loadedText);
-
-		var ticks:Int = 15;
-		if (maxLoopTimes <= 15)
-			ticks = 1;
-
-		copyLoop = new FlxAsyncLoop(maxLoopTimes, copyAsset, ticks);
-		add(copyLoop);
-		copyLoop.start();
+		else
+		{
+			TitleState.ignoreCopy = true;
+			FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+			MusicBeatState.switchState(new TitleState());
+		}
 
 		super.create();
 	}
@@ -83,20 +87,34 @@ class CopyState extends MusicBeatState
 			{
 				if (failedFiles.length > 0)
 				{
-					#if (!ios || !iphoneos || !iphonesim)
-					CoolUtil.showPopUp(failedFiles.join('\n'), 'Failed To Copy ${failedFiles.length} File.');
-					#end
+					SUtil.showPopUp(failedFiles.join('\n'), 'Failed To Copy ${failedFiles.length} File.');
 					if (!FileSystem.exists('logs'))
 						FileSystem.createDirectory('logs');
-					File.saveContent('logs/' + Date.now().toString().replace(' ', '-').replace(':', "'") + '-CopyState' + '.txt', failedFilesStack.join('\n'));
+					File.saveContent('logs/' + Date.now().toString().replace(' ', '-').replace(':', "'") + '-CopyState' + '.txt', failedFiles.join('\n'));
+				}
+				if (!checkExistingFiles())
+				{
+					trace('reloaded CopyState...');
+					FlxG.resetState();
+					return;
 				}
 				canUpdate = false;
-				FlxG.sound.play(Paths.sound('confirmMenu')).onComplete = () ->
-				{
-					MusicBeatState.switchState(new TitleState());
-				};
+				FlxG.sound.play(Paths.sound('confirmMenu'));
+				var black = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+				black.alpha = 0;
+				add(black);
+				FlxTween.tween(black, {alpha: 1}, 0.9, {
+					onComplete: function(twn:FlxTween)
+					{
+						System.gc();
+						TitleState.ignoreCopy = true;
+						FlxTransitionableState.skipNextTransIn = FlxTransitionableState.skipNextTransOut = true;
+						MusicBeatState.switchState(new TitleState());
+					},
+					ease: FlxEase.linear,
+					startDelay: 0.4
+				});
 			}
-
 			if (maxLoopTimes == 0)
 				loadedText.text = "Completed!";
 			else
@@ -108,116 +126,97 @@ class CopyState extends MusicBeatState
 	public function copyAsset()
 	{
 		var file = locatedFiles[loopTimes];
+		var toFile = Path.join([to, file]);
 		loopTimes++;
-		if (!FileSystem.exists(file))
+		if (!FileSystem.exists(toFile))
 		{
-			var directory = Path.directory(file);
+			var directory = Path.directory(toFile);
 			if (!FileSystem.exists(directory))
-				StorageUtil.createDirectories(directory);
+				SUtil.mkDirs(directory);
 			try
 			{
-				if (OpenFLAssets.exists(getFile(file)))
+				if (OpenflAssets.exists(getFile(file)))
 				{
 					if (textFilesExtensions.contains(Path.extension(file)))
 						createContentFromInternal(file);
 					else
-						File.saveBytes(file, getFileBytes(getFile(file)));
+						File.saveBytes(toFile, getFileBytes(getFile(file)));
 				}
 				else
 				{
 					failedFiles.push(getFile(file) + " (File Dosen't Exist)");
-					failedFilesStack.push('Asset ${getFile(file)} does not exist.');
 				}
 			}
-			catch (e:haxe.Exception)
+			catch (err:Dynamic)
 			{
-				failedFiles.push('${getFile(file)} (${e.message})');
-				failedFilesStack.push('${getFile(file)} (${e.stack})');
+				failedFiles.push('${getFile(file)} ($err)');
 			}
 		}
 	}
 
-	public function createContentFromInternal(file:String)
-	{
-		var fileName = Path.withoutDirectory(file);
-		var directory = Path.directory(file);
-		try
-		{
-			var fileData:String = OpenFLAssets.getText(getFile(file));
-			if (fileData == null)
-				fileData = '';
-			if (!FileSystem.exists(directory))
-				StorageUtil.createDirectories(directory);
-			File.saveContent(Path.join([directory, fileName]), fileData);
-		}
-		catch (e:haxe.Exception)
-		{
-			failedFiles.push('${getFile(file)} (${e.message})');
-			failedFilesStack.push('${getFile(file)} (${e.stack})');
-		}
-	}
-
-	public function getFileBytes(file:String):ByteArray
+	public static function getFileBytes(file:String):ByteArray
 	{
 		switch (Path.extension(file))
 		{
 			case 'otf' | 'ttf':
 				return ByteArray.fromFile(file);
 			default:
-				return OpenFLAssets.getBytes(file);
+				return OpenflAssets.getBytes(file);
 		}
 	}
 
 	public static function getFile(file:String):String
 	{
-		if (OpenFLAssets.exists(file))
-			return file;
-
 		@:privateAccess
-		for (library in LimeAssets.libraries.keys())
-		{
-			if (OpenFLAssets.exists('$library:$file') && library != 'default')
+		for(library in LimeAssets.libraries.keys()){
+			if(OpenflAssets.exists('$library:$file') && library != 'default')
 				return '$library:$file';
 		}
-
 		return file;
+	}
+
+	public function createContentFromInternal(file:String = 'assets/file.txt')
+	{
+		var fileName = Path.withoutDirectory(file);
+		var directory = Path.directory(Path.join([to, file]));
+		try
+		{
+			var fileData:String = OpenflAssets.getText(getFile(file));
+			if (fileData == null)
+				fileData = '';
+			if (!FileSystem.exists(directory))
+				SUtil.mkDirs(directory);
+			File.saveContent(Path.join([directory, fileName]), fileData);
+		}
+		catch (error:Dynamic)
+		{
+			failedFiles.push('${getFile(file)} ($error)');
+		}
 	}
 
 	public static function checkExistingFiles():Bool
 	{
-		locatedFiles = OpenFLAssets.list();
-
+		locatedFiles = OpenflAssets.list();
 		// removes unwanted assets
 		var assets = locatedFiles.filter(folder -> folder.startsWith('assets/'));
 		var mods = locatedFiles.filter(folder -> folder.startsWith('mods/'));
 		locatedFiles = assets.concat(mods);
-		locatedFiles = locatedFiles.filter(file -> !FileSystem.exists(file));
 
 		var filesToRemove:Array<String> = [];
-
 		for (file in locatedFiles)
 		{
-			if (filesToRemove.contains(file))
-				continue;
-
-			if(file.endsWith(IGNORE_FOLDER_FILE_NAME) && !directoriesToIgnore.contains(Path.directory(file)))
-				directoriesToIgnore.push(Path.directory(file));
-
-			if (directoriesToIgnore.length > 0)
+			var toFile = Path.join([to, file]);
+			if (FileSystem.exists(toFile))
 			{
-				for (directory in directoriesToIgnore)
-				{
-					if (file.startsWith(directory))
-						filesToRemove.push(file);
-				}
+				filesToRemove.push(file);
 			}
 		}
 
-		locatedFiles = locatedFiles.filter(file -> !filesToRemove.contains(file));
+		for (file in filesToRemove)
+			locatedFiles.remove(file);
 
 		maxLoopTimes = locatedFiles.length;
 
-		return (maxLoopTimes <= 0);
+		return (maxLoopTimes < 0);
 	}
 }
-#end

@@ -54,14 +54,17 @@ class Spooky extends BaseStage
 		lightningStrikeBeat = curBeat;
 		lightningOffset = FlxG.random.int(8, 24);
 
-		if(boyfriend.hasAnimation('scared'))
+		if(boyfriend.animOffsets.exists('scared')) {
 			boyfriend.playAnim('scared', true);
+		}
 
-		if(dad.hasAnimation('scared'))
+		if(dad.animOffsets.exists('scared')) {
 			dad.playAnim('scared', true);
+		}
 
-		if(gf != null && gf.hasAnimation('scared'))
+		if(gf != null && gf.animOffsets.exists('scared')) {
 			gf.playAnim('scared', true);
+		}
 
 		if(ClientPrefs.data.camZooms) {
 			FlxG.camera.zoom += 0.015;

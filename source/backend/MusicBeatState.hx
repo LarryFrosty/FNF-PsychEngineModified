@@ -1,10 +1,14 @@
 package backend;
 
+import flixel.addons.ui.FlxUIState;
+import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
 import backend.PsychCamera;
 
-class MusicBeatState extends FlxState
+class MusicBeatState extends FlxUIState
 {
+	public static var instance:MusicBeatState;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -19,100 +23,77 @@ class MusicBeatState extends FlxState
 		return Controls.instance;
 	}
 
-	public var touchPad:TouchPad;
-	public var mobileControls:IMobileControls;
+	public var virtualPad:FlxVirtualPad;
+	public var mobileControls:MobileControls;
 	public var camControls:FlxCamera;
-	public var tpadCam:FlxCamera;
+	public var vpadCam:FlxCamera;
 
-	public function addTouchPad(DPad:String, Action:String)
+	public function addVirtualPad(DPad:FlxDPadMode, Action:FlxActionMode)
 	{
-		touchPad = new TouchPad(DPad, Action);
-		add(touchPad);
+		virtualPad = new FlxVirtualPad(DPad, Action);
+		virtualPad.alpha = ClientPrefs.data.controlsAlpha;
+		add(virtualPad);
 	}
 
-	public function removeTouchPad()
+	public function removeVirtualPad()
 	{
-		if (touchPad != null)
-		{
-			remove(touchPad);
-			touchPad = FlxDestroyUtil.destroy(touchPad);
-		}
-
-		if(tpadCam != null)
-		{
-			FlxG.cameras.remove(tpadCam);
-			tpadCam = FlxDestroyUtil.destroy(tpadCam);
-		}
+		if (virtualPad != null)
+			remove(virtualPad);
 	}
 
-	public function addMobileControls(defaultDrawTarget:Bool = false):Void
+	public function addMobileControls(DefaultDrawTarget:Bool = true):Void
 	{
-		var extraMode = MobileData.extraActions.get(ClientPrefs.data.extraButtons);
+		mobileControls = new MobileControls();
 
-		switch (MobileData.mode)
-		{
-			case 0: // RIGHT_FULL
-				mobileControls = new TouchPad('RIGHT_FULL', 'NONE', extraMode);
-			case 1: // LEFT_FULL
-				mobileControls = new TouchPad('LEFT_FULL', 'NONE', extraMode);
-			case 2: // CUSTOM
-				mobileControls = MobileData.getTouchPadCustom(new TouchPad('RIGHT_FULL', 'NONE', extraMode));
-			case 3: // HITBOX
-				mobileControls = new Hitbox(extraMode);
-		}
-
-		mobileControls.instance = MobileData.setButtonsColors(mobileControls.instance);
 		camControls = new FlxCamera();
 		camControls.bgColor.alpha = 0;
-		FlxG.cameras.add(camControls, defaultDrawTarget);
+		FlxG.cameras.add(camControls, DefaultDrawTarget);
 
-		mobileControls.instance.cameras = [camControls];
-		mobileControls.instance.visible = false;
-		add(mobileControls.instance);
+		mobileControls.cameras = [camControls];
+		mobileControls.visible = false;
+		mobileControls.alpha = ClientPrefs.data.controlsAlpha;
+		add(mobileControls);
 	}
 
 	public function removeMobileControls()
 	{
 		if (mobileControls != null)
-		{
-			remove(mobileControls.instance);
-			mobileControls.instance = FlxDestroyUtil.destroy(mobileControls.instance);
-			mobileControls = null;
-		}
-
-		if(camControls != null)
-		{
-			FlxG.cameras.remove(camControls);
-			camControls = FlxDestroyUtil.destroy(camControls);
-		}
+			remove(mobileControls);
 	}
 
-	public function addTouchPadCamera(defaultDrawTarget:Bool = false):Void
+	public function addVirtualPadCamera(DefaultDrawTarget:Bool = true):Void
 	{
-		if (touchPad != null)
+		if (virtualPad != null)
 		{
-			tpadCam = new FlxCamera();
-			tpadCam.bgColor.alpha = 0;
-			FlxG.cameras.add(tpadCam, defaultDrawTarget);
-			touchPad.cameras = [tpadCam];
+			vpadCam = new FlxCamera();
+			vpadCam.bgColor.alpha = 0;
+			FlxG.cameras.add(vpadCam, DefaultDrawTarget);
+			virtualPad.cameras = [vpadCam];
 		}
 	}
 
 	override function destroy()
 	{
-		removeTouchPad();
-		removeMobileControls();
-		
 		super.destroy();
+
+		if (virtualPad != null)
+		{
+			virtualPad = FlxDestroyUtil.destroy(virtualPad);
+			virtualPad = null;
+		}
+
+		if (mobileControls != null)
+		{
+			mobileControls = FlxDestroyUtil.destroy(mobileControls);
+			mobileControls = null;
+		}
 	}
 
 	var _psychCameraInitialized:Bool = false;
 
-	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
-	public static function getVariables()
-		return getState().variables;
-
 	override function create() {
+		instance = this;
+
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
 
@@ -121,7 +102,7 @@ class MusicBeatState extends FlxState
 		super.create();
 
 		if(!skip) {
-			openSubState(new CustomFadeTransition(0.5, true));
+			openSubState(new CustomFadeTransition(0.6, true));
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
@@ -243,7 +224,7 @@ class MusicBeatState extends FlxState
 		if(nextState == null)
 			nextState = FlxG.state;
 
-		FlxG.state.openSubState(new CustomFadeTransition(0.5, false));
+		FlxG.state.openSubState(new CustomFadeTransition(0.6, false));
 		if(nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else

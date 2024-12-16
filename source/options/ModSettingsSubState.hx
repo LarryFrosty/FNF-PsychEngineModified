@@ -1,13 +1,9 @@
 package options;
 
-import states.ModsMenuState;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 
 import objects.Character;
-import haxe.Json;
-
-import options.Option.OptionType;
 
 class ModSettingsSubState extends BaseOptionsMenu
 {
@@ -38,14 +34,13 @@ class ModSettingsSubState extends BaseOptionsMenu
 					option.name != null ? option.name : option.save,
 					option.description != null ? option.description : 'No description provided.',
 					option.save,
-					convertType(option.type),
-					option.options,
-					option.translation_key
+					option.type,
+					option.options
 				);
 
 				switch(newOption.type)
 				{
-					case KEYBIND:
+					case 'keybind':
 						//Defaulting and error checking
 						var keyboardStr:String = option.keyboard;
 						var gamepadStr:String = option.gamepad;
@@ -54,12 +49,12 @@ class ModSettingsSubState extends BaseOptionsMenu
 
 						newOption.defaultKeys.keyboard = keyboardStr;
 						newOption.defaultKeys.gamepad = gamepadStr;
-
-						if(save.exists(option.save)) save.remove(option.save);
-
+						if(save.get(option.save) == null)
+						{
 							newOption.keys.keyboard = newOption.defaultKeys.keyboard;
 							newOption.keys.gamepad = newOption.defaultKeys.gamepad;
 							save.set(option.save, newOption.keys);
+						}
 
 						// getting inputs and checking
 						var keyboardKey:FlxKey = cast FlxKey.fromString(keyboardStr);
@@ -79,8 +74,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 
 								if(!controls.controllerMode) data.keyboard = value;
 								else data.gamepad = value;
-								if(save.exists(newOption.variable)) save.remove(newOption.variable);
-									save.set(newOption.variable, data);
+								save.set(newOption.variable, data);
 							};
 						}
 
@@ -91,14 +85,11 @@ class ModSettingsSubState extends BaseOptionsMenu
 						@:privateAccess
 						{
 							newOption.getValue = function() return save.get(newOption.variable);
-							newOption.setValue = function(value:Dynamic) { 
-								if(save.exists(newOption.variable)) save.remove(newOption.variable);
-									save.set(newOption.variable, value);
-							}
+							newOption.setValue = function(value:Dynamic) save.set(newOption.variable, value);
 						}
 				}
 
-				if(option.type != KEYBIND)
+				if(option.type != 'keybind')
 				{
 					if(option.format != null) newOption.displayFormat = option.format;
 					if(option.min != null) newOption.minValue = option.min;
@@ -112,7 +103,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 					if(save.get(option.save) != null)
 					{
 						myValue = save.get(option.save);
-						if(newOption.type != KEYBIND) newOption.setValue(myValue);
+						if(newOption.type != 'keybind') newOption.setValue(myValue);
 						else newOption.setValue(!Controls.instance.controllerMode ? myValue.keyboard : myValue.gamepad);
 					}
 					else
@@ -123,13 +114,11 @@ class ModSettingsSubState extends BaseOptionsMenu
 	
 					switch(newOption.type)
 					{
-						case STRING:
+						case 'string':
 							var num:Int = newOption.options.indexOf(myValue);
 							if(num > -1) newOption.curOption = num;
-
-						default:
 					}
-					if(save.exists(option.save)) save.remove(option.save);
+	
 					save.set(option.save, myValue);
 				}
 				addOption(newOption);
@@ -140,7 +129,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 		{
 			var errorTitle = 'Mod name: ' + folder;
 			var errorMsg = 'An error occurred: $e';
-			CoolUtil.showPopUp(errorMsg, errorTitle);
+			SUtil.showPopUp(errorMsg, errorTitle);
 			_crashed = true;
 			close();
 			return;
@@ -151,27 +140,6 @@ class ModSettingsSubState extends BaseOptionsMenu
 		bg.alpha = 0.75;
 		bg.color = FlxColor.WHITE;
 		reloadCheckboxes();
-	}
-
-	private function convertType(str:String):OptionType
-	{
-		switch(str.toLowerCase().trim())
-		{
-			case 'bool':
-				return BOOL;
-			case 'int', 'integer':
-				return INT;
-			case 'float', 'fl':
-				return FLOAT;
-			case 'percent':
-				return PERCENT;
-			case 'string', 'str':
-				return STRING;
-			case 'keybind', 'key':
-				return KEYBIND;
-		}
-		FlxG.log.error("Could not find option type: " + str);
-		return BOOL;
 	}
 
 	override public function update(elapsed:Float)
@@ -186,19 +154,6 @@ class ModSettingsSubState extends BaseOptionsMenu
 
 	override public function close()
 	{
-		try {
-			var modPath:String = ModsMenuState.modsGroup.members[ModsMenuState.curSelectedMod].folder;
-			var settingsPath:String = Paths.mods('$modPath/data/settings.json');
-			var settingsJson:Array<Dynamic> = Json.parse(File.getContent(settingsPath));
-			for(option in settingsJson)
-				option.value = save.get(option.save);
-
-			if(FileSystem.exists(settingsPath))
-				FileSystem.deleteFile(settingsPath);
-
-			File.saveContent(settingsPath, Json.stringify(settingsJson, '\t'));
-		} catch(e:Dynamic) trace('exploded: $e');
-
 		FlxG.save.data.modSettings.set(folder, save);
 		FlxG.save.flush();
 		super.close();

@@ -62,17 +62,7 @@ class CustomFadeTransition extends FlxSubState {
 		if(transGradient.y >= targetPos)
 		{
 			close();
-		}
-	}
-
-	// Don't delete this
-	override function close():Void
-	{
-		super.close();
-
-		if(finishCallback != null)
-		{
-			finishCallback();
+			if(finishCallback != null) finishCallback();
 			finishCallback = null;
 		}
 	}

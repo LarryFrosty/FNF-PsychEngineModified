@@ -5,38 +5,21 @@ import backend.Discord;
 #end
 
 //Psych
-#if LUA_ALLOWED
-import llua.*;
-import llua.Lua;
-#end
-
 #if ACHIEVEMENTS_ALLOWED
 import backend.Achievements;
 #end
-
-// Mobile Controls
-import mobile.objects.MobileControls;
-import mobile.objects.IMobileControls;
-import mobile.objects.Hitbox;
-import mobile.objects.TouchPad;
-import mobile.objects.TouchButton;
-import mobile.input.MobileInputID;
-import mobile.backend.MobileData;
-import mobile.input.MobileInputManager;
-import mobile.backend.TouchUtil;
-
-// Android
-#if android
-import android.content.Context as AndroidContext;
-import android.widget.Toast as AndroidToast;
-import android.os.Environment as AndroidEnvironment;
-import android.Permissions as AndroidPermissions;
-import android.Settings as AndroidSettings;
-import android.Tools as AndroidTools;
-import android.os.Build.VERSION as AndroidVersion;
-import android.os.Build.VERSION_CODES as AndroidVersionCode;
-import android.os.BatteryManager as AndroidBatteryManager;
+#if VIDEOS_ALLOWED
+import backend.VideoManager;
+import backend.VideoSpriteManager;
 #end
+
+//Mobile Controls
+import mobile.objects.MobileControls;
+import mobile.flixel.FlxHitbox;
+import mobile.flixel.FlxVirtualPad;
+import mobile.flixel.input.FlxMobileInputID;
+import mobile.backend.Data;
+import mobile.backend.SUtil;
 
 #if sys
 import sys.*;
@@ -56,10 +39,6 @@ import backend.Conductor;
 import backend.BaseStage;
 import backend.Difficulty;
 import backend.Mods;
-import backend.Language;
-import mobile.backend.StorageUtil;
-
-import backend.ui.*; //Psych-UI
 
 import objects.Alphabet;
 import objects.BGSprite;
@@ -69,7 +48,6 @@ import states.LoadingState;
 
 #if flxanimate
 import flxanimate.*;
-import flxanimate.PsychFlxAnimate as FlxAnimate;
 #end
 
 //Flixel
@@ -87,8 +65,6 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.addons.transition.FlxTransitionableState;
-import shaders.flixel.system.FlxShader;
 
 using StringTools;
 #end
