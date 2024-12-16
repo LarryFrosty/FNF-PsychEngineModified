@@ -45,10 +45,10 @@ jobs:
           yes | haxelib set flixel-ui 2.6.1 --quiet
           yes | haxelib set flixel-tools 1.5.1 --quiet
           yes | haxelib set tjson 1.4.0 --quiet
+          yes | haxelib set extension-androidtools 1.8.0 --quiet
           yes | haxelib git hxCodec https://github.com/polybiusproxy/hxCodec --quiet
           yes | haxelib git flxanimate https://github.com/ShadowMario/flxanimate dev --quiet
           yes | haxelib git linc_luajit https://github.com/mcagabe19-stuff/linc_luajit-rewriten --quiet
-          yes | haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools df9dfd0cda74e5460ae3afcfff1081c50959ed4a --quiet --skip-dependencies
 
       - name: Configure Android
         run: |
