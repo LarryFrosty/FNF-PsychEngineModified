@@ -1036,11 +1036,11 @@ class PlayState extends MusicBeatState
 				if(!skipArrowStartTween)
 				{
 					notes.forEachAlive(function(note:Note) {
-						if(ClientPrefs.data.opponentStrums || note.mustPress)
+						if(ClientPrefs.data.opponentStrums || note.mustPress != opponentMode)
 						{
 							note.copyAlpha = false;
 							note.alpha = note.multAlpha;
-							if(ClientPrefs.data.middleScroll && !note.mustPress)
+							if(ClientPrefs.data.middleScroll && note.mustPress == opponentMode)
 								note.alpha *= 0.35;
 						}
 					});
@@ -1556,7 +1556,7 @@ class PlayState extends MusicBeatState
 			{
 				if (opponentMode && ClientPrefs.data.middleScroll)
 				{
-					babyArrow.x += 310;
+					babyArrow.x -= 330;
 					if (i > 1) { //Up and Right
 						babyArrow.x += FlxG.width / 2 + 25;
 					}
@@ -1565,10 +1565,10 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				if (!opponentMode && ClientPrefs.data.middleScroll)
+				if (ClientPrefs.data.middleScroll)
 				{
-					babyArrow.x += 310;
-					if(i > 1) { //Up and Right
+					babyArrow.x += (!opponentMode ? 310 : 640);
+					if(i > 1 && !opponentMode) { //Up and Right
 						babyArrow.x += FlxG.width / 2 + 25;
 					}
 				}
