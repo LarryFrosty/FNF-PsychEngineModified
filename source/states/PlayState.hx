@@ -3046,7 +3046,7 @@ class PlayState extends MusicBeatState
 		note.hitByOpponent = true;
 
 		if (opponentMode)
-		(
+		{
 			if (!note.isSustainNote)
 			{
 				combo++;
