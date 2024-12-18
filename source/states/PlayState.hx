@@ -174,6 +174,8 @@ class PlayState extends MusicBeatState
 	public static var chartingMode:Bool = false;
 
 	//Gameplay settings
+	public static var opponentMode:Bool = false;
+
 	public var healthGain:Float = 1;
 	public var healthLoss:Float = 1;
 
@@ -284,6 +286,7 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		// Gameplay settings
+		opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
 		healthGain = ClientPrefs.getGameplaySetting('healthgain');
 		healthLoss = ClientPrefs.getGameplaySetting('healthloss');
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill');
@@ -517,7 +520,7 @@ class PlayState extends MusicBeatState
 
 		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.data.downScroll ? 0.89 : 0.11), 'healthBar', function() return health, 0, 2);
 		healthBar.screenCenter(X);
-		healthBar.leftToRight = false;
+		healthBar.leftToRight = opponentMode;
 		healthBar.scrollFactor.set();
 		healthBar.visible = !ClientPrefs.data.hideHud;
 		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
@@ -1344,7 +1347,7 @@ class PlayState extends MusicBeatState
 				if (Math.isNaN(holdLength))
 					holdLength = 0.0;
 
-				var gottaHitNote:Bool = (songNotes[1] < totalColumns);
+				var gottaHitNote:Bool = songNotes[1] < totalColumns;
 
 				if (i != 0) {
 					// CLEAR ANY POSSIBLE GHOST NOTES
@@ -1798,6 +1801,11 @@ class PlayState extends MusicBeatState
 								if(cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
 									goodNoteHit(daNote);
 							}
+							else if (opponentMode)
+							{
+								if (cpuControlled && !daNote.wasGoodHit && daNote.canBeHit && !daNote.blockHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+									opponentNoteHit(daNote);
+							}
 							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
 								opponentNoteHit(daNote);
 
@@ -1806,7 +1814,7 @@ class PlayState extends MusicBeatState
 							// Kill extremely late notes and cause misses
 							if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
 							{
-								if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
+								if (daNote.mustPress == !opponentMode && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
 									noteMiss(daNote);
 
 								daNote.active = daNote.visible = false;
@@ -1878,8 +1886,16 @@ class PlayState extends MusicBeatState
 		var newPercent:Null<Float> = FlxMath.remapToRange(FlxMath.bound(healthBar.valueFunction(), healthBar.bounds.min, healthBar.bounds.max), healthBar.bounds.min, healthBar.bounds.max, 0, 100);
 		healthBar.percent = (newPercent != null ? newPercent : 0);
 
-		iconP1.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : 0; //If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
-		iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0; //If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+		if (!opponentMode)
+		{
+			iconP1.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : 0; //If health is under 20%, change player icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+			iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0; //If health is over 80%, change opponent icon to frame 1 (losing icon), otherwise, frame 0 (normal)
+		}
+		else
+		{
+			iconP1.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : 0;
+			iconP2.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : 0;
+		}
 		return health;
 	}
 
@@ -2695,7 +2711,8 @@ class PlayState extends MusicBeatState
 
 	private function keyPressed(key:Int)
 	{
-		if(cpuControlled || paused || inCutscene || key < 0 || key >= playerStrums.length || !generatedMusic || endingSong || boyfriend.stunned) return;
+		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? opponentStrums : playerStrums;
+		if(cpuControlled || paused || inCutscene || key < 0 || key >= strumGroup.length || !generatedMusic || endingSong || (!opponentMode && boyfriend.stunned || opponentMode && dad.stunned)) return;
 
 		var ret:Dynamic = callOnScripts('onKeyPressPre', [key]);
 		if(ret == LuaUtils.Function_Stop) return;
@@ -2706,7 +2723,7 @@ class PlayState extends MusicBeatState
 
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool {
-			var canHit:Bool = n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit;
+			var canHit:Bool = n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress == !opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit;
 			return canHit && !n.isSustainNote && n.noteData == key;
 		});
 		plrInputNotes.sort(sortHitNotes);
@@ -2728,7 +2745,10 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			goodNoteHit(funnyNote);
+			if (!opponentMode)
+				goodNoteHit(funnyNote);
+			else
+				opponentNoteHit(funnyNote);
 		}
 		else
 		{
@@ -2745,7 +2765,7 @@ class PlayState extends MusicBeatState
 		//more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 		Conductor.songPosition = lastTime;
 
-		var spr:StrumNote = playerStrums.members[key];
+		var spr:StrumNote = strumGroup.members[key];
 		if(strumsBlocked[key] != true && spr != null && spr.animation.curAnim.name != 'confirm')
 		{
 			spr.playAnim('pressed');
@@ -2773,12 +2793,13 @@ class PlayState extends MusicBeatState
 
 	private function keyReleased(key:Int)
 	{
-		if(cpuControlled || !startedCountdown || paused || key < 0 || key >= playerStrums.length) return;
+		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? opponentStrums : playerStrums;
+		if(cpuControlled || !startedCountdown || paused || key < 0 || key >= strumGroup.length) return;
 
 		var ret:Dynamic = callOnScripts('onKeyReleasePre', [key]);
 		if(ret == LuaUtils.Function_Stop) return;
 
-		var spr:StrumNote = playerStrums.members[key];
+		var spr:StrumNote = strumGroup.members[key];
 		if(spr != null)
 		{
 			spr.playAnim('static');
@@ -2822,21 +2843,28 @@ class PlayState extends MusicBeatState
 				if(pressArray[i] && strumsBlocked[i] != true)
 					keyPressed(i);
 
-		if (startedCountdown && !inCutscene && !boyfriend.stunned && generatedMusic)
+		if (startedCountdown && !inCutscene && (!opponentMode && !boyfriend.stunned || opponentMode && !dad.stunned) && generatedMusic)
 		{
-			if (notes.length > 0) {
+			if (notes.length > 0)
+			{
 				for (n in notes) { // I can't do a filter here, that's kinda awesome
 					var canHit:Bool = (n != null && !strumsBlocked[n.noteData] && n.canBeHit
-						&& n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit);
+						&& n.mustPress == !opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit);
 
 					if (guitarHeroSustains)
 						canHit = canHit && n.parent != null && n.parent.wasGoodHit;
 
-					if (canHit && n.isSustainNote) {
+					if (canHit && n.isSustainNote)
+					{
 						var released:Bool = !holdArray[n.noteData];
 
 						if (!released)
-							goodNoteHit(n);
+						{
+							if (!opponentMode)
+								goodNoteHit(n);
+							else
+								opponentNoteHit(n);
+						}
 					}
 				}
 			}
@@ -2859,7 +2887,7 @@ class PlayState extends MusicBeatState
 	function noteMiss(daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		//Dupe note remove
 		notes.forEachAlive(function(note:Note) {
-			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1)
+			if (daNote != note && daNote.mustPress == !opponentMode && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1)
 				invalidateNote(note);
 		});
 
@@ -2940,7 +2968,7 @@ class PlayState extends MusicBeatState
 		RecalculateRating(true);
 
 		// play character anims
-		var char:Character = boyfriend;
+		var char:Character = !opponentMode ? boyfriend : dad;
 		if((note != null && note.gfNote) || (SONG.notes[curSection] != null && SONG.notes[curSection].gfSection)) char = gf;
 
 		if(char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations)
@@ -2949,6 +2977,7 @@ class PlayState extends MusicBeatState
 			if(note != null) postfix = note.animSuffix;
 
 			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, direction)))] + 'miss' + postfix;
+			if (!char.hasAnimation(animToPlay)) animToPlay = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, direction)))] + 'miss';
 			char.playAnim(animToPlay, true);
 
 			if(char != gf && lastCombo > 5 && gf != null && gf.hasAnimation('sad'))
@@ -2957,15 +2986,24 @@ class PlayState extends MusicBeatState
 				gf.specialAnim = true;
 			}
 		}
-		vocals.volume = 0;
+		if (!opponentMode) vocals.volume = 0;
+		else opponentVocals.volume = 0;
 	}
 
 	function opponentNoteHit(note:Note):Void
 	{
+		if(note.wasGoodHit) return;
+		if(cpuControlled && note.ignoreNote) return;
+
 		var result:Dynamic = callOnLuas('opponentNoteHitPre', [notes.members.indexOf(note), Math.abs(note.noteData), note.noteType, note.isSustainNote]);
 		if(result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll) result = callOnHScript('opponentNoteHitPre', [note]);
 
 		if(result == LuaUtils.Function_Stop) return;
+
+		note.wasGoodHit = true;
+
+		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled)
+			FlxG.sound.play(Paths.sound(note.hitsound), note.hitsoundVolume);
 
 		if (songName != 'tutorial')
 			camZooming = true;
@@ -2997,10 +3035,29 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		if(opponentVocals.length <= 0) vocals.volume = 1;
-		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+		if (!cpuControlled && opponentMode)
+		{
+			var spr = opponentStrums.members[note.noteData];
+			if(spr != null) spr.playAnim('confirm', true);
+		}
+		else strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+		if (opponentVocals.length <= 0) vocals.volume = 1;
+		else opponentVocals.volume = 1;
 		note.hitByOpponent = true;
-		
+
+		if (opponentMode)
+		(
+			if (!note.isSustainNote)
+			{
+				combo++;
+				if(combo > 9999) combo = 9999;
+				popUpScore(note);
+			}
+			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
+			if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
+			if (gainHealth) health += note.hitHealth * healthGain;
+		}
+
 		stagesFunc(function(stage:BaseStage) stage.opponentNoteHit(note));
 		var result:Dynamic = callOnLuas('opponentNoteHit', [notes.members.indexOf(note), Math.abs(note.noteData), note.noteType, note.isSustainNote]);
 		if(result != LuaUtils.Function_Stop && result != LuaUtils.Function_StopHScript && result != LuaUtils.Function_StopAll) callOnHScript('opponentNoteHit', [note]);
@@ -3083,7 +3140,6 @@ class PlayState extends MusicBeatState
 			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
 			if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
 			if (gainHealth) health += note.hitHealth * healthGain;
-
 		}
 		else //Notes that count as a miss if you hit them (Hurt notes for example)
 		{
@@ -3118,7 +3174,7 @@ class PlayState extends MusicBeatState
 
 	public function spawnNoteSplashOnNote(note:Note) {
 		if(note != null) {
-			var strum:StrumNote = playerStrums.members[note.noteData];
+			var strum:StrumNote = !opponentMode ? playerStrums.members[note.noteData] : opponentStrums.members[note.noteData];
 			if(strum != null)
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note, strum);
 		}

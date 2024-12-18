@@ -60,6 +60,7 @@ class Character extends FlxSprite
 	public var singDuration:Float = 4; //Multiplier of how long a character holds the sing pose
 	public var idleSuffix:String = '';
 	public var danceIdle:Bool = false; //Character use "danceLeft" and "danceRight" instead of "idle"
+	public var autoDance:Bool = true;
 	public var skipDance:Bool = false;
 
 	public var healthIcon:String = 'face';
@@ -92,6 +93,7 @@ class Character extends FlxSprite
 
 		animOffsets = new Map<String, Array<Dynamic>>();
 		this.isPlayer = isPlayer;
+		autoDance = !isPlayer;
 		changeCharacter(character);
 		
 		switch(curCharacter)
@@ -301,9 +303,9 @@ class Character extends FlxSprite
 		}
 
 		if (getAnimationName().startsWith('sing')) holdTimer += elapsed;
-		else if(isPlayer) holdTimer = 0;
+		else if (isPlayer) holdTimer = 0;
 
-		if (!isPlayer && holdTimer >= Conductor.stepCrochet * (0.0011 #if FLX_PITCH / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1) #end) * singDuration)
+		if (autoDance && holdTimer >= Conductor.stepCrochet * (0.0011 #if FLX_PITCH / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1) #end) * singDuration)
 		{
 			dance();
 			holdTimer = 0;
