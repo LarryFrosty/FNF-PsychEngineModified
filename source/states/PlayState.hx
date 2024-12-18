@@ -400,10 +400,12 @@ class PlayState extends MusicBeatState
 		}
 
 		dad = new Character(0, 0, SONG.player2);
+		dad.autoDance = !opponentMode;
 		startCharacterPos(dad, true);
 		dadGroup.add(dad);
 
 		boyfriend = new Character(0, 0, SONG.player1, true);
+		boyfriend.autoDance = opponentMode;
 		startCharacterPos(boyfriend);
 		boyfriendGroup.add(boyfriend);
 		
@@ -713,6 +715,7 @@ class PlayState extends MusicBeatState
 			case 0:
 				if(!boyfriendMap.exists(newCharacter)) {
 					var newBoyfriend:Character = new Character(0, 0, newCharacter, true);
+					newBoyfriend.autoDance = opponentMode;
 					boyfriendMap.set(newCharacter, newBoyfriend);
 					boyfriendGroup.add(newBoyfriend);
 					startCharacterPos(newBoyfriend);
@@ -723,6 +726,7 @@ class PlayState extends MusicBeatState
 			case 1:
 				if(!dadMap.exists(newCharacter)) {
 					var newDad:Character = new Character(0, 0, newCharacter);
+					newDad.autoDance = !opponentMode;
 					dadMap.set(newCharacter, newDad);
 					dadGroup.add(newDad);
 					startCharacterPos(newDad, true);
@@ -1658,7 +1662,8 @@ class PlayState extends MusicBeatState
 	{
 		if(!inCutscene && !paused && !freezeCamera) {
 			FlxG.camera.followLerp = 0.04 * cameraSpeed * playbackRate;
-			if(!startingSong && !endingSong && boyfriend.getAnimationName().startsWith('idle')) {
+			var char:Character = !opponentMode ? boyfriend : dad;
+			if(!startingSong && !endingSong && char.getAnimationName().startsWith('idle')) {
 				boyfriendIdleTime += elapsed;
 				if(boyfriendIdleTime >= 0.15) { // Kind of a mercy thing for making the achievement easier to get as it's apparently frustrating to some playerss
 					boyfriendIdled = true;
@@ -1798,7 +1803,7 @@ class PlayState extends MusicBeatState
 
 							if(daNote.mustPress)
 							{
-								if(cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+								if((cpuControlled || opponentMode) && !daNote.blockHit && daNote.canBeHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
 									goodNoteHit(daNote);
 							}
 							else if (opponentMode)
@@ -1814,7 +1819,7 @@ class PlayState extends MusicBeatState
 							// Kill extremely late notes and cause misses
 							if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
 							{
-								if (daNote.mustPress == !opponentMode && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
+								if (daNote.mustPress != opponentMode && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
 									noteMiss(daNote);
 
 								daNote.active = daNote.visible = false;
@@ -1977,7 +1982,8 @@ class PlayState extends MusicBeatState
 			if(ret != LuaUtils.Function_Stop)
 			{
 				FlxG.animationTimeScale = 1;
-				boyfriend.stunned = true;
+				if (!opponentMode) boyfriend.stunned = true;
+				else dad.stunned = true;
 				deathCounter++;
 
 				paused = true;
@@ -1997,7 +2003,7 @@ class PlayState extends MusicBeatState
 						vocals.stop();
 						opponentVocals.stop();
 						FlxG.sound.music.stop();
-						openSubState(new GameOverSubstate(boyfriend));
+						openSubState(new GameOverSubstate(!opponentMode ? boyfriend : dad));
 						gameOverTimer = null;
 					});
 				}
@@ -2006,7 +2012,7 @@ class PlayState extends MusicBeatState
 					vocals.stop();
 					opponentVocals.stop();
 					FlxG.sound.music.stop();
-					openSubState(new GameOverSubstate(boyfriend));
+					openSubState(new GameOverSubstate(!opponentMode ? boyfriend : dad));
 				}
 
 				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
@@ -2711,7 +2717,7 @@ class PlayState extends MusicBeatState
 
 	private function keyPressed(key:Int)
 	{
-		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? opponentStrums : playerStrums;
+		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? playerStrums : opponentStrums;
 		if(cpuControlled || paused || inCutscene || key < 0 || key >= strumGroup.length || !generatedMusic || endingSong || (!opponentMode && boyfriend.stunned || opponentMode && dad.stunned)) return;
 
 		var ret:Dynamic = callOnScripts('onKeyPressPre', [key]);
@@ -2723,7 +2729,7 @@ class PlayState extends MusicBeatState
 
 		// obtain notes that the player can hit
 		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool {
-			var canHit:Bool = n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress == !opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit;
+			var canHit:Bool = n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress != opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit;
 			return canHit && !n.isSustainNote && n.noteData == key;
 		});
 		plrInputNotes.sort(sortHitNotes);
@@ -2793,7 +2799,7 @@ class PlayState extends MusicBeatState
 
 	private function keyReleased(key:Int)
 	{
-		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? opponentStrums : playerStrums;
+		var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? playerStrums : opponentStrums;
 		if(cpuControlled || !startedCountdown || paused || key < 0 || key >= strumGroup.length) return;
 
 		var ret:Dynamic = callOnScripts('onKeyReleasePre', [key]);
@@ -2849,7 +2855,7 @@ class PlayState extends MusicBeatState
 			{
 				for (n in notes) { // I can't do a filter here, that's kinda awesome
 					var canHit:Bool = (n != null && !strumsBlocked[n.noteData] && n.canBeHit
-						&& n.mustPress == !opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit);
+						&& n.mustPress != opponentMode && !n.tooLate && !n.wasGoodHit && !n.blockHit);
 
 					if (guitarHeroSustains)
 						canHit = canHit && n.parent != null && n.parent.wasGoodHit;
@@ -2887,7 +2893,7 @@ class PlayState extends MusicBeatState
 	function noteMiss(daNote:Note):Void { //You didn't hit the key and let it go offscreen, also used by Hurt Notes
 		//Dupe note remove
 		notes.forEachAlive(function(note:Note) {
-			if (daNote != note && daNote.mustPress == !opponentMode && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1)
+			if (daNote != note && daNote.mustPress != opponentMode && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1)
 				invalidateNote(note);
 		});
 
@@ -3002,7 +3008,7 @@ class PlayState extends MusicBeatState
 
 		note.wasGoodHit = true;
 
-		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled)
+		if (opponentMode && note.hitsoundVolume > 0 && !note.hitsoundDisabled)
 			FlxG.sound.play(Paths.sound(note.hitsound), note.hitsoundVolume);
 
 		if (songName != 'tutorial')
@@ -3081,7 +3087,7 @@ class PlayState extends MusicBeatState
 
 		note.wasGoodHit = true;
 
-		if (note.hitsoundVolume > 0 && !note.hitsoundDisabled)
+		if (!opponentMode && note.hitsoundVolume > 0 && !note.hitsoundDisabled)
 			FlxG.sound.play(Paths.sound(note.hitsound), note.hitsoundVolume);
 
 		if(!note.hitCausesMiss) //Common notes
@@ -3123,7 +3129,7 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			if(!cpuControlled)
+			if(!cpuControlled && !opponentMode)
 			{
 				var spr = playerStrums.members[note.noteData];
 				if(spr != null) spr.playAnim('confirm', true);
@@ -3131,15 +3137,18 @@ class PlayState extends MusicBeatState
 			else strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 			vocals.volume = 1;
 
-			if (!note.isSustainNote)
+			if (!opponentMode)
 			{
-				combo++;
-				if(combo > 9999) combo = 9999;
-				popUpScore(note);
+				if (!note.isSustainNote)
+				{
+					combo++;
+					if(combo > 9999) combo = 9999;
+					popUpScore(note);
+				}
+				var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
+				if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
+				if (gainHealth) health += note.hitHealth * healthGain;
 			}
-			var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
-			if (guitarHeroSustains && note.isSustainNote) gainHealth = false;
-			if (gainHealth) health += note.hitHealth * healthGain;
 		}
 		else //Notes that count as a miss if you hit them (Hurt notes for example)
 		{
@@ -3285,9 +3294,10 @@ class PlayState extends MusicBeatState
 
 	public function playerDance():Void
 	{
-		var anim:String = boyfriend.getAnimationName();
-		if(boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * boyfriend.singDuration && anim.startsWith('sing') && !anim.endsWith('miss'))
-			boyfriend.dance();
+		var char:Character = !opponentMode ? boyfriend : dad;
+		var anim:String = char.getAnimationName();
+		if(char.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * char.singDuration && anim.startsWith('sing') && !anim.endsWith('miss'))
+			char.dance();
 	}
 
 	override function sectionHit()
@@ -3552,6 +3562,7 @@ class PlayState extends MusicBeatState
 		if(chartingMode) return;
 
 		var usedPractice:Bool = (ClientPrefs.getGameplaySetting('practice') || ClientPrefs.getGameplaySetting('botplay'));
+		var char:Character = !opponentMode ? boyfriend : dad;
 		if(cpuControlled) return;
 
 		for (name in achievesToCheck) {
@@ -3569,7 +3580,7 @@ class PlayState extends MusicBeatState
 						unlock = (ratingPercent >= 1 && !usedPractice);
 
 					case 'oversinging':
-						unlock = (boyfriend.holdTimer >= 10 && !usedPractice);
+						unlock = (char.holdTimer >= 10 && !usedPractice);
 
 					case 'hype':
 						unlock = (!boyfriendIdled && !usedPractice);
