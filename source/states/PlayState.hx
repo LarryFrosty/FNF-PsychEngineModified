@@ -1525,10 +1525,21 @@ class PlayState extends MusicBeatState
 		{
 			// FlxG.log.add(i);
 			var targetAlpha:Float = 1;
-			if (player < 1)
+			if (!opponentMode)
 			{
-				if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
-				else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
+				if (player < 1)
+				{
+					if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
+					else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
+				}
+			}
+			else
+			{
+				if (player == 1)
+				{
+					if(!ClientPrefs.data.opponentStrums) targetAlpha = 0;
+					else if(ClientPrefs.data.middleScroll) targetAlpha = 0.35;
+				}
 			}
 
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
@@ -1537,15 +1548,24 @@ class PlayState extends MusicBeatState
 			{
 				//babyArrow.y -= 10;
 				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {/*y: babyArrow.y + 10,*/ alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				FlxTween.tween(babyArrow, {alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 			}
 			else babyArrow.alpha = targetAlpha;
 
 			if (player == 1)
+			{
+				if (opponentMode && ClientPrefs.data.middleScroll)
+				{
+					babyArrow.x += 310;
+					if (i > 1) { //Up and Right
+						babyArrow.x += FlxG.width / 2 + 25;
+					}
+				}
 				playerStrums.add(babyArrow);
+			}
 			else
 			{
-				if(ClientPrefs.data.middleScroll)
+				if (!opponentMode && ClientPrefs.data.middleScroll)
 				{
 					babyArrow.x += 310;
 					if(i > 1) { //Up and Right
@@ -1808,10 +1828,10 @@ class PlayState extends MusicBeatState
 							}
 							else if (opponentMode)
 							{
-								if (cpuControlled && !daNote.wasGoodHit && daNote.canBeHit && !daNote.blockHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
+								if (cpuControlled && daNote.canBeHit && !daNote.blockHit && (daNote.isSustainNote || daNote.strumTime <= Conductor.songPosition))
 									opponentNoteHit(daNote);
 							}
-							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
+							else if (daNote.canBeHit && !daNote.hitByOpponent && !daNote.ignoreNote)
 								opponentNoteHit(daNote);
 
 							if(daNote.isSustainNote && strum.sustainReduce) daNote.clipToStrumNote(strum);
@@ -1918,7 +1938,8 @@ class PlayState extends MusicBeatState
 		}
 		if(!cpuControlled)
 		{
-			for (note in playerStrums)
+			var strumGroup:FlxTypedGroup<StrumNote> = !opponentMode ? playerStrums : opponentStrums;
+			for (note in strumGroup)
 				if(note.animation.curAnim != null && note.animation.curAnim.name != 'static')
 				{
 					note.playAnim('static');
@@ -2700,7 +2721,6 @@ class PlayState extends MusicBeatState
 	public var strumsBlocked:Array<Bool> = [];
 	private function onKeyPress(event:KeyboardEvent):Void
 	{
-
 		var eventKey:FlxKey = event.keyCode;
 		var key:Int = getKeyFromEvent(keysArray, eventKey);
 
