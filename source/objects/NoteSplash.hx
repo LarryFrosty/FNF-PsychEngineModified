@@ -361,7 +361,7 @@ class PixelSplashShaderRef
 {
 	public var shader:PixelSplashShader = new PixelSplashShader();
 	public var enabled(default, set):Bool = true;
-	public var pixelAmount(default, set):Float = 1;
+	public var pixelAmount(default, set):Float;
 
 	public function copyValues(tempShader:RGBPalette)
 	{
@@ -405,6 +405,7 @@ class PixelSplashShaderRef
 		enabled = true;
 
 		if (PlayState.isPixelStage) pixelAmount = PlayState.daPixelZoom;
+		else pixelAmount = 1;
 		//trace('Created shader ' + Conductor.songPosition);
 	}
 }
