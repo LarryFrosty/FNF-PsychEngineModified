@@ -571,7 +571,7 @@ class FreeplayState extends MusicBeatState
 
 		if (songs[curSelected].songName.toLowerCase() == 'tutorial')
 		{
-			ClientPrefs.data.gameplaySettings.set('Play as Opponent', false);
+			ClientPrefs.data.gameplaySettings.set('opponentmode', false);
 			ClientPrefs.saveSettings();
 		}
 
