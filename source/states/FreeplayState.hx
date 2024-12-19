@@ -19,7 +19,6 @@ import haxe.Json;
 
 import lime.utils.Assets;
 
-@:allow(options.GameplayChangersSubstate)
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
@@ -55,13 +54,10 @@ class FreeplayState extends MusicBeatState
 
 	var player:MusicPlayer;
 
-	public static var instance:FreeplayState;
 	override function create()
 	{
 		//Paths.clearStoredMemory();
 		//Paths.clearUnusedMemory();
-
-		instance = this;
 
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
@@ -569,12 +565,6 @@ class FreeplayState extends MusicBeatState
 		else
 			curDifficulty = 0;
 
-		if (songs[curSelected].songName.toLowerCase() == 'tutorial')
-		{
-			ClientPrefs.data.gameplaySettings.set('opponentmode', false);
-			ClientPrefs.saveSettings();
-		}
-
 		changeDiff();
 		_updateSongLastDifficulty();
 	}
@@ -620,7 +610,6 @@ class FreeplayState extends MusicBeatState
 
 	override function destroy():Void
 	{
-		instance = null;
 		super.destroy();
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;

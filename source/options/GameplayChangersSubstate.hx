@@ -5,8 +5,6 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
-import states.FreeplayState;
-
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
 	private var curSelected:Int = 0;
@@ -15,9 +13,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	private var grpTexts:FlxTypedGroup<AttachedText>;
-
-	private var disallowedBG:FlxSprite;
-	private var disallowedText:FlxText;
 
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
@@ -129,12 +124,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (FreeplayState.instance.songs[FreeplayState.curSelected].songName.toLowerCase() == 'tutorial' && optionsArray[i].name == 'Play as Opponent')
-				{
-					optionsArray[i].setValue(false);
-					optionText.color = 0xFF878787;
-					checkbox.color = 0xFF878787;
-				}
 			}
 			else
 			{
@@ -179,12 +168,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
-		if (controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET || touchPad.buttonC.justPressed)
-		{
-			disallowedBG.visible = false;
-			disallowedText.visible = false;
-		}
-
 		if (controls.BACK)
 		{
 			close();
@@ -200,18 +183,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					if (FreeplayState.instance.songs[FreeplayState.curSelected].songName.toLowerCase() == 'tutorial' && curOption.name == 'Play as Opponent')
-					{
-						FlxG.sound.play(Paths.sound('cancelMenu'));
-						disallowedBG.visible = true;
-						disallowedText.visible = true;
-					}
-					else
-					{
-						FlxG.sound.play(Paths.sound('scrollMenu'));
-						curOption.setValue((curOption.getValue() == true) ? false : true);
-						curOption.change();
-					}
+					FlxG.sound.play(Paths.sound('scrollMenu'));
+					curOption.setValue((curOption.getValue() == true) ? false : true);
+					curOption.change();
 					reloadCheckboxes();
 				}
 			}
