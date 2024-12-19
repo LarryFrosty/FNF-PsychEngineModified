@@ -19,6 +19,7 @@ import haxe.Json;
 
 import lime.utils.Assets;
 
+@:allow(options.GameplayChangersSubstate)
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
