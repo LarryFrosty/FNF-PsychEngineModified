@@ -5,6 +5,8 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
+import states.FreeplayState;
+
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
 	private var curSelected:Int = 0;
@@ -176,7 +178,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
-		if (controls.UI_UI_P || controls.UI_DOWN_P || controls.RESET)
+		if (controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET)
 		{
 			disallowedBG.visible = false;
 			disallowedText.visible = false;
