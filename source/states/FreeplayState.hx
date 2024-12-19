@@ -569,6 +569,12 @@ class FreeplayState extends MusicBeatState
 		else
 			curDifficulty = 0;
 
+		if (songs[curSelected].songName.toLowerCase() == 'tutorial')
+		{
+			ClientPrefs.data.gameplaySettings.set('Play as Opponent', false);
+			ClientPrefs.saveSettings();
+		}
+
 		changeDiff();
 		_updateSongLastDifficulty();
 	}
