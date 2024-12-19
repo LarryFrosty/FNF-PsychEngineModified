@@ -131,6 +131,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkboxGroup.add(checkbox);
 				if (FreeplayState.instance.songs[FreeplayState.curSelected].songName.toLowerCase() == 'tutorial' && optionsArray[i].name == 'Play as Opponent')
 				{
+					optionsArray[i].setValue(false);
 					optionText.color = 0xFF878787;
 					checkbox.color = 0xFF878787;
 				}
@@ -153,8 +154,8 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		disallowedBG.visible = false;
 		add(disallowedBG);
 		
-		disallowedText = new FlxText(50, 0, FlxG.width - 100, 'This option cannot be enabled on Specialist', 24);
-		disallowedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		disallowedText = new FlxText(50, 0, FlxG.width - 100, 'This option cannot be enabled on Tutorial', 32);
+		disallowedText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		disallowedText.scrollFactor.set();
 		disallowedText.screenCenter();
 		disallowedText.visible = false;
@@ -178,7 +179,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
-		if (controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET)
+		if (controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET || touchPad.buttonC.justPressed)
 		{
 			disallowedBG.visible = false;
 			disallowedText.visible = false;
