@@ -14,6 +14,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	private var grpTexts:FlxTypedGroup<AttachedText>;
 
+	private var disallowedBG:FlxSprite;
+	private var disallowedText:FlxText;
+
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
 
@@ -69,7 +72,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
-		optionsArray.push(new GameplayOption('Opponent Mode', 'opponentmode', BOOL, false));
+		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false));
 	}
 
 	public function getOptionByName(name:String)
@@ -124,6 +127,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
+				if (FreeplayState.instance.songs[FreeplayState.curSelected].songName.toLowerCase() == 'tutorial' && optionsArray[i].name == 'Play as Opponent')
+				{
+					optionText.color = 0xFF878787;
+					checkbox.color = 0xFF878787;
+				}
 			}
 			else
 			{
@@ -137,6 +145,18 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			}
 			updateTextFrom(optionsArray[i]);
 		}
+
+		disallowedBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		disallowedBG.alpha = 0.6;
+		disallowedBG.visible = false;
+		add(disallowedBG);
+		
+		disallowedText = new FlxText(50, 0, FlxG.width - 100, 'This option cannot be enabled on Specialist', 24);
+		disallowedText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		disallowedText.scrollFactor.set();
+		disallowedText.screenCenter();
+		disallowedText.visible = false;
+		add(disallowedText);
 
 		addTouchPad('LEFT_FULL', 'A_B_C');
 		addTouchPadCamera();
@@ -156,6 +176,12 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
+		if (controls.UI_UI_P || controls.UI_DOWN_P || controls.RESET)
+		{
+			disallowedBG.visible = false;
+			disallowedText.visible = false;
+		}
+
 		if (controls.BACK)
 		{
 			close();
@@ -171,9 +197,18 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					FlxG.sound.play(Paths.sound('scrollMenu'));
-					curOption.setValue((curOption.getValue() == true) ? false : true);
-					curOption.change();
+					if (FreeplayState.instance.songs[FreeplayState.curSelected].songName.toLowerCase() == 'tutorial' && curOption.name == 'Play as Opponent')
+					{
+						FlxG.sound.play(Paths.sound('cancelMenu'));
+						disallowedBG.visible = true;
+						disallowedText.visible = true;
+					}
+					else
+					{
+						FlxG.sound.play(Paths.sound('scrollMenu'));
+						curOption.setValue((curOption.getValue() == true) ? false : true);
+						curOption.change();
+					}
 					reloadCheckboxes();
 				}
 			}

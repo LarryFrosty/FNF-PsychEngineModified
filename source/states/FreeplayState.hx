@@ -54,11 +54,14 @@ class FreeplayState extends MusicBeatState
 
 	var player:MusicPlayer;
 
+	public static var instance:FreeplayState;
 	override function create()
 	{
 		//Paths.clearStoredMemory();
 		//Paths.clearUnusedMemory();
-		
+
+		instance = this;
+
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
@@ -610,6 +613,7 @@ class FreeplayState extends MusicBeatState
 
 	override function destroy():Void
 	{
+		instance = null;
 		super.destroy();
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;
