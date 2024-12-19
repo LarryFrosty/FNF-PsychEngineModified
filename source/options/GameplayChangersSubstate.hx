@@ -138,18 +138,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			updateTextFrom(optionsArray[i]);
 		}
 
-		disallowedBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		disallowedBG.alpha = 0.6;
-		disallowedBG.visible = false;
-		add(disallowedBG);
-		
-		disallowedText = new FlxText(50, 0, FlxG.width - 100, 'This option cannot be enabled on Tutorial', 32);
-		disallowedText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		disallowedText.scrollFactor.set();
-		disallowedText.screenCenter();
-		disallowedText.visible = false;
-		add(disallowedText);
-
 		addTouchPad('LEFT_FULL', 'A_B_C');
 		addTouchPadCamera();
 
