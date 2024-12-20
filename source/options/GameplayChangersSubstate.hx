@@ -185,6 +185,12 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
+		if (controls_UI_LEFT_P || controls.UI_RIGHT_P || controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET)
+		{
+			disallowedBG.visible = false;
+			disallowedText.visible = false;
+		}
+
 		if (controls.BACK)
 		{
 			close();
