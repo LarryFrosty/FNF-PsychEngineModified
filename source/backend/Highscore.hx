@@ -8,11 +8,11 @@ class Highscore
 	public static var songScoresOpponent:Map<String, Int> = new Map<String, Int>();
 	public static var songRatingOpponent:Map<String, Float> = new Map<String, Float>();
 
-	public static function resetSong(song:String, diff:Int = 0):Void
+	public static function resetSong(song:String, diff:Int = 0, ?opponent:Bool = false):Void
 	{
 		var daSong:String = formatSong(song, diff);
-		setScore(daSong, 0);
-		setRating(daSong, 0);
+		setScore(daSong, 0, opponent);
+		setRating(daSong, 0, opponent);
 	}
 
 	public static function resetWeek(week:String, diff:Int = 0):Void
