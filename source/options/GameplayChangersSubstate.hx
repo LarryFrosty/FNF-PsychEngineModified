@@ -2,8 +2,10 @@ package options;
 
 import objects.AttachedText;
 import objects.CheckboxThingie;
-import states.FreeplayState;
+
 import options.Option.OptionType;
+
+import states.FreeplayState;
 
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
