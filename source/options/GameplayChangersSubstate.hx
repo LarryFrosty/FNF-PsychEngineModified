@@ -91,7 +91,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		return null;
 	}
 
-	public function new(instance:FreeplayState)
+	public function new(instance:FreeplayState = null)
 	{
 		controls.isInSubstate = true;
 
@@ -122,7 +122,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			optionText.setScale(0.8);
 			optionText.targetY = i;
 			grpOptions.add(optionText);
-			if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+			if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
 			{
 				optionsArray[i].setValue(optionsArray[i].defaultValue);
 				optionText.color = 0xFF878787;
@@ -138,7 +138,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+				if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
 					checkbox.color = 0xFF878787;
 			}
 			else
@@ -150,7 +150,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				valueText.ID = i;
 				grpTexts.add(valueText);
 				optionsArray[i].setChild(valueText);
-				if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+				if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
 					valueText.color = 0xFF878787;
 			}
 			updateTextFrom(optionsArray[i]);
@@ -200,7 +200,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					if (curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+					if (instance != null && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 					{
 						FlxG.sound.play(Paths.sound('cancelMenu'));
 						disallowedBG.visible = true;
@@ -224,7 +224,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
 					if(holdTime > 0.5 || pressed)
 					{
-						if (pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 						{
 							FlxG.sound.play(Paths.sound('cancelMenu'));
 							disallowedBG.visible = true;

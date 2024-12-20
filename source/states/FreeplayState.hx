@@ -431,6 +431,7 @@ class FreeplayState extends MusicBeatState
 				if (option.disallowedSongs.contains(songLowercase))
 					option.setValue(option.defaultValue);
 			}
+			ClientPrefs.saveSettings();
 
 			try
 			{
