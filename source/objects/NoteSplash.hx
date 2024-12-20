@@ -31,9 +31,12 @@ typedef NoteSplashConfig = {
 class NoteSplash extends FlxSprite
 {
 	public var rgbShader:PixelSplashShaderRef;
+	public var noteData:Int = 0;
 	public var texture:String;
 	public var config(default, set):NoteSplashConfig;
 	public var babyArrow:StrumNote;
+	public var copyX:Bool = true;
+	public var copyY:Bool = true;
 
 	var noteDataMap:Map<Int, String> = new Map();
 
@@ -96,14 +99,46 @@ class NoteSplash extends FlxSprite
 		}
 		else
 		{
-			var oldConfig:Dynamic = parseTxt(path) ?? {anim: 'note splash', fps: [22, 26], offsets: [[0, 0]]}
-			var animName:String = oldConfig.anim;
+			var tempConfig:NoteSplashConfig = createConfig();
+			var anim:String = 'note splash';
+			var fps:Array<Null<Int>> = [22, 26];
+			var offsets:Array<Array<Float>> = [[0, 0]];
+			if (Paths.fileExists('$path.txt'), TEXT)
+			{
+				var configFile:Array<String> = CoolUtil.coolTextFile(path);
+				if (configFile.length > 0)
+				{
+					anim = configFile[0];
+					if (configFile.length > 1)
+					{
+						var framerates:Array<String> = configFile[1].split(' ');
+						fps = [Std.parseInt(framerates[0]), Std.parseInt(framerates[1])];
+						if (fps[0] == null) fps[0] = 22;
+						if (fps[1] == null) fps[1] = 26;
+
+						if (configFile.length > 2)
+						{
+							offsets = [];
+							for (i in 2...configFile.length)
+							{
+								var animOffs:Array<String> = configFile[i].split(' ');
+								var x:Float = Std.parseFloat(animOffs[0]);
+								var y:Float = Std.parseFloat(animOffs[1]);
+								if (Math.isNaN(x)) x = 0;
+								if (Math.isNaN(y)) y = 0;
+								offsets.push([x, y]);
+							}
+						}
+					}
+				}
+			}
+
 			var failedToFind:Bool = false;
 			while (true)
 			{
 				for (v in Note.colArray)
 				{
-					if (!checkForAnim('$animName $v ${maxAnims+1}'))
+					if (!checkForAnim('$anim $v ${maxAnims+1}'))
 					{
 						failedToFind = true;
 						break;
@@ -113,20 +148,18 @@ class NoteSplash extends FlxSprite
 				maxAnims++;
 			}
 
-			var tempConfig:NoteSplashConfig = createConfig();
 			for (animNum in 0...maxAnims)
 			{
 				for (i => col in Note.colArray)
 				{
-					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length); 
-					var offsets:Array<Float> = oldConfig.offsets[FlxMath.wrap(data, 0, Std.int(oldConfig.offsets.length-1))];
-					var anim:String = animNum > 0 ? '$col' + (animNum + 1) : col;
-					addAnimationToConfig(tempConfig, 1, anim, '$animName $col ${animNum+1}', oldConfig.fps, offsets, [], data);
+					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
+					var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
+					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offsets, [], data);
 				}
 			}
 
 			this.config = tempConfig;
-			configs.set('$path.json', config);
+			configs.set('$path.json', this.config);
 		}
 	}
 
@@ -134,6 +167,8 @@ class NoteSplash extends FlxSprite
 	{
 		if (note != null && note.noteSplashData.disabled)
 			return;
+
+		aliveTime = 0;
 
 		var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
 		if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
@@ -148,6 +183,10 @@ class NoteSplash extends FlxSprite
 		if (note != null)
 			noteData = note.noteData;
 
+		this.noteData = noteData;
+
+		animation.play(noteDataMap.get(this.noteData));
+
 		if (randomize)
 		{
 			var animArray:Array<Int> = [];
@@ -161,11 +200,8 @@ class NoteSplash extends FlxSprite
 			}
 
 			if (animArray.length > 1)
-				noteData = animArray[FlxG.random.int(0, animArray.length-1)];
+				animation.play(noteDataMap.get(animArray[FlxG.random.int(0, animArray.length-1)]));
 		}
-
-		this.noteData = noteData;
-		var anim:String = playDefaultAnim();
 
 		var tempShader:RGBPalette = null;
 		var inEditor:Bool = (cast FlxG.state) is NoteSplashEditorState;
@@ -221,14 +257,14 @@ class NoteSplash extends FlxSprite
 
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
-		var conf = config.animations.get(anim);
-		var offsets = conf?.offsets ?? null;
+		var conf = config.animations.get(animation.name);
+		var offsets = null;
+		if(conf != null) offsets = conf.offsets;
 		if(offsets != null) offset.set(offsets[0], offsets[1]);
-		//else offset.set(10, 10);
 
 		animation.finishCallback = function(name:String) {
 			kill();
-		};
+		}
 		
         alpha = ClientPrefs.data.splashAlpha;
 		if(note != null) alpha = note.noteSplashData.a;
@@ -250,17 +286,6 @@ class NoteSplash extends FlxSprite
 		if(animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
 	}
-	
-	public var noteData:Int = 0;
-	public function playDefaultAnim()
-	{
-		var animData:String = noteDataMap.get(noteData);
-		if (animData != null && animation.exists(animData))
-			animation.play(animData, true);
-		else
-			visible = false;
-		return animData;
-	}
 
 	function checkForAnim(anim:String)
 	{
@@ -271,15 +296,22 @@ class NoteSplash extends FlxSprite
 		return animFrames.length > 0;
 	}
 
+	var aliveTime:Float = 0;
+	static var buggedKillTime:Float = 0.5; //automatically kills note splashes if they break to prevent it from flooding your HUD
 	override function update(elapsed:Float)
 	{
-		super.update(elapsed);
+		aliveTime += elapsed;
+		if(animation.curAnim != null && animation.curAnim.finished || animation.curAnim == null && aliveTime >= buggedKillTime) kill();
 
 		if (babyArrow != null)
 		{
-			//cameras = babyArrow.cameras;
-			setPosition(babyArrow.x, babyArrow.y);
+			if (copyX)
+				x = babyArrow.x;
+
+			if (copyY)
+				y = babyArrow.y;
 		}
+		super.update(elapsed);
 	}
 
     public static function getSplashSkinPostfix()
@@ -301,28 +333,6 @@ class NoteSplash extends FlxSprite
 		}
 	}
 
-	public static function parseTxt(skin:String)
-	{
-		var path:String = Paths.getPath('$skin.txt', TEXT);
-		var configFile:Array<String> = CoolUtil.coolTextFile(path);
-		if(configFile.length < 1) return null;
-		
-		var framerates:Array<String> = configFile[1].split(' ');
-		var offs:Array<Array<Float>> = [];
-		for (i in 2...configFile.length)
-		{
-			var animOffs:Array<String> = configFile[i].split(' ');
-			offs.push([Std.parseFloat(animOffs[0]), Std.parseFloat(animOffs[1])]);
-		}
-
-		var config:Dynamic = {
-			anim: configFile[0],
-			fps: [Std.parseInt(framerates[0]), Std.parseInt(framerates[1])],
-			offsets: offs
-		};
-		return config;
-	}
-
 	public static function addAnimationToConfig(config:NoteSplashConfig, scale:Float, name:String, prefix:String, fps:Array<Int>, offsets:Array<Float>, indices:Array<Int>, noteData:Int):NoteSplashConfig
 	{
 		if (config == null) config = createConfig();
@@ -336,6 +346,7 @@ class NoteSplash extends FlxSprite
 	{
 		if (value == null) value = createConfig();
 
+		animation.clearAnimations();
 		noteDataMap.clear();
 
 		for (i in value.animations)

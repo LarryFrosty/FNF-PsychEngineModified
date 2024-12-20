@@ -944,68 +944,39 @@ class NoteSplashEditorState extends MusicBeatState
 			if (fps[1] == null) fps[1] = 26;
 		}
 
-		var hasOneOffset = false;
 		var offsets:Array<Array<Null<Float>>> = [[0, 0]];
-		if (configs.length == 3 || configs.length == 2)
-		{
-			hasOneOffset = true;
-			if (configs.length == 3)
-			{
-                offsets = [];
-				var offset = configs[2].trim();
-				if (offset != "")
-				{
-					var offset:Array<String> = offset.split(" ");
-					var x:Null<Float> = Std.parseFloat(offset[0]);
-					var y:Null<Float> = Std.parseFloat(offset[1]);
-					if (x == null) x = 0;
-					if (y == null) y = 0;
-					offsets.push([x, y]);
-				}
-			}
-		}
-		else if (configs.length > 3)
+		if (configs.length > 2)
 		{
 			offsets = [];
-			var i = 2;
-			while (true)
+			for (i in 2...configs.length)
 			{
 				var offset = configs[i].trim();
 				if (offset != "")
 				{
 					var offset:Array<String> = offset.split(" ");
-					var x:Null<Float> = Std.parseFloat(offset[0]);
-					var y:Null<Float> = Std.parseFloat(offset[1]);
-					if (x == null) x = 0;
-					if (y == null) y = 0;
+					var x:Float = Std.parseFloat(offset[0]);
+					var y:Float = Std.parseFloat(offset[1]);
+					if (Math.isNaN(x)) x = 0;
+					if (Math.isNaN(y)) y = 0;
 					offsets.push([x, y]);
 				}
-				i++;
-
-				if (i + 1 > configs.length)
-					break;
 			}
 		}
 
-		for (i in 0...Note.colArray.length)
+		var i = 0;
+		var k = 1;
+		while (true)
 		{
-			var offset = offsets[hasOneOffset ? 0 : i];
-			if (i + 1 > configs.length && !hasOneOffset)
-				break;
-
-			config = NoteSplash.addAnimationToConfig(config, 1, Note.colArray[i], '$animation ${Note.colArray[i]} 10', fps, offset, [], i);
-		}
-
-		if (offsets.length > 4)
-		{
-			for (i in 0...Note.colArray.length)
+			for (col in Note.colArray)
 			{
-				var offset = offsets[i + 4];
-				if (i + 1 > offsets.length)
-					break;
+				var offset = offsets[i];
+				if (offset == null) offset = [0, 0];
 
-				config = NoteSplash.addAnimationToConfig(config, 1, Note.colArray[i] + "2", '$animation ${Note.colArray[i]} 20', fps, offset, [], i + 4);
+				config = addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
+				i++;
 			}
+			if (offsets[i] == null) break;
+			k++;
 		}
 
 		return config;
