@@ -162,7 +162,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.BACK)
 		{
 			close();
-			if (FreeplayState.opponentMode != ClientPrefs.getGameplaySetting('opponentmode'))
+			if (instance != null && FreeplayState.opponentMode != ClientPrefs.getGameplaySetting('opponentmode'))
 			{
 				FreeplayState.opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
 				instance.changeDiff();

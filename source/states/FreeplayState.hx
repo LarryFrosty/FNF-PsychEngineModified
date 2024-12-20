@@ -344,7 +344,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
+			openSubState(new GameplayChangersSubstate(this));
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
