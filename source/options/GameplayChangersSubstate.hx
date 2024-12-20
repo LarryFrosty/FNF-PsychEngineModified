@@ -48,7 +48,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		#if FLX_PITCH
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1, null ['fresh', 'blammed', 'milf']);
+		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1, null, ['fresh', 'blammed', 'milf']);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
