@@ -5,13 +5,8 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
-import states.FreeplayState;
-
-@:access(states.FreeplayState)
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
-	private var instance:FreeplayState;
-
 	private var curSelected:Int = 0;
 	private var optionsArray:Array<Dynamic> = [];
 
@@ -25,10 +20,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
 
-	public static function getOptions():Array<Dynamic>
+	function getOptions()
 	{
-		var optionsArray:Array<Dynamic> = [];
-		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"], ['blammed', 'milf']);
+		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"]);
 		optionsArray.push(goption);
 
 		var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollspeed', FLOAT, 1);
@@ -49,7 +43,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		#if FLX_PITCH
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1, null, ['fresh', 'blammed', 'milf']);
+		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
@@ -59,7 +53,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', FLOAT, 1, null, ['dad-battle', 'pico']);
+		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', FLOAT, 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0;
 		option.maxValue = 5;
@@ -78,8 +72,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
-		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false, null, ['tutorial', 'fresh']));
-		return optionsArray;
+		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false));
 	}
 
 	public function getOptionByName(name:String)
@@ -93,13 +86,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		return null;
 	}
 
-	public function new(instance:FreeplayState = null)
+	public function new()
 	{
 		controls.isInSubstate = true;
 
 		super();
-
-		this.instance = instance;
 		
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.6;
@@ -115,7 +106,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		checkboxGroup = new FlxTypedGroup<CheckboxThingie>();
 		add(checkboxGroup);
 		
-		optionsArray = getOptions();
+		getOptions();
 
 		for (i in 0...optionsArray.length)
 		{
@@ -124,12 +115,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			optionText.setScale(0.8);
 			optionText.targetY = i;
 			grpOptions.add(optionText);
-			if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
-			{
-				optionsArray[i].setValue(optionsArray[i].defaultValue);
-				optionsArray[i].disallowed = true;
-				optionText.color = 0xFF878787;
-			}
+
 			if(optionsArray[i].type == BOOL)
 			{
 				optionText.x += 60;
@@ -141,8 +127,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
-					checkbox.color = 0xFF878787;
 			}
 			else
 			{
@@ -156,17 +140,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			}
 			updateTextFrom(optionsArray[i]);
 		}
-
-		disallowedBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		disallowedBG.alpha = 0.6;
-		disallowedBG.visible = false;
-		add(disallowedBG);
-		
-		disallowedText = new FlxText(0, 0, FlxG.width - 100, '', 32);
-		disallowedText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		disallowedText.scrollFactor.set();
-		disallowedText.visible = false;
-		add(disallowedText);
 
 		addTouchPad('LEFT_FULL', 'A_B_C');
 		addTouchPadCamera();
@@ -186,12 +159,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
-		if (controls.UI_LEFT_P || controls.UI_RIGHT_P || controls.UI_UP_P || controls.UI_DOWN_P || controls.RESET)
-		{
-			disallowedBG.visible = false;
-			disallowedText.visible = false;
-		}
-
 		if (controls.BACK)
 		{
 			close();
@@ -207,20 +174,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					if (instance != null && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
-					{
-						FlxG.sound.play(Paths.sound('cancelMenu'));
-						disallowedBG.visible = true;
-						disallowedText.text = 'This option cannot be enabled on ' + instance.songs[FreeplayState.curSelected].songName;
-						disallowedText.screenCenter();
-						disallowedText.visible = true;
-					}
-					else
-					{
-						FlxG.sound.play(Paths.sound('scrollMenu'));
-						curOption.setValue((curOption.getValue() == true) ? false : true);
-						curOption.change();
-					}
+					FlxG.sound.play(Paths.sound('scrollMenu'));
+					curOption.setValue((curOption.getValue() == true) ? false : true);
+					curOption.change();
 					reloadCheckboxes();
 				}
 			}
@@ -229,17 +185,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
-					if(holdTime > 0.5 || pressed)
+					if (holdTime > 0.5 || pressed)
 					{
-						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
-						{
-							FlxG.sound.play(Paths.sound('cancelMenu'));
-							disallowedBG.visible = true;
-							disallowedText.text = 'This option cannot be changed on ' + instance.songs[FreeplayState.curSelected].songName;
-							disallowedText.screenCenter();
-							disallowedText.visible = true;
-						}
-						else if (pressed)
+						if (pressed)
 						{
 							var add:Dynamic = null;
 							if(curOption.type != STRING)
@@ -435,12 +383,10 @@ class GameplayOption
 	public var maxValue:Dynamic = null; //Only used in int/float/percent type
 	public var decimals:Int = 1; //Only used in float/percent type
 
-	public var disallowedSongs:Array<String> = null; //Songs not allowed to change the value and will use the default value
-	public var disallowed:Bool = false;
 	public var displayFormat:String = '%v'; //How String/Float/Percent/Int values are shown, %v = Current value, %d = Default value
 	public var name:String = 'Unknown';
 
-	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null, ?disallowedSongs:Array<String> = null)
+	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null)
 	{
 		_name = name;
 		this.name = Language.getPhrase('setting_$name', name);
@@ -448,7 +394,6 @@ class GameplayOption
 		this.type = type;
 		this.defaultValue = defaultValue;
 		this.options = options;
-		this.disallowedSongs = disallowedSongs ?? [];
 
 		if(defaultValue == 'null variable value')
 		{
@@ -518,8 +463,6 @@ class GameplayOption
 		{
 			_text = newValue;
 			child.text = Language.getPhrase('setting_$_name-$_text', _text);
-			if (disallowed)
-				child.color = 0xFF878787;
 			return _text;
 		}
 		return null;

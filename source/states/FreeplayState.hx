@@ -42,8 +42,6 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
-	var disallowedModifiers:Map<GameplayOption, Array<String>> = [];
-
 	var bg:FlxSprite;
 	var intendedColor:Int;
 
@@ -201,12 +199,6 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		updateTexts();
 
-		for (option in GameplayChangersSubstate.getOptions())
-		{
-			if (option.disallowedSongs.length > 0)
-				disallowedModifiers.set(option, option.disallowedSongs);
-		}
-
 		addTouchPad('LEFT_FULL', 'A_B_C_X_Y_Z');
 		super.create();
 	}
@@ -348,7 +340,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate(this));
+			openSubState(new GameplayChangersSubstate());
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
@@ -431,17 +423,6 @@ class FreeplayState extends MusicBeatState
 			persistentUpdate = false;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
-
-			var shouldSave:Bool = false;
-			for (option => songArray in disallowedModifiers)
-			{
-				if (songArray.contains(songLowercase) && option.getValue() != option.defaultValue)
-				{
-					option.setValue(option.defaultValue);
-					shouldSave = true;
-				}
-			}
-			if (shouldSave) ClientPrefs.saveSettings();
 
 			try
 			{
