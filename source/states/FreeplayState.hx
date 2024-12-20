@@ -501,7 +501,7 @@ class FreeplayState extends MusicBeatState
 		opponentVocals = FlxDestroyUtil.destroy(opponentVocals);
 	}
 
-	public function changeDiff(change:Int = 0)
+	function changeDiff(change:Int = 0)
 	{
 		if (player.playingMusic)
 			return;
