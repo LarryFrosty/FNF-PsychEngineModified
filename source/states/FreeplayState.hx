@@ -42,6 +42,8 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
+	public static var opponentMode:Bool = false;
+
 	var bg:FlxSprite;
 	var intendedColor:Int;
 
@@ -62,6 +64,8 @@ class FreeplayState extends MusicBeatState
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
+
+		opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
 
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
@@ -257,7 +261,7 @@ class FreeplayState extends MusicBeatState
 
 		if (!player.playingMusic)
 		{
-			scoreText.text = Language.getPhrase('personal_best', 'PERSONAL BEST: {1} ({2}%)', [lerpScore, ratingSplit.join('.')]);
+			scoreText.text = Language.getPhrase('personal_best', 'PERSONAL BEST: {1} ({2}%)' + (!opponentMode ? '' : ' (OPPONENT)'), [lerpScore, ratingSplit.join('.')]);
 			positionHighscore();
 			
 			if(songs.length > 1)
@@ -504,8 +508,8 @@ class FreeplayState extends MusicBeatState
 
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.list.length-1);
 		#if !switch
-		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
-		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
+		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty, opponentMode);
+		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty, opponentMode);
 		#end
 
 		lastDifficultyName = Difficulty.getString(curDifficulty, false);

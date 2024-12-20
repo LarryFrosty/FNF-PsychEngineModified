@@ -2,7 +2,7 @@ package options;
 
 import objects.AttachedText;
 import objects.CheckboxThingie;
-
+import states.FreeplayState;
 import options.Option.OptionType;
 
 class GameplayChangersSubstate extends MusicBeatSubstate
@@ -13,9 +13,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	private var grpTexts:FlxTypedGroup<AttachedText>;
-
-	private var disallowedBG:FlxSprite;
-	private var disallowedText:FlxText;
 
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
@@ -86,12 +83,15 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		return null;
 	}
 
-	public function new()
+	var instance:FreeplayState;
+	public function new(instance:FreeplayState = null)
 	{
 		controls.isInSubstate = true;
 
 		super();
-		
+
+		this.instance = instance;
+
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.6;
 		add(bg);
@@ -162,6 +162,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.BACK)
 		{
 			close();
+			if (FreeplayState.opponentMode != ClientPrefs.getGameplaySetting('opponentmode'))
+			{
+				FreeplayState.opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
+				instance.changeDiff();
+			}
 			ClientPrefs.saveSettings();
 			controls.isInSubstate = false;
 			FlxG.sound.play(Paths.sound('cancelMenu'));
