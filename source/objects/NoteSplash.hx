@@ -103,7 +103,7 @@ class NoteSplash extends FlxSprite
 			var anim:String = 'note splash';
 			var fps:Array<Null<Int>> = [22, 26];
 			var offsets:Array<Array<Float>> = [[0, 0]];
-			if (Paths.fileExists('$path.txt'), TEXT)
+			if (Paths.fileExists('$path.txt', TEXT))
 			{
 				var configFile:Array<String> = CoolUtil.coolTextFile(path);
 				if (configFile.length > 0)

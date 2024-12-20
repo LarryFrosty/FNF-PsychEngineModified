@@ -7,6 +7,7 @@ import options.Option.OptionType;
 
 import states.FreeplayState;
 
+@:access(states.FreeplayState)
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
 	private var curSelected:Int = 0;
