@@ -132,7 +132,7 @@ class Highscore
 		if (FlxG.save.data.songScoresOpponent != null)
 			songScoresOpponent = FlxG.save.data.songScoresOpponent;
 
-		if (FlxG.save.data.songRating != null)
+		if (FlxG.save.data.songRatingOpponent != null)
 			songRatingOpponent = FlxG.save.data.songRatingOpponent;
 	}
 }
