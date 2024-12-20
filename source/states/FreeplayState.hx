@@ -42,7 +42,6 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
-	var modifiers:GameplayChangersSubstate;
 	var disallowedModifiers:Map<GameplayOption, Array<String>> = [];
 
 	var bg:FlxSprite;
@@ -202,11 +201,9 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		updateTexts();
 
-		modifiers = new GameplayChangersSubstate(this);
-		@:privateAccess
-		for (option in modifiers.optionsArray)
+		for (option in GameplayChangersSubstate.getOptions())
 		{
-			if (option.disallowed)
+			if (option.disallowedSongs.length > 0)
 				disallowedModifiers.set(option, option.disallowedSongs);
 		}
 
@@ -351,7 +348,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(modifiers);
+			openSubState(new GameplayChangersSubstate());
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)

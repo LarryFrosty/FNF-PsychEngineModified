@@ -25,8 +25,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
 
-	function getOptions()
+	public static function getOptions():Array<Dynamic>
 	{
+		var optionsArray:Array<Dynamic> = [];
 		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"], ['blammed', 'milf']);
 		optionsArray.push(goption);
 
@@ -78,6 +79,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
 		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false, null, ['tutorial', 'fresh']));
+		return optionsArray;
 	}
 
 	public function getOptionByName(name:String)
@@ -113,7 +115,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		checkboxGroup = new FlxTypedGroup<CheckboxThingie>();
 		add(checkboxGroup);
 		
-		getOptions();
+		optionsArray = getOptions();
 
 		for (i in 0...optionsArray.length)
 		{
@@ -139,7 +141,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (instance != null && optionsArray[i].disallowed)
+				if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 					checkbox.color = 0xFF878787;
 			}
 			else
@@ -205,7 +207,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					if (instance != null && curOption.disallowed)
+					if (instance != null && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName))))
 					{
 						FlxG.sound.play(Paths.sound('cancelMenu'));
 						disallowedBG.visible = true;
@@ -229,7 +231,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
 					if(holdTime > 0.5 || pressed)
 					{
-						if (instance != null && pressed && curOption.disallowed)
+						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))))
 						{
 							FlxG.sound.play(Paths.sound('cancelMenu'));
 							disallowedBG.visible = true;
