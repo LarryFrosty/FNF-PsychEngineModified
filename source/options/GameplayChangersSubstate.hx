@@ -122,9 +122,10 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			optionText.setScale(0.8);
 			optionText.targetY = i;
 			grpOptions.add(optionText);
-			if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+			if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 			{
 				optionsArray[i].setValue(optionsArray[i].defaultValue);
+				optionsArray[i].disallowed = true;
 				optionText.color = 0xFF878787;
 			}
 			if(optionsArray[i].type == BOOL)
@@ -138,7 +139,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+				if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 					checkbox.color = 0xFF878787;
 			}
 			else
@@ -150,8 +151,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				valueText.ID = i;
 				grpTexts.add(valueText);
 				optionsArray[i].setChild(valueText);
-				if (instance != null && optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
-					valueText.color = 0xFF878787;
 			}
 			updateTextFrom(optionsArray[i]);
 		}
@@ -435,6 +434,7 @@ class GameplayOption
 	public var decimals:Int = 1; //Only used in float/percent type
 
 	public var disallowedSongs:Array<String> = null; //Songs not allowed to change the value and will use the default value
+	private var disallowed:Bool = false;
 	public var displayFormat:String = '%v'; //How String/Float/Percent/Int values are shown, %v = Current value, %d = Default value
 	public var name:String = 'Unknown';
 
@@ -516,6 +516,8 @@ class GameplayOption
 		{
 			_text = newValue;
 			child.text = Language.getPhrase('setting_$_name-$_text', _text);
+			if (disallowed)
+				valueText.color = 0xFF878787;
 			return _text;
 		}
 		return null;
