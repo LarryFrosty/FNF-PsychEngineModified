@@ -426,6 +426,7 @@ class FreeplayState extends MusicBeatState
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 
 			var substate:GameplayChangersSubstate = new GameplayChangersSubstate(this);
+			@:privateAccess
 			for (option in substate.optionsArray)
 			{
 				if (option.disallowedSongs.contains(songLowercase))
