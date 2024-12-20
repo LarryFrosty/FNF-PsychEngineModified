@@ -42,6 +42,9 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
+	var modifiers:GameplayChangersSubstate;
+	var disallowedModifiers:Map<GameplayOption, Array<String>> = [];
+
 	var bg:FlxSprite;
 	var intendedColor:Int;
 
@@ -157,7 +160,6 @@ class FreeplayState extends MusicBeatState
 
 		add(scoreText);
 
-
 		missingTextBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		missingTextBG.alpha = 0.6;
 		missingTextBG.visible = false;
@@ -199,6 +201,14 @@ class FreeplayState extends MusicBeatState
 		
 		changeSelection();
 		updateTexts();
+
+		modifiers = new GameplayChangersSubstate(this);
+		@:privateAccess
+		for (option in modifiers.optionsArray)
+		{
+			if (option.disallowed)
+				disallowedModifiers.set(option, option.disallowedSongs);
+		}
 
 		addTouchPad('LEFT_FULL', 'A_B_C_X_Y_Z');
 		super.create();
@@ -341,7 +351,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate(this));
+			openSubState(modifiers);
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
@@ -425,14 +435,16 @@ class FreeplayState extends MusicBeatState
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 
-			var substate:GameplayChangersSubstate = new GameplayChangersSubstate(this);
-			@:privateAccess
-			for (option in substate.optionsArray)
+			var shouldSave:Bool = false;
+			for (option => songArray in disallowedModifiers)
 			{
-				if (option.disallowedSongs.contains(songLowercase))
+				if (songArray.contains(songLowercase) && option.getValue() != option.defaultValue)
+				{
 					option.setValue(option.defaultValue);
+					shouldSave = true;
+				}
 			}
-			ClientPrefs.saveSettings();
+			if (shouldSave) ClientPrefs.saveSettings();
 
 			try
 			{

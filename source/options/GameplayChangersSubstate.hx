@@ -139,7 +139,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
-				if (instance != null && optionsArray[i].disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+				if (instance != null && optionsArray[i].disallowed)
 					checkbox.color = 0xFF878787;
 			}
 			else
@@ -205,7 +205,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					if (instance != null && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+					if (instance != null && curOption.disallowed)
 					{
 						FlxG.sound.play(Paths.sound('cancelMenu'));
 						disallowedBG.visible = true;
@@ -229,7 +229,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
 					if(holdTime > 0.5 || pressed)
 					{
-						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+						if (instance != null && pressed && curOption.disallowed)
 						{
 							FlxG.sound.play(Paths.sound('cancelMenu'));
 							disallowedBG.visible = true;
@@ -434,7 +434,7 @@ class GameplayOption
 	public var decimals:Int = 1; //Only used in float/percent type
 
 	public var disallowedSongs:Array<String> = null; //Songs not allowed to change the value and will use the default value
-	private var disallowed:Bool = false;
+	public var disallowed:Bool = false;
 	public var displayFormat:String = '%v'; //How String/Float/Percent/Int values are shown, %v = Current value, %d = Default value
 	public var name:String = 'Unknown';
 
