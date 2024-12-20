@@ -77,10 +77,10 @@ class Highscore
 	static function setRating(song:String, rating:Float, ?opponent:Bool = false):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
-		var rating:Map<String, Float> = !opponent ? songRating : songRatingOpponent;
-		rating.set(song, rating);
-		if (!opponent) FlxG.save.data.songRating = rating;
-		else FlxG.save.data.songRatingOpponent = rating;
+		var ratings:Map<String, Float> = !opponent ? songRating : songRatingOpponent;
+		ratings.set(song, rating);
+		if (!opponent) FlxG.save.data.songRating = ratings;
+		else FlxG.save.data.songRatingOpponent = ratings;
 		FlxG.save.flush();
 	}
 
