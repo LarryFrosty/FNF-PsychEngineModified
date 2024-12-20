@@ -231,7 +231,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
 					if(holdTime > 0.5 || pressed)
 					{
-						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))))
+						if (instance != null && pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
 						{
 							FlxG.sound.play(Paths.sound('cancelMenu'));
 							disallowedBG.visible = true;
