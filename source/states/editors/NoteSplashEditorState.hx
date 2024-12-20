@@ -972,7 +972,7 @@ class NoteSplashEditorState extends MusicBeatState
 				var offset = offsets[i];
 				if (offset == null) offset = [0, 0];
 
-				config = addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
+				config = NoteSplash.addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
 				i++;
 			}
 			if (offsets[i] == null) break;

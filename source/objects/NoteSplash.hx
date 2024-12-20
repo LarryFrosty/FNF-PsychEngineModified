@@ -154,7 +154,9 @@ class NoteSplash extends FlxSprite
 				{
 					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
 					var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
-					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offsets, [], data);
+					var offset:Array<Float> = offsets[data];
+					if (offset == null) offset = [0, 0];
+					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offset, [], data);
 				}
 			}
 
@@ -185,8 +187,6 @@ class NoteSplash extends FlxSprite
 
 		this.noteData = noteData;
 
-		animation.play(noteDataMap.get(this.noteData));
-
 		if (randomize)
 		{
 			var animArray:Array<Int> = [];
@@ -200,8 +200,10 @@ class NoteSplash extends FlxSprite
 			}
 
 			if (animArray.length > 1)
-				animation.play(noteDataMap.get(animArray[FlxG.random.int(0, animArray.length-1)]));
+				noteData = animArray[FlxG.random.int(0, animArray.length-1)];
 		}
+
+		var anim:String = playDefaultAnim();
 
 		var tempShader:RGBPalette = null;
 		var inEditor:Bool = (cast FlxG.state) is NoteSplashEditorState;
@@ -257,7 +259,7 @@ class NoteSplash extends FlxSprite
 
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
-		var conf = config.animations.get(animation.name);
+		var conf = config.animations.get(anim);
 		var offsets = null;
 		if(conf != null) offsets = conf.offsets;
 		if(offsets != null) offset.set(offsets[0], offsets[1]);
@@ -285,6 +287,13 @@ class NoteSplash extends FlxSprite
 
 		if(animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
+	}
+
+	public function playDefaultAnim()
+	{
+		var anim:String = noteDataMap.get(noteData);
+		animation.play(anim);
+		return anim;
 	}
 
 	function checkForAnim(anim:String)
@@ -346,6 +355,7 @@ class NoteSplash extends FlxSprite
 	{
 		if (value == null) value = createConfig();
 
+		@:privateAccess
 		animation.clearAnimations();
 		noteDataMap.clear();
 
