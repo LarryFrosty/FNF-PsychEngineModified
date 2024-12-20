@@ -261,7 +261,7 @@ class FreeplayState extends MusicBeatState
 
 		if (!player.playingMusic)
 		{
-			scoreText.text = Language.getPhrase('personal_best', 'PERSONAL BEST: {1} ({2}%)' + (!opponentMode ? '' : ' (OPPONENT)'), [lerpScore, ratingSplit.join('.')]);
+			scoreText.text = Language.getPhrase('personal_best', 'PERSONAL BEST: {1} ({2}%)', [lerpScore, ratingSplit.join('.')]);
 			positionHighscore();
 			
 			if(songs.length > 1)
@@ -518,6 +518,8 @@ class FreeplayState extends MusicBeatState
 			diffText.text = '< ' + displayDiff.toUpperCase() + ' >';
 		else
 			diffText.text = displayDiff.toUpperCase();
+
+		if (opponentMode) diffText.text += ' (OPPONENT)';
 
 		positionHighscore();
 		missingText.visible = false;
