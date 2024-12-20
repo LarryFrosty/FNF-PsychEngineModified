@@ -5,8 +5,13 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
+import states.FreeplayState;
+
+@:access(states.FreeplayState)
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
+	private var instance:FreeplayState;
+
 	private var curSelected:Int = 0;
 	private var optionsArray:Array<Dynamic> = [];
 
@@ -14,12 +19,15 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	private var grpTexts:FlxTypedGroup<AttachedText>;
 
+	private var disallowedBG:FlxSprite;
+	private var disallowedText:FlxText;
+
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
 
 	function getOptions()
 	{
-		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"]);
+		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"], ['blammed', 'milf']);
 		optionsArray.push(goption);
 
 		var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollspeed', FLOAT, 1);
@@ -40,7 +48,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		#if FLX_PITCH
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1);
+		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', FLOAT, 1, null ['fresh', 'blammed', 'milf']);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
@@ -50,7 +58,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', FLOAT, 1);
+		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', FLOAT, 1, null, ['dad-battle', 'pico']);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0;
 		option.maxValue = 5;
@@ -69,7 +77,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
-		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false));
+		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false, null, ['tutorial', 'fresh']));
 	}
 
 	public function getOptionByName(name:String)
@@ -83,11 +91,13 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		return null;
 	}
 
-	public function new()
+	public function new(instance:FreeplayState)
 	{
 		controls.isInSubstate = true;
 
 		super();
+
+		this.instance = instance;
 		
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.6;
@@ -112,7 +122,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			optionText.setScale(0.8);
 			optionText.targetY = i;
 			grpOptions.add(optionText);
-
+			if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+			{
+				optionsArray[i].setValue(optionsArray[i].defaultValue);
+				optionText.color = 0xFF878787;
+			}
 			if(optionsArray[i].type == BOOL)
 			{
 				optionText.x += 60;
@@ -124,6 +138,8 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				checkbox.offsetY = -52;
 				checkbox.ID = i;
 				checkboxGroup.add(checkbox);
+				if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+					checkbox.color = 0xFF878787;
 			}
 			else
 			{
@@ -134,9 +150,22 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				valueText.ID = i;
 				grpTexts.add(valueText);
 				optionsArray[i].setChild(valueText);
+				if (optionsArray[i].disallowedSongs.contains(instance.songs[FreeplayState.curSelected].songName.toLowerCase()))
+					valueText.color = 0xFF878787;
 			}
 			updateTextFrom(optionsArray[i]);
 		}
+
+		disallowedBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		disallowedBG.alpha = 0.6;
+		disallowedBG.visible = false;
+		add(disallowedBG);
+		
+		disallowedText = new FlxText(0, 0, FlxG.width - 100, '', 32);
+		disallowedText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		disallowedText.scrollFactor.set();
+		disallowedText.visible = false;
+		add(disallowedText);
 
 		addTouchPad('LEFT_FULL', 'A_B_C');
 		addTouchPadCamera();
@@ -171,20 +200,39 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 			{
 				if(controls.ACCEPT)
 				{
-					FlxG.sound.play(Paths.sound('scrollMenu'));
-					curOption.setValue((curOption.getValue() == true) ? false : true);
-					curOption.change();
+					if (curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+					{
+						FlxG.sound.play(Paths.sound('cancelMenu'));
+						disallowedBG.visible = true;
+						disallowedText.text = 'This option cannot be enabled on ' + instance.songs[FreeplayState.curSelected].songName;
+						disallowedText.screenCenter();
+						disallowedText.visible = true;
+					}
+					else
+					{
+						FlxG.sound.play(Paths.sound('scrollMenu'));
+						curOption.setValue((curOption.getValue() == true) ? false : true);
+						curOption.change();
+					}
 					reloadCheckboxes();
 				}
 			}
 			else
 			{
-				if(controls.UI_LEFT || controls.UI_RIGHT)
+				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
 					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
 					if(holdTime > 0.5 || pressed)
 					{
-						if(pressed)
+						if (pressed && curOption.disallowedSongs.contains(Paths.formatToSongPath(instance.songs[FreeplayState.curSelected].songName)))
+						{
+							FlxG.sound.play(Paths.sound('cancelMenu'));
+							disallowedBG.visible = true;
+							disallowedText.text = 'This option cannot be changed on ' + instance.songs[FreeplayState.curSelected].songName;
+							disallowedText.screenCenter();
+							disallowedText.visible = true;
+						}
+						else if (pressed)
 						{
 							var add:Dynamic = null;
 							if(curOption.type != STRING)
@@ -380,10 +428,11 @@ class GameplayOption
 	public var maxValue:Dynamic = null; //Only used in int/float/percent type
 	public var decimals:Int = 1; //Only used in float/percent type
 
+	public var disallowedSongs:Array<String> = null; //Songs not allowed to change the value and will use the default value
 	public var displayFormat:String = '%v'; //How String/Float/Percent/Int values are shown, %v = Current value, %d = Default value
 	public var name:String = 'Unknown';
 
-	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null)
+	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null, ?disallowedSongs:Array<String> = null)
 	{
 		_name = name;
 		this.name = Language.getPhrase('setting_$name', name);
@@ -391,6 +440,7 @@ class GameplayOption
 		this.type = type;
 		this.defaultValue = defaultValue;
 		this.options = options;
+		this.disallowedSongs = disallowedSongs ?? [];
 
 		if(defaultValue == 'null variable value')
 		{

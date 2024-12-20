@@ -341,7 +341,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
+			openSubState(new GameplayChangersSubstate(this));
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
@@ -424,6 +424,13 @@ class FreeplayState extends MusicBeatState
 			persistentUpdate = false;
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
+
+			var substate:GameplayChangersSubstate = new GameplayChangersSubstate(this);
+			for (option in substate.optionsArray)
+			{
+				if (option.disallowedSongs.contains(songLowercase))
+					option.setValue(option.defaultValue);
+			}
 
 			try
 			{
