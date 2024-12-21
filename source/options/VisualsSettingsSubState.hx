@@ -259,10 +259,10 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		for (splash in splashes)
 		{
-			debugPrint('Frame: ' + splash.animation.curAnim.curFrame, FlxColor.WHITE);
+			debugPrint('Frame: ' + splash.animation?.curAnim?.curFrame, FlxColor.WHITE);
 			var anim:String = splash.playDefaultAnim();
-			debugPrint('New frame: ' + splash.animation.curAnim.curFrame, FlxColor.WHITE);
-			debugPrint('Name: ' + splash.animation.name, FlxColor.WHITE);
+			debugPrint('New frame: ' + splash.animation?.curAnim?.curFrame, FlxColor.WHITE);
+			debugPrint('Name: ' + splash.animation?.name, FlxColor.WHITE);
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			
