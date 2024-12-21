@@ -154,7 +154,7 @@ class NoteSplash extends FlxSprite
 				{
 					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
 					var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
-					var offset:Array<Float> = offsets[FlxMath.wrap(data, 0, Std.int(offsets.length-1)];
+					var offset:Array<Float> = offsets[FlxMath.wrap(data, 0, Std.int(offsets.length-1))];
 					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offset, [], data);
 				}
 			}
