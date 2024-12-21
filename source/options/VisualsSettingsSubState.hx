@@ -178,6 +178,9 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		super();
 		add(notes);
 		add(splashes);
+
+		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		add(debugGroup);
 	}
 
 	var notesShown:Bool = false;
@@ -197,6 +200,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 					}
 				}
 				notesShown = true;
+				debugPrint('Option chosen: ' + curOption.variable + '\nCalculated: ' + Math.abs(notes.members[0].y - noteY), FlxColor.WHITE);
 				if(curOption.variable.startsWith('splash') && Math.abs(notes.members[0].y - noteY) < 25) playNoteSplashes();
 
 			default:
@@ -255,7 +259,10 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		for (splash in splashes)
 		{
+			debugPrint('Frame: ' + splash.animation.curAnim.curFrame, FlxColor.WHITE);
 			var anim:String = splash.playDefaultAnim();
+			debugPrint('New frame: ' + splash.animation.curAnim.curFrame, FlxColor.WHITE);
+			debugPrint('Name: ' + splash.animation.name, FlxColor.WHITE);
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			
@@ -266,11 +273,27 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 				offsets = conf.offsets;
 
 			if (offsets != null)
-			{
-				splash.centerOffsets();
 				splash.offset.set(offsets[0], offsets[1]);
-			}
+			
+			debugPrint('Offset: ' + splash.offset, FlxColor.WHITE);
 		}
+	}
+
+	var debugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	public function debugPrint(text:String, color:FlxColor) {
+		var newText:psychlua.DebugLuaText = debugGroup.recycle(psychlua.DebugLuaText);
+		newText.text = text;
+		newText.color = color;
+		newText.disableTime = 6;
+		newText.alpha = 1;
+		newText.setPosition(10, 8 - newText.height);
+
+		debugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
+			spr.y += newText.height + 2;
+		});
+		debugGroup.add(newText);
+
+		Sys.println(text);
 	}
 
 	override function destroy()

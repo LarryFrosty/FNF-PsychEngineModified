@@ -173,10 +173,10 @@ class NoteSplash extends FlxSprite
 
 		var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
 		if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
-		else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
+		else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
 
 		loadSplash(loadedTexture);
-		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
+		setPosition(x, y);
 
 		if (babyArrow != null)
 			setPosition(babyArrow.x - Note.swagWidth * 0.95, babyArrow.y - Note.swagWidth); // To prevent it from being misplaced for one game tick
@@ -210,7 +210,7 @@ class NoteSplash extends FlxSprite
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
 			// If Note RGB is enabled:
-			if((note != null && !note.noteSplashData.useGlobalShader) || inEditor)
+			if(note != null && !note.noteSplashData.useGlobalShader || inEditor)
 			{
 				tempShader = new RGBPalette();
 				var colors = config.rgb;
@@ -248,9 +248,12 @@ class NoteSplash extends FlxSprite
 				}
 				else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 
-				if (note.noteSplashData.r != -1) tempShader.r = note.noteSplashData.r;
-				if (note.noteSplashData.g != -1) tempShader.g = note.noteSplashData.g;
-				if (note.noteSplashData.b != -1) tempShader.b = note.noteSplashData.b;
+				if (note != null)
+				{	
+					if (note.noteSplashData.r != -1) tempShader.r = note.noteSplashData.r;
+					if (note.noteSplashData.g != -1) tempShader.g = note.noteSplashData.g;
+					if (note.noteSplashData.b != -1) tempShader.b = note.noteSplashData.b;
+				}
 			}
 			else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 		}
@@ -266,11 +269,6 @@ class NoteSplash extends FlxSprite
 		{
 			offset.x += offsets[0];
 			offset.y += offsets[1];
-		}
-		else
-		{
-			offset.x -= 58;
-			offset.y -= 55;
 		}
 
 		animation.finishCallback = function(name:String) {
