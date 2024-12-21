@@ -17,6 +17,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		title = Language.getPhrase('visuals_menu', 'Visuals Settings');
 		rpcTitle = 'Visuals Settings Menu'; //for Discord Rich Presence
 
+		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+
 		// for note skins and splash skins
 		notes = new FlxTypedGroup<StrumNote>();
 		splashes = new FlxTypedGroup<NoteSplash>();
@@ -178,8 +180,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		super();
 		add(notes);
 		add(splashes);
-
-		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
 		add(debugGroup);
 	}
 
