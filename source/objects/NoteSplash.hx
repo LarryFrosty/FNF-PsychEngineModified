@@ -154,8 +154,7 @@ class NoteSplash extends FlxSprite
 				{
 					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
 					var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
-					var offset:Array<Float> = offsets[data];
-					if (offset == null) offset = [0, 0];
+					var offset:Array<Float> = offsets[FlxMath.wrap(data, 0, Std.int(offsets.length-1)];
 					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offset, [], data);
 				}
 			}
@@ -177,10 +176,10 @@ class NoteSplash extends FlxSprite
 		else if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
 
 		loadSplash(loadedTexture);
-		setPosition(x, y);
+		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 
 		if (babyArrow != null)
-			setPosition(babyArrow.x, babyArrow.y); // To prevent it from being misplaced for one game tick
+			setPosition(babyArrow.x - Note.swagWidth * 0.95, babyArrow.y - Note.swagWidth); // To prevent it from being misplaced for one game tick
 
 		if (note != null)
 			noteData = note.noteData;
@@ -259,10 +258,20 @@ class NoteSplash extends FlxSprite
 
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
+		offset.set(10, 10);
 		var conf = config.animations.get(anim);
 		var offsets = null;
 		if(conf != null) offsets = conf.offsets;
-		if(offsets != null) offset.set(offsets[0], offsets[1]);
+		if(offsets != null)
+		{
+			offset.x += offsets[0];
+			offset.y += offsets[1];
+		}
+		else
+		{
+			offset.x -= 58;
+			offset.y -= 55;
+		}
 
 		animation.finishCallback = function(name:String) {
 			kill();
@@ -292,7 +301,7 @@ class NoteSplash extends FlxSprite
 	public function playDefaultAnim()
 	{
 		var anim:String = noteDataMap.get(noteData);
-		animation.play(anim);
+		animation.play(anim, true);
 		return anim;
 	}
 
@@ -315,10 +324,10 @@ class NoteSplash extends FlxSprite
 		if (babyArrow != null)
 		{
 			if (copyX)
-				x = babyArrow.x;
+				x = babyArrow.x - Note.swagWidth * 0.95;
 
 			if (copyY)
-				y = babyArrow.y;
+				y = babyArrow.y - Note.swagWidth;
 		}
 		super.update(elapsed);
 	}
