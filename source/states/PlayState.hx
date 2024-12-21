@@ -859,7 +859,7 @@ class PlayState extends MusicBeatState
 						FlxG.camera.snapToTarget();
 					}
 					videoCutscene = null;
-					canPause = false;
+					canPause = true;
 					inCutscene = false;
 					startAndEnd();
 				}
@@ -869,7 +869,7 @@ class PlayState extends MusicBeatState
 			add(videoCutscene);
 
 			if (playOnLoad)
-				videoCutscene.videoSprite.play();
+				videoCutscene.play();
 			return videoCutscene;
 		}
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)

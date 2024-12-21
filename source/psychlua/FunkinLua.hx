@@ -1191,7 +1191,7 @@ class FunkinLua {
 			}
 			return false;
 		});
-		set("startVideo", function(videoFile:String, ?canSkip:Bool = true) {
+		set("startVideo", function(videoFile:String, ?canSkip:Bool = true, ?forMidSong:Bool = false, ?shouldLoop:Bool = false) {
 			#if VIDEOS_ALLOWED
 			if(FileSystem.exists(Paths.video(videoFile)))
 			{
@@ -1200,7 +1200,7 @@ class FunkinLua {
 					game.remove(game.videoCutscene);
 					game.videoCutscene.destroy();
 				}
-				game.videoCutscene = game.startVideo(videoFile, false, canSkip);
+				game.videoCutscene = game.startVideo(videoFile, forMidSong, canSkip, shouldLoop);
 				return true;
 			}
 			else
