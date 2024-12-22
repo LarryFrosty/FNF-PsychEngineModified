@@ -103,7 +103,7 @@ class NoteSplash extends FlxSprite
 		var anim:String = 'note splash';
 		var fps:Array<Null<Int>> = [22, 26];
 		var offsets:Array<Array<Float>> = [[0, 0]];
-		if (Paths.fileExists('$path.txt', TEXT))
+		if (Paths.fileExists('$path.txt', TEXT)) // Backwards compatibility with 0.7 splashes
 		{
 			var configFile:Array<String> = CoolUtil.listFromString(Paths.getTextFromFile('$path.txt'));
 			if (configFile.length > 0)
@@ -278,7 +278,7 @@ class NoteSplash extends FlxSprite
 		if (note != null) alpha = note.noteSplashData.a;
 
 		if (note != null) antialiasing = note.noteSplashData.antialiasing;
-		if (PlayState.isPixelStage || !ClientPrefs.data.antialiasing) antialiasing = false;
+		if ((PlayState.isPixelStage && config.allowPixel) || !ClientPrefs.data.antialiasing) antialiasing = false;
 
 		var minFps:Int = 22;
 		var maxFps:Int = 26;
