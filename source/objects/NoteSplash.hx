@@ -298,7 +298,9 @@ class NoteSplash extends FlxSprite
 	public function playDefaultAnim()
 	{
 		var anim:String = noteDataMap.get(noteData);
-		animation.play(anim, true);
+		if (anim != null)
+			animation.play(anim, true);
+
 		return anim;
 	}
 
