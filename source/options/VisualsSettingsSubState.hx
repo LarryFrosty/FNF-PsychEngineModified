@@ -32,8 +32,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			
 			var splash:NoteSplash = new NoteSplash();
 			splash.noteData = i;
-			splash.setPosition(note.x, noteY);
-			splash.loadSplash();
+			splash.babyArrow = note;
+			splash.setPosition(babyArrow.x - Note.swagWidth * 0.95, babyArrow.y - Note.swagWidth);
 			splash.visible = false;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			splash.animation.finishCallback = function(name:String) splash.visible = false;
@@ -200,7 +200,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 					}
 				}
 				notesShown = true;
-				debugPrint('Option chosen: ' + curOption.variable + '\nCalculated: ' + Math.abs(notes.members[0].y - noteY), FlxColor.WHITE);
 				if(curOption.variable.startsWith('splash') && Math.abs(notes.members[0].y - noteY) < 25) playNoteSplashes();
 
 			default:
@@ -259,11 +258,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		for (splash in splashes)
 		{
-			splash.revive();
-			debugPrint('Frame: ' + splash.animation?.curAnim?.curFrame, FlxColor.WHITE);
 			var anim:String = splash.playDefaultAnim();
-			debugPrint('New frame: ' + splash.animation?.curAnim?.curFrame, FlxColor.WHITE);
-			debugPrint('Name: ' + splash.animation?.name, FlxColor.WHITE);
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			
@@ -275,26 +270,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 			if (offsets != null)
 				splash.offset.set(offsets[0], offsets[1]);
-			
-			debugPrint('Offset: ' + splash.offset, FlxColor.WHITE);
 		}
-	}
-
-	var debugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	public function debugPrint(text:String, color:FlxColor) {
-		var newText:psychlua.DebugLuaText = debugGroup.recycle(psychlua.DebugLuaText);
-		newText.text = text;
-		newText.color = color;
-		newText.disableTime = 6;
-		newText.alpha = 1;
-		newText.setPosition(10, 8 - newText.height);
-
-		debugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
-			spr.y += newText.height + 2;
-		});
-		debugGroup.add(newText);
-
-		Sys.println(text);
 	}
 
 	override function destroy()

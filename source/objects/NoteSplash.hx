@@ -209,7 +209,7 @@ class NoteSplash extends FlxSprite
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
 			// If Note RGB is enabled:
-			if(note != null && !note.noteSplashData.useGlobalShader || inEditor)
+			if (note != null && !note.noteSplashData.useGlobalShader || inEditor)
 			{
 				tempShader = new RGBPalette();
 				var colors = config.rgb;
@@ -220,7 +220,7 @@ class NoteSplash extends FlxSprite
 						if (i > 2) break;
 
 						var arr:Array<FlxColor> = ClientPrefs.data.arrowRGB[noteData % Note.colArray.length];
-						if(PlayState.isPixelStage) arr = ClientPrefs.data.arrowRGBPixel[noteData % Note.colArray.length];
+						if (PlayState.isPixelStage) arr = ClientPrefs.data.arrowRGBPixel[noteData % Note.colArray.length];
 
 						var rgb = colors[i];
 						if (rgb == null)
@@ -258,13 +258,13 @@ class NoteSplash extends FlxSprite
 		}
 		rgbShader.copyValues(tempShader);
 
-		if(!config.allowPixel) rgbShader.pixelAmount = 1;
+		if (!config.allowPixel) rgbShader.pixelAmount = 1;
 
 		offset.set(10, 10);
 		var conf:NoteSplashAnim = config.animations.get(anim);
 		var offsets:Array<Float> = [0, 0];
-		if(conf != null) offsets = conf.offsets;
-		if(offsets != null)
+		if (conf != null) offsets = conf.offsets;
+		if (offsets != null)
 		{
 			offset.x += offsets[0];
 			offset.y += offsets[1];
@@ -275,14 +275,14 @@ class NoteSplash extends FlxSprite
 		}
 		
         alpha = ClientPrefs.data.splashAlpha;
-		if(note != null) alpha = note.noteSplashData.a;
+		if (note != null) alpha = note.noteSplashData.a;
 
-		if(note != null) antialiasing = note.noteSplashData.antialiasing;
-		if(PlayState.isPixelStage || !ClientPrefs.data.antialiasing) antialiasing = false;
+		if (note != null) antialiasing = note.noteSplashData.antialiasing;
+		if (PlayState.isPixelStage || !ClientPrefs.data.antialiasing) antialiasing = false;
 
 		var minFps:Int = 22;
 		var maxFps:Int = 26;
-		if(conf != null)
+		if (conf != null)
 		{
 			minFps = conf.fps[0];
 			if (minFps < 0) minFps = 0;
@@ -291,7 +291,7 @@ class NoteSplash extends FlxSprite
 			if (maxFps < 0) maxFps = 0;
 		}
 
-		if(animation.curAnim != null)
+		if (animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
 	}
 
@@ -318,7 +318,7 @@ class NoteSplash extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		aliveTime += elapsed;
-		if(animation.curAnim != null && animation.curAnim.finished || animation.curAnim == null && aliveTime >= buggedKillTime) kill();
+		if (animation.curAnim == null && aliveTime >= buggedKillTime) kill();
 
 		if (babyArrow != null)
 		{
@@ -334,7 +334,7 @@ class NoteSplash extends FlxSprite
     public static function getSplashSkinPostfix()
 	{
 		var skin:String = '';
-		if(ClientPrefs.data.splashSkin != ClientPrefs.defaultData.splashSkin)
+		if (ClientPrefs.data.splashSkin != ClientPrefs.defaultData.splashSkin)
 			skin = '-' + ClientPrefs.data.splashSkin.trim().toLowerCase().replace(' ', '-');
 		return skin;
 	}
@@ -394,7 +394,7 @@ class PixelSplashShaderRef
 
 	public function copyValues(tempShader:RGBPalette)
 	{
-		if(tempShader != null)
+		if (tempShader != null)
 		{
 			for (i in 0...3)
 			{
@@ -457,7 +457,7 @@ class PixelSplashShader extends FlxShader
 				return color;
 			}
 
-			if(color.a == 0.0 || mult == 0.0) {
+			if (color.a == 0.0 || mult == 0.0) {
 				return color * openfl_Alphav;
 			}
 
@@ -467,7 +467,7 @@ class PixelSplashShader extends FlxShader
 
 			color = mix(color, newColor, mult);
 
-			if(color.a > 0.0) {
+			if (color.a > 0.0) {
 				return vec4(color.rgb, color.a);
 			}
 			return vec4(0.0, 0.0, 0.0, 0.0);
