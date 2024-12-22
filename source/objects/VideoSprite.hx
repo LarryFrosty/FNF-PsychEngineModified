@@ -23,7 +23,7 @@ class VideoSprite extends FlxSpriteGroup {
 	public var waiting:Bool = false;
 	public var didPlay:Bool = false;
 
-	public function new(videoName:String, isWaiting:Bool, canSkip:Bool = false, shouldLoop:Dynamic = false) {
+	public function new(videoName:String, isWaiting:Bool, canSkip:Bool = false, shouldLoop:Dynamic = false, autoPause = true) {
 		super();
 
 		this.videoName = videoName;
@@ -43,6 +43,7 @@ class VideoSprite extends FlxSpriteGroup {
 		// initialize sprites
 		videoSprite = new FlxVideoSprite();
 		videoSprite.antialiasing = ClientPrefs.data.antialiasing;
+		videoSprite.autoPause = autoPause;
 		add(videoSprite);
 		if(canSkip) this.canSkip = true;
 
@@ -100,7 +101,12 @@ class VideoSprite extends FlxSpriteGroup {
 	{
 		if(canSkip)
 		{
-			if(Controls.instance.pressed('accept'))
+			#if android
+			var holdingTouch:Bool = false;
+			for (touch in FlxG.touches.list)
+				if (touch.pressed) holdingTouch = true;
+			#end
+			if(Controls.instance.pressed('accept') #if android || holdingTouch #end)
 			{
 				holdingTime = Math.max(0, Math.min(_timeToSkip, holdingTime + elapsed));
 			}
