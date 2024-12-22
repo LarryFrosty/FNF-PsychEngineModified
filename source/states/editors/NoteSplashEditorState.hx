@@ -91,8 +91,7 @@ class NoteSplashEditorState extends MusicBeatState
         add(strums);
         add(splashes);
 
-        splash = new NoteSplash(0, 0); // this cannot be recycled
-		splash.loadSplash(imageSkin);
+        splash = new NoteSplash(0, 0, imageSkin); // this cannot be recycled
         splash.alpha = .0;
         splashes.add(splash);
 
