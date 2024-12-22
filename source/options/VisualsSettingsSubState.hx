@@ -268,7 +268,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 			if (offsets != null)
 			{
-				splash.offset.x += offsets[0]
+				splash.offset.x += offsets[0];
 				splash.offset.y += offsets[1];
 			}
 		}
