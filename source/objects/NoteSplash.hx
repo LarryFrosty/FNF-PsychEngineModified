@@ -74,7 +74,7 @@ class NoteSplash extends FlxSprite
 		}
 
 		var path:String = 'images/$texture';
-		if (configs.exists('$path.json')) this.config = configs.get('$path.json');
+		if (configs.exists(path)) this.config = configs.get(path);
 		else if (Paths.fileExists('$path.json', TEXT))
 		{
 			var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile('$path.json'));
@@ -94,74 +94,73 @@ class NoteSplash extends FlxSprite
 				}
 
 				this.config = tempConfig;
-				configs.set('$path.json', this.config);
+				configs.set(path, this.config);
+				return;
 			}
 		}
-		else
-		{
-			var tempConfig:NoteSplashConfig = createConfig();
-			var anim:String = 'note splash';
-			var fps:Array<Null<Int>> = [22, 26];
-			var offsets:Array<Array<Float>> = [[0, 0]];
-			if (Paths.fileExists('$path.txt', TEXT))
-			{
-				var configFile:Array<String> = CoolUtil.coolTextFile(path);
-				if (configFile.length > 0)
-				{
-					anim = configFile[0];
-					if (configFile.length > 1)
-					{
-						var framerates:Array<String> = configFile[1].split(' ');
-						fps = [Std.parseInt(framerates[0]), Std.parseInt(framerates[1])];
-						if (fps[0] == null) fps[0] = 22;
-						if (fps[1] == null) fps[1] = 26;
 
-						if (configFile.length > 2)
+		var tempConfig:NoteSplashConfig = createConfig();
+		var anim:String = 'note splash';
+		var fps:Array<Null<Int>> = [22, 26];
+		var offsets:Array<Array<Float>> = [[0, 0]];
+		if (Paths.fileExists('$path.txt', TEXT))
+		{
+			var configFile:Array<String> = CoolUtil.listFromString(Paths.getTextFromFile('$path.txt'));
+			if (configFile.length > 0)
+			{
+				anim = configFile[0];
+				if (configFile.length > 1)
+				{
+					var framerates:Array<String> = configFile[1].split(' ');
+					fps = [Std.parseInt(framerates[0]), Std.parseInt(framerates[1])];
+					if (fps[0] == null) fps[0] = 22;
+					if (fps[1] == null) fps[1] = 26;
+
+					if (configFile.length > 2)
+					{
+						offsets = [];
+						for (i in 2...configFile.length)
 						{
-							offsets = [];
-							for (i in 2...configFile.length)
-							{
-								var animOffs:Array<String> = configFile[i].split(' ');
-								var x:Float = Std.parseFloat(animOffs[0]);
-								var y:Float = Std.parseFloat(animOffs[1]);
-								if (Math.isNaN(x)) x = 0;
-								if (Math.isNaN(y)) y = 0;
-								offsets.push([x, y]);
-							}
+							var animOffs:Array<String> = configFile[i].split(' ');
+							var x:Float = Std.parseFloat(animOffs[0]);
+							var y:Float = Std.parseFloat(animOffs[1]);
+							if (Math.isNaN(x)) x = 0;
+							if (Math.isNaN(y)) y = 0;
+							offsets.push([x, y]);
 						}
 					}
 				}
 			}
-
-			var failedToFind:Bool = false;
-			while (true)
-			{
-				for (v in Note.colArray)
-				{
-					if (!checkForAnim('$anim $v ${maxAnims+1}'))
-					{
-						failedToFind = true;
-						break;
-					}
-				}
-				if (failedToFind) break;
-				maxAnims++;
-			}
-
-			for (animNum in 0...maxAnims)
-			{
-				for (i => col in Note.colArray)
-				{
-					var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
-					var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
-					var offset:Array<Float> = offsets[FlxMath.wrap(data, 0, Std.int(offsets.length-1))];
-					addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offset, [], data);
-				}
-			}
-
-			this.config = tempConfig;
-			configs.set('$path.json', this.config);
 		}
+
+		var failedToFind:Bool = false;
+		while (true)
+		{
+			for (v in Note.colArray)
+			{
+				if (!checkForAnim('$anim $v ${maxAnims+1}'))
+				{
+					failedToFind = true;
+					break;
+				}
+			}
+			if (failedToFind) break;
+			maxAnims++;
+		}
+
+		for (animNum in 0...maxAnims)
+		{
+			for (i => col in Note.colArray)
+			{
+				var data:Int = i % Note.colArray.length + (animNum * Note.colArray.length);
+				var name:String = animNum > 0 ? '$col' + (animNum + 1) : col;
+				var offset:Array<Float> = offsets[FlxMath.wrap(data, 0, Std.int(offsets.length-1))];
+				addAnimationToConfig(tempConfig, 1, name, '$anim $col ${animNum + 1}', fps, offset, [], data);
+			}
+		}
+
+		this.config = tempConfig;
+		configs.set(path, this.config);
 	}
 
 	public function spawnSplashNote(?x:Float = 0, ?y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)

@@ -36,7 +36,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			splash.loadSplash();
 			splash.visible = false;
 			splash.alpha = ClientPrefs.data.splashAlpha;
-			splash.animation.finishCallback = function(name:String) splash.visible = false;
+			//splash.animation.finishCallback = function(name:String) splash.visible = false;
 			splashes.add(splash);
 			
 			Note.initializeGlobalRGBShader(i % Note.colArray.length);
