@@ -262,7 +262,7 @@ class NoteSplash extends FlxSprite
 
 		offset.set(10, 10);
 		var conf = config.animations.get(anim);
-		var offsets = null;
+		var offsets = [0, 0];
 		if(conf != null) offsets = conf.offsets;
 		if(offsets != null)
 		{
