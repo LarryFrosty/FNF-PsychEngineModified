@@ -17,8 +17,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		title = Language.getPhrase('visuals_menu', 'Visuals Settings');
 		rpcTitle = 'Visuals Settings Menu'; //for Discord Rich Presence
 
-		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-
 		// for note skins and splash skins
 		notes = new FlxTypedGroup<StrumNote>();
 		splashes = new FlxTypedGroup<NoteSplash>();
@@ -33,7 +31,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			var splash:NoteSplash = new NoteSplash();
 			splash.noteData = i;
 			splash.babyArrow = note;
-			splash.setPosition(babyArrow.x - Note.swagWidth * 0.95, babyArrow.y - Note.swagWidth);
+			splash.setPosition(note.x - Note.swagWidth * 0.95, note.y - Note.swagWidth);
 			splash.visible = false;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			splash.animation.finishCallback = function(name:String) splash.visible = false;
@@ -180,7 +178,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		super();
 		add(notes);
 		add(splashes);
-		add(debugGroup);
 	}
 
 	var notesShown:Bool = false;
