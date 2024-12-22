@@ -261,7 +261,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
-			offset.set(10, 10);
+			splash.offset.set(10, 10);
 
 			if (conf != null)
 				offsets = conf.offsets;
