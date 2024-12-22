@@ -261,8 +261,8 @@ class NoteSplash extends FlxSprite
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
 		offset.set(10, 10);
-		var conf = config.animations.get(anim);
-		var offsets = [0, 0];
+		var conf:NoteSplashConfig = config.animations.get(anim);
+		var offsets:Array<Float> = [0, 0];
 		if(conf != null) offsets = conf.offsets;
 		if(offsets != null)
 		{
