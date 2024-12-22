@@ -682,7 +682,7 @@ class NoteSplashEditorState extends MusicBeatState
 	function updateText()
 	{
 		curText.text = 'Copied Offsets: ' + Std.string(copiedOffset).replace(',', ', ') + '\n';
-		curText.text += 'Current Animation: ' + (curAnim == null || curAnim.length < 1)  ? "NONE" : Std.string(curAnim);
+		curText.text += 'Current Animation: ${curAnim == null || curAnim.length < 1 ? "NONE" : curAnim}';
 		if (config != null && !curText.text.contains('NONE'))
         {
             var offsets:Array<Float> = try config.animations.get(curAnim).offsets catch (e) [0, 0];

@@ -5,13 +5,13 @@ import shaders.RGBPalette;
 import states.editors.NoteSplashEditorState;
 import flixel.system.FlxAssets.FlxShader;
 
-private typedef RGB = {
+typedef RGB = {
 	r:Null<Int>,
 	g:Null<Int>,
 	b:Null<Int>
 }
 
-private typedef NoteSplashAnim = {
+typedef NoteSplashAnim = {
 	name:String,
 	noteData:Int,
 	prefix:String,
@@ -261,7 +261,7 @@ class NoteSplash extends FlxSprite
 		if(!config.allowPixel) rgbShader.pixelAmount = 1;
 
 		offset.set(10, 10);
-		var conf:NoteSplashConfig = config.animations.get(anim);
+		var conf:NoteSplashAnim = config.animations.get(anim);
 		var offsets:Array<Float> = [0, 0];
 		if(conf != null) offsets = conf.offsets;
 		if(offsets != null)
