@@ -823,12 +823,16 @@ class NoteSplashEditorState extends MusicBeatState
 
 	public function loadTxt()
 	{
+		var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
+        File.saveContent('saves/shit.json', Json.stringify(conf, '\t'));
+		#if desktop
 		var jsonFilter:FileFilter = new FileFilter('Select a note splash TXT', '*.txt');
 		_file = new FileReference();
 		_file.addEventListener(Event.SELECT, onLoadComplete);
 		_file.addEventListener(Event.CANCEL, onLoadCancel);
 		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
 		_file.browse([#if windows jsonFilter #end]);
+		#end
 	}
 
 	function onLoadComplete(_):Void
@@ -842,9 +846,7 @@ class NoteSplashEditorState extends MusicBeatState
 			var txtLoaded:Dynamic = Json.parse(Json.stringify(_file));
             var txt:String = null;
             var file:String = "config.json";
-            var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
-            File.saveContent('saves/shit.json', Json.stringify(conf, '\t'));
-            #if (MODS_ALLOWED && desktop)
+            #if MODS_ALLOWED
             if (txtLoaded.__path != null)
             {
                 try txt = File.getContent(txtLoaded.__path) catch (e) txt = null;
