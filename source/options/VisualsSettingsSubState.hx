@@ -255,22 +255,47 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		for (splash in splashes)
 		{
+			var animArray:Array<Int> = [];
+			for (i in 0...splash.maxAnims)
+			{
+				var data:Int = splash.noteData % Note.colArray.length + (i * Note.colArray.length); 
+
+				if (!animArray.contains(data))
+					animArray.push(data);
+			}
+
+			if (animArray.length > 1)
+				splash.noteData = animArray[FlxG.random.int(0, animArray.length-1)];
+
 			var anim:String = splash.playDefaultAnim();
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
 			
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
+			var minFps:Int = 22;
+			var maxFps:Int = 26;
 			splash.offset.set(10, 10);
 
 			if (conf != null)
+			{
 				offsets = conf.offsets;
+
+				minFps = conf.fps[0];
+				if (minFps < 0) minFps = 0;
+
+				maxFps = conf.fps[1];
+				if (maxFps < 0) maxFps = 0;
+			}
 
 			if (offsets != null)
 			{
 				splash.offset.x += offsets[0];
 				splash.offset.y += offsets[1];
 			}
+
+			if (animation.curAnim != null)
+				animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
 		}
 	}
 

@@ -168,8 +168,6 @@ class NoteSplash extends FlxSprite
 		if (note != null && note.noteSplashData.disabled)
 			return;
 
-		aliveTime = 0;
-
 		var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
 		if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
 		else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
@@ -313,13 +311,8 @@ class NoteSplash extends FlxSprite
 		return animFrames.length > 0;
 	}
 
-	var aliveTime:Float = 0;
-	static var buggedKillTime:Float = 0.5; //automatically kills note splashes if they break to prevent it from flooding your HUD
 	override function update(elapsed:Float)
 	{
-		aliveTime += elapsed;
-		if (animation.curAnim == null && aliveTime >= buggedKillTime) kill();
-
 		if (babyArrow != null)
 		{
 			if (copyX)

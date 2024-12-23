@@ -517,9 +517,10 @@ class NoteSplashEditorState extends MusicBeatState
 
         if (config != null)
         {
-            if (addButton.label != 'Update' && config.animations.exists(curAnimText.text) && config.animations.get(curAnimText.text) != null)
+        	var currentAnim:String = curAnimText.text;
+            if (config.animations.exists(currentAnim) && config.animations.get(currentAnim) != null)
                 addButton.label = 'Update';
-            else if (addButton.label != 'Add')
+            else
                 addButton.label = 'Add';
 
             config.scale = scaleNumericStepper.value;
@@ -625,41 +626,9 @@ class NoteSplashEditorState extends MusicBeatState
                         //strum.holdTimer = Math.POSITIVE_INFINITY;
 
                         var splash:NoteSplash = splashes.recycle(null, createSplash);
-                        splash.alpha = 0.00001;
                         splash.config = config;
-
-                        var anims:Int = 0;
-                        var animArray:Array<Int> = [];
-
-                        while (true)
-                        {
-                            var data:Int = strum.ID % 4 + (anims * 4); 
-                            if (!splash.noteDataMap.exists(data) || !splash.animation.exists(splash.noteDataMap[data]))
-                                break;
-
-                            anims++;
-                        }
-
-                        if (anims > 1)
-                        {
-                            for (i in 0...anims)
-                            {
-                                animArray.push(strum.ID % 4 + (i * 4));
-                            }
-                        }
-
-                        var data:Int = strum.ID % 4;
-                        if (!splash.noteDataMap.exists(data) && splash.noteDataMap.exists(strum.ID % 4 + 4))
-                            data = strum.ID % 4 + 4;
-
-                        if (animArray.length > 1)
-                        {
-                            data = animArray[FlxG.random.int(0, animArray.length - 1)];
-                        }
-
                         splash.babyArrow = strum;
                         splash.spawnSplashNote(0, 0, data);
-                        splash.alpha = 1;
                         splashes.add(splash);
                     }
                 }
@@ -873,7 +842,10 @@ class NoteSplashEditorState extends MusicBeatState
 			var txtLoaded:Dynamic = Json.parse(Json.stringify(_file));
             var txt:String = null;
             var file:String = "config.json";
-            #if MODS_ALLOWED
+            var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
+            conf = Json.stringify(conf, '\t');
+            File.saveContent('saves/shit.json', conf);
+            #if MODS_ALLOWED && desktop
             if (txtLoaded.__path != null)
             {
                 try txt = File.getContent(txtLoaded.__path) catch (e) txt = null;
@@ -979,8 +951,7 @@ class NoteSplashEditorState extends MusicBeatState
 		{
 			for (col in Note.colArray)
 			{
-				var offset = offsets[i];
-				if (offset == null) offset = [0, 0];
+				var offset = offsets[FlxMath.wrap(i, 0, Std.int(offsets.length - 1))];
 
 				config = NoteSplash.addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
 				i++;
