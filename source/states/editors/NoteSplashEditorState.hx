@@ -845,7 +845,7 @@ class NoteSplashEditorState extends MusicBeatState
             var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
             conf = Json.stringify(conf, '\t');
             File.saveContent('saves/shit.json', conf);
-            #if MODS_ALLOWED && desktop
+            #if (MODS_ALLOWED && desktop)
             if (txtLoaded.__path != null)
             {
                 try txt = File.getContent(txtLoaded.__path) catch (e) txt = null;
