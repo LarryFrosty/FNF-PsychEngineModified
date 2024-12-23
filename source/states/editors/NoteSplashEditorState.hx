@@ -120,6 +120,9 @@ class NoteSplashEditorState extends MusicBeatState
 
 		updateText();
 
+		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		add(debugGroup);
+
         addTouchPad('LEFT_FULL', 'NOTE_SPLASH_EDITOR');
 
         super.create();
@@ -625,10 +628,11 @@ class NoteSplashEditorState extends MusicBeatState
                         strum.playAnim('confirm', true);
                         //strum.holdTimer = Math.POSITIVE_INFINITY;
 
-                        var splash:NoteSplash = splashes.recycle(null, createSplash);
+                        var splash:NoteSplash = new NoteSplash(0, 0, imageSkin);
                         splash.config = config;
                         splash.babyArrow = strum;
                         splash.spawnSplashNote(0, 0, strum.ID % 4);
+                        debugPrint('Offset strum played: '+splash.offset, FlxColor.WHITE);
                         splashes.add(splash);
                     }
                 }
@@ -661,17 +665,17 @@ class NoteSplashEditorState extends MusicBeatState
 
     function playStrumAnim(?name:String, noteData:Int)
     {
-        var splash:NoteSplash = splashes.recycle(null, createSplash);
-        splash.alpha = 1;
+        var splash:NoteSplash = new NoteSplash(0, 0, imageSkin);
         splash.config = config;
         if (noteData < 0) noteData = 0;
 
-        if (name != null && splash.animation.exists(name) && noteData > -1)
+        if (name != null && splash.animation.exists(name))
         {
             splash.babyArrow = strums.members[noteData % 4];
             splash.spawnSplashNote(0, 0, noteData, null, false);
             splash.alpha = 1;
             splashes.add(splash);
+            debugPrint('Offset played: '+splash.offset, FlxColor.WHITE);
         }
         else
         {
@@ -963,6 +967,21 @@ class NoteSplashEditorState extends MusicBeatState
 
 		return config;
 	}
+
+	var debugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	public function debugPrint(text:String, color:FlxColor) {
+		var newText:psychlua.DebugLuaText = debugGroup.recycle(psychlua.DebugLuaText);
+		newText.text = text;
+		newText.color = color;
+		newText.disableTime = 6;
+		newText.alpha = 1;
+		newText.setPosition(10, 8 - newText.height);
+		debugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
+			spr.y += newText.height + 2;
+		});
+		debugGroup.add(newText);
+		Sys.println(text);
+	}
 }
 
 
@@ -977,7 +996,7 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
         add(bg);
 
 		var str:Array<String> = controls.mobileC ? ["Touch on a Strum", "to spawn a Splash", "", "Arrow Keys - Move Offset",
-			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "To add extra animations, noteData must be (currentNoteData) + 4"] : [
+			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "To add extra animations,", "noteData must be (currentNoteData) + 4"] : [
 			"Click on a Strum or Press Space",
 			"to spawn a Splash",
 			"",
