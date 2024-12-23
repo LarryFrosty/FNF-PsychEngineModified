@@ -294,8 +294,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 				splash.offset.y += offsets[1];
 			}
 
-			if (animation.curAnim != null)
-				animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
+			if (splash.animation.curAnim != null)
+				splash.animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
 		}
 	}
 

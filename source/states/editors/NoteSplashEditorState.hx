@@ -628,7 +628,7 @@ class NoteSplashEditorState extends MusicBeatState
                         var splash:NoteSplash = splashes.recycle(null, createSplash);
                         splash.config = config;
                         splash.babyArrow = strum;
-                        splash.spawnSplashNote(0, 0, data);
+                        splash.spawnSplashNote(0, 0, strum.ID % 4);
                         splashes.add(splash);
                     }
                 }
@@ -843,8 +843,7 @@ class NoteSplashEditorState extends MusicBeatState
             var txt:String = null;
             var file:String = "config.json";
             var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
-            conf = Json.stringify(conf, '\t');
-            File.saveContent('saves/shit.json', conf);
+            File.saveContent('saves/shit.json', Json.stringify(conf, '\t'));
             #if (MODS_ALLOWED && desktop)
             if (txtLoaded.__path != null)
             {

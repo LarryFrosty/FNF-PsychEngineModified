@@ -55,7 +55,7 @@ class NoteSplash extends FlxSprite
 		loadSplash(splash);
 	}
 
-	var maxAnims:Int = 0;
+	public var maxAnims:Int = 0;
 	public function loadSplash(?splash:String)
 	{
 		maxAnims = 0;
