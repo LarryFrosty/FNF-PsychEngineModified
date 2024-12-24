@@ -121,12 +121,15 @@ class NoteSplash extends FlxSprite
 						offsets = [];
 						for (i in 2...configFile.length)
 						{
-							var animOffs:Array<String> = configFile[i].split(' ');
-							var x:Float = Std.parseFloat(animOffs[0]);
-							var y:Float = Std.parseFloat(animOffs[1]);
-							if (Math.isNaN(x)) x = 0;
-							if (Math.isNaN(y)) y = 0;
-							offsets.push([x, y]);
+							if (configFile[i].trim() != '')
+							{
+								var animOffs:Array<String> = configFile[i].split(' ');
+								var x:Float = Std.parseFloat(animOffs[0]);
+								var y:Float = Std.parseFloat(animOffs[1]);
+								if (Math.isNaN(x)) x = 0;
+								if (Math.isNaN(y)) y = 0;
+								offsets.push([x, y]);
+							}
 						}
 					}
 				}

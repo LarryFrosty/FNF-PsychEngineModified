@@ -633,6 +633,7 @@ class NoteSplashEditorState extends MusicBeatState
                         splash.babyArrow = strum;
                         splash.spawnSplashNote(0, 0, strum.ID % 4);
                         debugPrint('Offset strum played: '+splash.offset, FlxColor.WHITE);
+                        debugPrint('Config strum played: '+splash.config, FlxColor.WHITE)
                         splashes.add(splash);
                     }
                 }
@@ -676,6 +677,7 @@ class NoteSplashEditorState extends MusicBeatState
             splash.alpha = 1;
             splashes.add(splash);
             debugPrint('Offset played: '+splash.offset, FlxColor.WHITE);
+            debugPrint('Config played: '+splash.config, FlxColor.WHITE);
         }
         else
         {
