@@ -60,6 +60,12 @@ class NoteSplash extends FlxSprite
 	{
 		maxAnims = 0;
 
+		if (splash == null || splash.length < 1)
+		{
+			if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
+				splash = PlayState.SONG.splashSkin;
+		}
+
 		texture = splash;
 		frames = Paths.getSparrowAtlas(texture);
 		if (frames == null)
@@ -168,14 +174,15 @@ class NoteSplash extends FlxSprite
 
 	public function spawnSplashNote(?x:Float = 0, ?y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
 	{
-		if (note != null && note.noteSplashData.disabled)
-			return;
+		if (note != null)
+		{
+			if (note.noteSplashData.disabled)
+				return;
 
-		var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
-		if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
-		else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
+			if (note.noteSplashData.texture != null)
+				loadSplash(note.noteSplashData.texture);
+		}
 
-		loadSplash(loadedTexture);
 		setPosition(x, y);
 
 		if (babyArrow != null)

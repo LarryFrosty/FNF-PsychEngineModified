@@ -118,11 +118,6 @@ class NoteSplashEditorState extends MusicBeatState
         curText.x += 5;
         add(curText);
 
-		updateText();
-
-		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		add(debugGroup);
-
         addTouchPad('LEFT_FULL', 'NOTE_SPLASH_EDITOR');
 
         super.create();
@@ -516,6 +511,14 @@ class NoteSplashEditorState extends MusicBeatState
     { 
         super.update(elapsed);
 
+		curText.text = 'Copied Offsets: ' + Std.string(copiedOffset).replace(',', ', ') + '\n';
+		curText.text += 'Current Animation: ${curAnim == null || curAnim.length < 1 ? "NONE" : curAnim}';
+		if (config != null && !curText.text.contains('NONE'))
+        {
+            var offsets:Array<Float> = try config.animations.get(curAnim).offsets catch (e) [0, 0];
+            curText.text += ' ($offsets)'.replace(',', ', ');
+        }
+
         errorText.x = FlxG.width - errorText.width - 5;
 
         if (config != null)
@@ -548,14 +551,12 @@ class NoteSplashEditorState extends MusicBeatState
                 if (touchPad.buttonC.justPressed || FlxG.keys.justPressed.C)
                 {
                     copiedOffset = config.animations.get(curAnim).offsets.copy();
-                    updateText();
                 }
                 else if (touchPad.buttonV.justPressed || FlxG.keys.justPressed.V)
                 {
                     var conf = config.animations.get(curAnim);
                     conf.offsets = copiedOffset.copy(); 
                     config.animations.set(curAnim, conf);
-                    updateText();
                     changedOffset = true;
                 }
                 else if(FlxG.keys.justPressed.R)
@@ -563,7 +564,6 @@ class NoteSplashEditorState extends MusicBeatState
                     var conf = config.animations.get(curAnim);
                     conf.offsets = [0, 0];
                     config.animations.set(curAnim, conf);
-                    updateText();
                     changedOffset = true;
                 }
             }
@@ -575,7 +575,6 @@ class NoteSplashEditorState extends MusicBeatState
             {
                 config.animations.get(curAnim).offsets[0] += ((moveKeysP[0] ? 1 : 0) - (moveKeysP[1] ? 1 : 0)) * multiplier;
                 config.animations.get(curAnim).offsets[1] += ((moveKeysP[2] ? 1 : 0) - (moveKeysP[3] ? 1 : 0)) * multiplier;
-                updateText();
                 changedOffset = true;
             }
     
@@ -590,7 +589,6 @@ class NoteSplashEditorState extends MusicBeatState
                     {
                         config.animations.get(curAnim).offsets[0] += ((moveKeys[0] ? 1 : 0) - (moveKeys[1] ? 1 : 0)) * multiplier;
                         config.animations.get(curAnim).offsets[1] += ((moveKeys[2] ? 1 : 0) - (moveKeys[3] ? 1 : 0)) * multiplier;
-                        updateText();
                         holdingArrowsElapsed -= (1/60);
                         changedOffset = true;
                     }
@@ -632,8 +630,6 @@ class NoteSplashEditorState extends MusicBeatState
                         splash.config = config;
                         splash.babyArrow = strum;
                         splash.spawnSplashNote(0, 0, strum.ID % 4);
-                        debugPrint('Offset strum played: '+splash.offset, FlxColor.WHITE);
-                        debugPrint('Config strum played: '+splash.config, FlxColor.WHITE);
                         splashes.add(splash);
                     }
                 }
@@ -653,17 +649,6 @@ class NoteSplashEditorState extends MusicBeatState
 		addTouchPad('LEFT_FULL', 'NOTE_SPLASH_EDITOR');
 	}
 
-	function updateText()
-	{
-		curText.text = 'Copied Offsets: ' + Std.string(copiedOffset).replace(',', ', ') + '\n';
-		curText.text += 'Current Animation: ${curAnim == null || curAnim.length < 1 ? "NONE" : curAnim}';
-		if (config != null && !curText.text.contains('NONE'))
-        {
-            var offsets:Array<Float> = try config.animations.get(curAnim).offsets catch (e) [0, 0];
-            curText.text += ' ($offsets)'.replace(',', ', ');
-        }
-	}
-
     function playStrumAnim(?name:String, noteData:Int)
     {
         var splash:NoteSplash = new NoteSplash(0, 0, imageSkin);
@@ -676,8 +661,6 @@ class NoteSplashEditorState extends MusicBeatState
             splash.spawnSplashNote(0, 0, noteData, null, false);
             splash.alpha = 1;
             splashes.add(splash);
-            debugPrint('Offset played: '+splash.offset, FlxColor.WHITE);
-            debugPrint('Config played: '+splash.config, FlxColor.WHITE);
         }
         else
         {
@@ -968,21 +951,6 @@ class NoteSplashEditorState extends MusicBeatState
 		}
 
 		return config;
-	}
-
-	var debugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	public function debugPrint(text:String, color:FlxColor) {
-		var newText:psychlua.DebugLuaText = debugGroup.recycle(psychlua.DebugLuaText);
-		newText.text = text;
-		newText.color = color;
-		newText.disableTime = 6;
-		newText.alpha = 1;
-		newText.setPosition(10, 8 - newText.height);
-		debugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
-			spr.y += newText.height + 2;
-		});
-		debugGroup.add(newText);
-		Sys.println(text);
 	}
 }
 
