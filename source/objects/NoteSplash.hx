@@ -80,7 +80,16 @@ class NoteSplash extends FlxSprite
 		}
 
 		var path:String = 'images/$texture';
-		if (configs.exists(path)) this.config = configs.get(path);
+		if (configs.exists(path))
+		{
+			this.config = configs.get(path);
+			for (anim in this.config.animations)
+			{
+				if (anim.noteData % 4 == 0)
+					maxAnims++;
+			}
+			return;
+		}
 		else if (Paths.fileExists('$path.json', TEXT))
 		{
 			var config:Dynamic = haxe.Json.parse(Paths.getTextFromFile('$path.json'));
@@ -96,6 +105,11 @@ class NoteSplash extends FlxSprite
 
 				for (i in Reflect.fields(config.animations))
 				{
+					var anim:NoteSplashAnim = Reflect.field(config.animations, i);
+					if (anim.noteData % 4 == 0)
+					{
+						maxAnims++;
+					}
 					tempConfig.animations.set(i, Reflect.field(config.animations, i));
 				}
 
@@ -105,11 +119,12 @@ class NoteSplash extends FlxSprite
 			}
 		}
 
+		// Splashes with no json
 		var tempConfig:NoteSplashConfig = createConfig();
 		var anim:String = 'note splash';
 		var fps:Array<Null<Int>> = [22, 26];
 		var offsets:Array<Array<Float>> = [[0, 0]];
-		if (Paths.fileExists('$path.txt', TEXT)) // Backwards compatibility with 0.7 splashes
+		if (Paths.fileExists('$path.txt', TEXT)) // Backwards compatibility with 0.7 splash txts
 		{
 			var configFile:Array<String> = CoolUtil.listFromString(Paths.getTextFromFile('$path.txt'));
 			if (configFile.length > 0)

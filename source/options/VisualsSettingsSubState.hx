@@ -253,19 +253,14 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 	function playNoteSplashes()
 	{
+		var rand:Int = 0;
+		if (splashes.members[0] != null && splashes.members[0].maxAnims > 1)
+			rand = FlxG.random.int(0, splashes.members[0].maxAnims - 1);
+
 		for (splash in splashes)
 		{
-			var animArray:Array<Int> = [];
-			for (i in 0...splash.maxAnims)
-			{
-				var data:Int = splash.noteData % Note.colArray.length + (i * Note.colArray.length); 
-
-				if (!animArray.contains(data))
-					animArray.push(data);
-			}
-
-			if (animArray.length > 1)
-				splash.noteData = animArray[FlxG.random.int(0, animArray.length-1)];
+			if (splash.maxAnims > 1)
+				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
 
 			var anim:String = splash.playDefaultAnim();
 			splash.visible = true;
