@@ -950,7 +950,8 @@ class NoteSplashEditorState extends MusicBeatState
 			k++;
 		}
 
-		return config = config;
+		config = config;
+		return config;
 	}
 }
 
