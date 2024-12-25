@@ -943,14 +943,13 @@ class NoteSplashEditorState extends MusicBeatState
 			{
 				var offset = offsets[FlxMath.wrap(i, 0, Std.int(offsets.length - 1))];
 
-				NoteSplash.addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
+				config = NoteSplash.addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
 				i++;
 			}
 			if (offsets[i] == null) break;
 			k++;
 		}
 
-		config = config;
 		return config;
 	}
 }
