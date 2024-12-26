@@ -358,10 +358,10 @@ class NoteSplashEditorState extends MusicBeatState
         templateButton = new PsychUIButton(20, 155, "Template");
         ui.add(templateButton);
 
-        //#if !mobile
+        #if !mobile
         var loadButton:PsychUIButton = new PsychUIButton(180, 155, "Convert TXT", loadTxt);
         ui.add(loadButton);
-        //#end
+        #end
 
         var allowRGBCheck:PsychUICheckBox = new PsychUICheckBox(20, 105, "", 1);
         function check()
@@ -812,16 +812,12 @@ class NoteSplashEditorState extends MusicBeatState
 
 	public function loadTxt()
 	{
-		var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes.txt'));
-        File.saveContent('saves/shit.json', Json.stringify(conf, '\t'));
-		#if desktop
 		var jsonFilter:FileFilter = new FileFilter('Select a note splash TXT', '*.txt');
 		_file = new FileReference();
 		_file.addEventListener(Event.SELECT, onLoadComplete);
 		_file.addEventListener(Event.CANCEL, onLoadCancel);
 		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
 		_file.browse([#if windows jsonFilter #end]);
-		#end
 	}
 
 	function onLoadComplete(_):Void
