@@ -12,20 +12,19 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	var notes:FlxTypedGroup<StrumNote>;
 	var splashes:FlxTypedGroup<NoteSplash>;
 	var noteY:Float = 90;
+	var debugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
 	public function new()
 	{
 		title = Language.getPhrase('visuals_menu', 'Visuals Settings');
 		rpcTitle = 'Visuals Settings Menu'; //for Discord Rich Presence
-
+		debugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
 		// for note skins and splash skins
 		notes = new FlxTypedGroup<StrumNote>();
 		splashes = new FlxTypedGroup<NoteSplash>();
 		for (i in 0...Note.colArray.length)
 		{
 			var note:StrumNote = new StrumNote(370 + (560 / Note.colArray.length) * i, -200, i, 0);
-			note.centerOffsets();
-			note.centerOrigin();
-			note.playAnim('static');
+			changeNoteSkin(note);
 			notes.add(note);
 			
 			var splash:NoteSplash = new NoteSplash(0, 0, NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix());
@@ -178,6 +177,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		super();
 		add(notes);
 		add(splashes);
+		add(debugGroup)
 	}
 
 	var notesShown:Bool = false;
@@ -260,12 +260,15 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 		for (splash in splashes)
 		{
-			//if (splash.maxAnims > 1)
-				//splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
+			debugPrint('Max Anims: '+splash.maxAnims, FlxColor.WHITE);
+			if (splash.maxAnims > 1)
+				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
+			debugPrint('Notedata: '+splash.noteData);
 
 			var anim:String = splash.playDefaultAnim();
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
+			debugPrint('Anim: '+splash.animation.name+' - playDefaultAnim: '+anim);
 			
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
@@ -293,6 +296,19 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			if (splash.animation.curAnim != null)
 				splash.animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
 		}
+	}
+
+	public function debugPrint(text:String, color:FlxColor) {
+		var newText:psychlua.DebugLuaText = debugGroup.recycle(psychlua.DebugLuaText);
+		newText.text = text;
+		newText.color = color;
+		newText.disableTime = 6;
+		newText.alpha = 1;
+		newText.setPosition(10, 8 - newText.height);
+		debugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
+			spr.y += newText.height + 2;
+		});
+		debugGroup.add(newText);
 	}
 
 	override function destroy()
