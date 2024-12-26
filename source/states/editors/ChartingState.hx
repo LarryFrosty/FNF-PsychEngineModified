@@ -2657,7 +2657,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		var tab_group = mainBox.getTab('Data').menu;
 		var objX = 10;
 		var objY = 25;
-		gameOverCharDropDown = new PsychUIDropDownMenu(objX, objY, [''], function(id:Int, character:String)
+		gameOverCharDropDown = new PsychUIDropDownMenu(objX, objY, [PlayState.SONG.gameOverChar != null ? PlayState.SONG.gameOverChar : ''], function(id:Int, character:String)
 		{
 			PlayState.SONG.gameOverChar = character;
 			if(character.length < 1) Reflect.deleteField(PlayState.SONG, 'gameOverChar');
@@ -2665,21 +2665,21 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		});
 
 		objY += 40;
-		gameOverSndInputText = new PsychUIInputText(objX, objY, 120, '', 8);
+		gameOverSndInputText = new PsychUIInputText(objX, objY, 120, PlayState.SONG.gameOverSound != null ? PlayState.SONG.gameOverSound : '', 8);
 		gameOverSndInputText.onChange = function(old:String, cur:String)
 		{
 			PlayState.SONG.gameOverSound = cur;
 			if(cur.trim().length < 1) Reflect.deleteField(PlayState.SONG, 'gameOverSound');
 		}
 		objY += 40;
-		gameOverLoopInputText = new PsychUIInputText(objX, objY, 120, '', 8);
+		gameOverLoopInputText = new PsychUIInputText(objX, objY, 120, PlayState.SONG.gameOverLoop != null ? PlayState.SONG.gameOverLoop : '', 8);
 		gameOverLoopInputText.onChange = function(old:String, cur:String)
 		{
 			PlayState.SONG.gameOverLoop = cur;
 			if(cur.trim().length < 1) Reflect.deleteField(PlayState.SONG, 'gameOverLoop');
 		}
 		objY += 40;
-		gameOverRetryInputText = new PsychUIInputText(objX, objY, 120, '', 8);
+		gameOverRetryInputText = new PsychUIInputText(objX, objY, 120, PlayState.SONG.gameOverEnd != null ? PlayState.SONG.gameOverEnd : '', 8);
 		gameOverRetryInputText.onChange = function(old:String, cur:String)
 		{
 			PlayState.SONG.gameOverEnd = cur;
@@ -2688,9 +2688,10 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		objY += 35;
 		noRGBCheckBox = new PsychUICheckBox(objX, objY, 'Disable Note RGB', 100, updateNotesRGB);
+		noRGBCheckBox.checked = (PlayState.SONG.disableNoteRGB == true);
 		
 		objY += 40;
-		noteTextureInputText = new PsychUIInputText(objX, objY, 120, '');
+		noteTextureInputText = new PsychUIInputText(objX, objY, 120, PlayState.SONG.arrowSkin != null ? PlayState.SONG.arrowSkin : '');
 		noteTextureInputText.unfocus = function()
 		{
 			var changed:Bool = false;
@@ -2723,7 +2724,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			}
 		};
 
-		noteSplashesInputText = new PsychUIInputText(objX + 140, objY, 120, '');
+		noteSplashesInputText = new PsychUIInputText(objX + 140, objY, 120, PlayState.SONG.splashSkin != null ? PlayState.SONG.splashSkin : '');
 		noteSplashesInputText.onChange = function(old:String, cur:String)
 		{
 			PlayState.SONG.splashSkin = cur;

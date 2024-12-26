@@ -260,8 +260,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 		for (splash in splashes)
 		{
-			if (splash.maxAnims > 1)
-				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
+			//if (splash.maxAnims > 1)
+				//splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
 
 			var anim:String = splash.playDefaultAnim();
 			splash.visible = true;
