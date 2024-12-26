@@ -263,12 +263,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			debugPrint('Max Anims: '+splash.maxAnims, FlxColor.WHITE);
 			if (splash.maxAnims > 1)
 				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
-			debugPrint('Notedata: '+splash.noteData);
+			debugPrint('Notedata: '+splash.noteData, FlxColor.WHITE);
 
 			var anim:String = splash.playDefaultAnim();
 			splash.visible = true;
 			splash.alpha = ClientPrefs.data.splashAlpha;
-			debugPrint('Anim: '+splash.animation.name+' - playDefaultAnim: '+anim);
+			debugPrint('Anim: '+splash.animation.name+' - playDefaultAnim: '+anim, FlxColor.WHITE);
 			
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
