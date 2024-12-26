@@ -245,8 +245,9 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 	function onChangeSplashSkin()
 	{
+		var skin:String = NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix();
 		for (splash in splashes)
-			splash.loadSplash();
+			splash.loadSplash(skin);
 
 		playNoteSplashes();
 	}
@@ -255,7 +256,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		var rand:Int = 0;
 		if (splashes.members[0] != null && splashes.members[0].maxAnims > 1)
-			rand = FlxG.random.int(0, splashes.members[0].maxAnims - 1);
+			rand = FlxG.random.int(0, splashes.members[0].maxAnims - 1); // Variable here to play the same random animation on all 4 splashes
 
 		for (splash in splashes)
 		{

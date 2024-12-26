@@ -812,7 +812,7 @@ class NoteSplashEditorState extends MusicBeatState
 
 	public function loadTxt()
 	{
-		var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes/noteSplashes.txt'));
+		var conf = parseTxt(File.getContent('assets/shared/images/noteSplashes.txt'));
         File.saveContent('saves/shit.json', Json.stringify(conf, '\t'));
 		#if desktop
 		var jsonFilter:FileFilter = new FileFilter('Select a note splash TXT', '*.txt');
@@ -883,6 +883,7 @@ class NoteSplashEditorState extends MusicBeatState
 
     override function destroy()
     {
+		NoteSplash.configs.clear();
         super.destroy();
 
         FlxG.sound.music.volume = 1;

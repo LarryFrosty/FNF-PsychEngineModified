@@ -58,13 +58,11 @@ class NoteSplash extends FlxSprite
 	public var maxAnims:Int = 0;
 	public function loadSplash(?splash:String)
 	{
+		config = null;
 		maxAnims = 0;
 
 		if (splash == null || splash.length < 1)
-		{
-			if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0)
-				splash = PlayState.SONG.splashSkin;
-		}
+			splash = try PlayState.SONG.splashSkin catch(e) null;
 
 		texture = splash;
 		frames = Paths.getSparrowAtlas(texture);
@@ -208,21 +206,8 @@ class NoteSplash extends FlxSprite
 
 		this.noteData = noteData;
 
-		if (randomize)
-		{
-			var animArray:Array<Int> = [];
-
-			for (i in 0...maxAnims)
-			{
-				var data:Int = noteData % Note.colArray.length + (i * Note.colArray.length); 
-
-				if (!animArray.contains(data))
-					animArray.push(data);
-			}
-
-			if (animArray.length > 1)
-				noteData = animArray[FlxG.random.int(0, animArray.length-1)];
-		}
+		if (randomize && maxAnims > 1)
+			noteData = noteData % Note.colArray.length + (FlxG.random.int(0, maxAnims - 1) * Note.colArray.length);
 
 		var anim:String = playDefaultAnim();
 
