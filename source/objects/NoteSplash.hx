@@ -55,7 +55,7 @@ class NoteSplash extends FlxSprite
 		loadSplash(splash);
 	}
 
-	public var maxAnims:Int = 0;
+	public var maxAnims(default, set):Int = 0;
 	public function loadSplash(?splash:String)
 	{
 		config = null;
@@ -305,7 +305,7 @@ class NoteSplash extends FlxSprite
 	public function playDefaultAnim()
 	{
 		var anim:String = noteDataMap.get(noteData);
-		if (anim != null)
+		if (anim != null && animation.exists(anim))
 			animation.play(anim, true);
 
 		return anim;
@@ -385,6 +385,12 @@ class NoteSplash extends FlxSprite
 
 		scale.set(value.scale, value.scale);
 		return config = value;
+	}
+
+	function set_maxAnims(value:Int)
+	{
+		noteData = FlxMath.bound(noteData, 0, (value * Note.colArray.length) - 1);
+		return maxAnims = value;
 	}
 }
 
