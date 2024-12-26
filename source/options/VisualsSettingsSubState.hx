@@ -177,7 +177,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 		super();
 		add(notes);
 		add(splashes);
-		add(debugGroup)
+		add(debugGroup);
 	}
 
 	var notesShown:Bool = false;
