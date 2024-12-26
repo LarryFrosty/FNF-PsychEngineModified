@@ -28,7 +28,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			note.playAnim('static');
 			notes.add(note);
 			
-			var splash:NoteSplash = new NoteSplash();
+			var splash:NoteSplash = new NoteSplash(0, 0, NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix());
 			splash.noteData = i;
 			splash.babyArrow = note;
 			splash.setPosition(note.x - Note.swagWidth * 0.95, note.y - Note.swagWidth);

@@ -942,9 +942,10 @@ class NoteSplashEditorState extends MusicBeatState
 		{
 			for (col in Note.colArray)
 			{
+				var anim = k <= 1 ? col : '$col' + k;
 				var offset = offsets[FlxMath.wrap(i, 0, Std.int(offsets.length - 1))];
 
-				config = NoteSplash.addAnimationToConfig(config, 1, col, '$animation $col $k', fps, offset, [], i);
+				config = NoteSplash.addAnimationToConfig(config, 1, anim, '$animation $col $k', fps, offset, [], i);
 				i++;
 			}
 			if (offsets[i] == null) break;

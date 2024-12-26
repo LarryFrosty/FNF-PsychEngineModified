@@ -204,11 +204,10 @@ class NoteSplash extends FlxSprite
 		if (note != null)
 			noteData = note.noteData;
 
-		this.noteData = noteData;
-
 		if (randomize && maxAnims > 1)
 			noteData = noteData % Note.colArray.length + (FlxG.random.int(0, maxAnims - 1) * Note.colArray.length);
 
+		this.noteData = noteData;
 		var anim:String = playDefaultAnim();
 
 		var tempShader:RGBPalette = null;
