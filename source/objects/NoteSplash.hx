@@ -214,7 +214,6 @@ class NoteSplash extends FlxSprite
 		if (config.allowRGB)
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
-			var rgbArray:Array<RGBPalette> = Note.globalRgbShaders.copy();
 			if (inEditor || (note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB))
 			{
 				// If Note RGB is enabled:
@@ -254,16 +253,17 @@ class NoteSplash extends FlxSprite
 							else if (i == 2) tempShader.b = color;
 						}
 					}
-					else tempShader = rgbArray[noteData % Note.colArray.length];
+					else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 
 					if (note != null)
-					{	
+					{
+						tempShader = new RGBPalette();
 						if (note.noteSplashData.r != -1) tempShader.r = note.noteSplashData.r;
 						if (note.noteSplashData.g != -1) tempShader.g = note.noteSplashData.g;
 						if (note.noteSplashData.b != -1) tempShader.b = note.noteSplashData.b;
 					}
 				}
-				else tempShader = rgbArray[noteData % Note.colArray.length];
+				else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 			}
 		}
 		rgbShader.copyValues(tempShader);
