@@ -61,9 +61,6 @@ class NoteSplash extends FlxSprite
 		config = null;
 		maxAnims = 0;
 
-		if (splash == null || splash.length < 1)
-			splash = try PlayState.SONG.splashSkin catch(e) null;
-
 		texture = splash;
 		frames = Paths.getSparrowAtlas(texture);
 		if (frames == null)
@@ -187,13 +184,16 @@ class NoteSplash extends FlxSprite
 
 	public function spawnSplashNote(?x:Float = 0, ?y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
 	{
-		if (note != null)
-		{
-			if (note.noteSplashData.disabled)
+		if (note != null && note.noteSplashData.disabled)
 				return;
 
-			if (note.noteSplashData.texture != null)
-				loadSplash(note.noteSplashData.texture);
+		var inEditor:Bool = (cast FlxG.state) is NoteSplashEditorState;
+		if (!inEditor)
+		{
+			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
+			if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
+			else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
+			loadSplash(loadedTexture);
 		}
 
 		setPosition(x, y);
@@ -215,7 +215,6 @@ class NoteSplash extends FlxSprite
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
 			var rgbArray:Array<RGBPalette> = Note.globalRgbShaders.copy();
-			var inEditor:Bool = (cast FlxG.state) is NoteSplashEditorState;
 			if (inEditor || (note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB))
 			{
 				// If Note RGB is enabled:
