@@ -262,13 +262,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
 
-			splash.offset.set(10, 10);
-			if (offsets != null)
-			{
-				splash.offset.x += offsets[0];
-				splash.offset.y += offsets[1];
-			}
-
 			var minFps:Int = 22;
 			var maxFps:Int = 26;
 			if (conf != null)
@@ -280,6 +273,13 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 				maxFps = conf.fps[1];
 				if (maxFps < 0) maxFps = 0;
+			}
+
+			splash.offset.set(10, 10);
+			if (offsets != null)
+			{
+				splash.offset.x += offsets[0];
+				splash.offset.y += offsets[1];
 			}
 
 			if (splash.animation.curAnim != null)
