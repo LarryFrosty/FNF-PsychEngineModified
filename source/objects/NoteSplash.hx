@@ -267,7 +267,6 @@ class NoteSplash extends FlxSprite
 			}
 		}
 		rgbShader.copyValues(tempShader);
-
 		if (!config.allowPixel) rgbShader.pixelAmount = 1;
 
 		offset.set(10, 10);
@@ -283,12 +282,13 @@ class NoteSplash extends FlxSprite
 		animation.finishCallback = function(name:String) {
 			kill();
 		}
-		
+
 		alpha = ClientPrefs.data.splashAlpha;
 		if (note != null) alpha = note.noteSplashData.a;
 
+		antialiasing = ClientPrefs.data.antialiasing;
 		if (note != null) antialiasing = note.noteSplashData.antialiasing;
-		if ((PlayState.isPixelStage && config.allowPixel) || !ClientPrefs.data.antialiasing) antialiasing = false;
+		if (PlayState.isPixelStage && config.allowPixel) antialiasing = false;
 
 		var minFps:Int = 22;
 		var maxFps:Int = 26;

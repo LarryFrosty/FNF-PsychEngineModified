@@ -27,16 +27,10 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			notes.add(note);
 			
 			var splash:NoteSplash = new NoteSplash(0, 0, NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix());
-			splash.noteData = i;
 			splash.babyArrow = note;
-			splash.setPosition(note.x - Note.swagWidth * 0.95, note.y - Note.swagWidth);
-			splash.visible = false;
-			splash.alpha = ClientPrefs.data.splashAlpha;
-			splash.animation.finishCallback = function(name:String) splash.visible = false;
+			splash.ID = i;
+			splash.kill();
 			splashes.add(splash);
-			
-			Note.initializeGlobalRGBShader(i % Note.colArray.length);
-			splash.rgbShader.copyValues(Note.globalRgbShaders[i % Note.colArray.length]);
 		}
 
 		// options
@@ -254,23 +248,29 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 	{
 		var rand:Int = 0;
 		if (splashes.members[0] != null && splashes.members[0].maxAnims > 1)
-			rand = FlxG.random.int(0, splashes.members[0].maxAnims - 1); // Variable here to play the same random animation on all 4 splashes
+			rand = FlxG.random.int(0, splashes.members[0].maxAnims - 1); // For playing the same random animation on all 4 splashes
 
 		for (splash in splashes)
 		{
+			splash.revive();
+
+			splash.spawnSplashNote(0, 0, splash.ID, null, false);
 			if (splash.maxAnims > 1)
 				splash.noteData = splash.noteData % Note.colArray.length + (rand * Note.colArray.length);
 
 			var anim:String = splash.playDefaultAnim();
-			splash.visible = true;
-			splash.alpha = ClientPrefs.data.splashAlpha;
-			
 			var conf = splash.config.animations.get(anim);
 			var offsets:Array<Float> = [0, 0];
+
+			splash.offset.set(10, 10);
+			if (offsets != null)
+			{
+				splash.offset.x += offsets[0];
+				splash.offset.y += offsets[1];
+			}
+
 			var minFps:Int = 22;
 			var maxFps:Int = 26;
-			splash.offset.set(10, 10);
-
 			if (conf != null)
 			{
 				offsets = conf.offsets;
@@ -280,12 +280,6 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 
 				maxFps = conf.fps[1];
 				if (maxFps < 0) maxFps = 0;
-			}
-
-			if (offsets != null)
-			{
-				splash.offset.x += offsets[0];
-				splash.offset.y += offsets[1];
 			}
 
 			if (splash.animation.curAnim != null)

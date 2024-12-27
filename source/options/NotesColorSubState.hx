@@ -594,7 +594,6 @@ class NotesColorSubState extends MusicBeatSubstate
 	public function spawnNotes()
 	{
 		dataArray = !onPixel ? ClientPrefs.data.arrowRGB : ClientPrefs.data.arrowRGBPixel;
-		if (onPixel) PlayState.stageUI = "pixel";
 
 		// clear groups
 		modeNotes.forEachAlive(function(note:FlxSprite) {
@@ -669,7 +668,6 @@ class NotesColorSubState extends MusicBeatSubstate
 		}
 		insert(members.indexOf(myNotes) + 1, bigNote);
 		_storedColor = getShaderColor();
-		PlayState.stageUI = "normal";
 	}
 
 	function updateNotes(?instant:Bool = false)
@@ -723,4 +721,10 @@ class NotesColorSubState extends MusicBeatSubstate
 	function setShaderColor(value:FlxColor) dataArray[curSelectedNote][curSelectedMode] = value;
 	function getShaderColor() return dataArray[curSelectedNote][curSelectedMode];
 	function getShader() return Note.globalRgbShaders[curSelectedNote];
+
+	override function destroy()
+	{
+		Note.globalRgbShaders = [];
+		super.destroy();
+	}
 }

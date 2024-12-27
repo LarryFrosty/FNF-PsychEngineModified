@@ -958,19 +958,20 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
         add(bg);
 
 		var str:Array<String> = /*controls.mobileC ? ["Touch on a Strum", "to spawn a Splash", "", "Arrow Keys - Move Offset",
-			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "To add an extra set of animations", "noteData must be (currentNoteData + 4)"] :*/ [
+			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "For every 4 note datas", "an extra set of animations will be added"] :*/ [
 			"Click on a Strum or Press Space",
 			"to spawn a Splash",
 			"",
+			"",
 			"Arrow Keys - Move Offset",
 			"Hold Shift - Move Offsets 10x faster",
-			"",
 			"",
 			"Ctrl + C - Copy Current Offset",
 			"Ctrl + V - Paste Copied Offset on Current Splash",
 			"Ctrl + R - Reset Current Offset",
 			"",
-			"You can add an extra animation set every 4 note datas"
+			"For every 4 note datas",
+			"an extra set of animations will be added"
 		];
 
 		var helpTexts:FlxSpriteGroup = new FlxSpriteGroup();
