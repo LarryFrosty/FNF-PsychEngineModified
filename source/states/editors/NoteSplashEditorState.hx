@@ -664,7 +664,6 @@ class NoteSplashEditorState extends MusicBeatState
         }
         else
         {
-            splashes.remove(splash);
             errorText.alpha = 1;
             errorText.text = "ERROR while playing splash";
             
@@ -672,11 +671,6 @@ class NoteSplashEditorState extends MusicBeatState
             FlxTween.tween(errorText, {alpha: 0}, {startDelay: 1});
         }
     }
-
-	function createSplash()
-	{
-		return new NoteSplash(0, 0, imageSkin);
-	}
 
     function resetRGB()
     {
@@ -963,8 +957,8 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
         bg.alpha = 0.6;
         add(bg);
 
-		var str:Array<String> = controls.mobileC ? ["Touch on a Strum", "to spawn a Splash", "", "Arrow Keys - Move Offset",
-			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "To add extra animations,", "noteData must be (currentNoteData) + 4"] : [
+		var str:Array<String> = /*controls.mobileC ? ["Touch on a Strum", "to spawn a Splash", "", "Arrow Keys - Move Offset",
+			"Hold Z - Move Offsets 10x faster", "", "", "C - Copy Current Offset", "V - Paste Copied Offset on Current Splash", "", "", "To add an extra set of animations", "noteData must be (currentNoteData + 4)"] :*/ [
 			"Click on a Strum or Press Space",
 			"to spawn a Splash",
 			"",
@@ -974,7 +968,9 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
 			"",
 			"Ctrl + C - Copy Current Offset",
 			"Ctrl + V - Paste Copied Offset on Current Splash",
-			"Ctrl + R - Reset Current Offset"
+			"Ctrl + R - Reset Current Offset",
+			"",
+			"You can add an extra animation set every 4 note datas"
 		];
 
 		var helpTexts:FlxSpriteGroup = new FlxSpriteGroup();
@@ -983,7 +979,7 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
 			if(txt.length < 1) continue;
 
 			var helpText:FlxText = new FlxText(0, 0, 0, txt, 32);
-			helpText.setFormat(null, 32, FlxColor.WHITE, CENTER, OUTLINE_FAST, FlxColor.BLACK);
+			helpText.setFormat(null, 24, FlxColor.WHITE, CENTER, OUTLINE_FAST, FlxColor.BLACK);
 			helpText.borderColor = FlxColor.BLACK;
 			helpText.scrollFactor.set();
 			helpText.borderSize = 1;
@@ -995,7 +991,7 @@ class NoteSplashEditorHelpSubState extends MusicBeatSubstate
 		add(helpTexts);
 
         var noteDataText:FlxText = new FlxText();
-        noteDataText.setFormat(null, 32, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
+        noteDataText.setFormat(null, 24, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
         noteDataText.text = "NOTE DATAS:\nLEFT: 0\nDOWN: 1\nUP: 2\nRIGHT: 3";
         noteDataText.x = FlxG.width - noteDataText.width - 5;
         noteDataText.y = FlxG.height - noteDataText.height - 5;
