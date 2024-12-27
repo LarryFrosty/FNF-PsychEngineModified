@@ -76,7 +76,7 @@ class NoteSplashEditorState extends MusicBeatState
         var tipText:FlxText = new FlxText();
         tipText.setFormat(null, 24);
         tipText.text = 'Press $buttonF1 for Help';
-        tipText.setPosition(properUI.x - properUI.width - 60, UI.y);
+        tipText.setPosition(properUI.x - properUI.width, UI.y);
         add(tipText);
 
         for (i in 0...4)
