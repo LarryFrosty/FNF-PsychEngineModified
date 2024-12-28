@@ -92,6 +92,7 @@ class NoteSplashEditorState extends MusicBeatState
         add(splashes);
 
         splash = new NoteSplash(0, 0, imageSkin); // this cannot be recycled
+		splash.inEditor = true;
         splash.alpha = .0;
         splashes.add(splash);
 
@@ -627,6 +628,7 @@ class NoteSplashEditorState extends MusicBeatState
                         //strum.holdTimer = Math.POSITIVE_INFINITY;
 
                         var splash:NoteSplash = new NoteSplash(0, 0, imageSkin);
+                        splash.inEditor = true;
                         splash.config = config;
                         splash.babyArrow = strum;
                         splash.spawnSplashNote(0, 0, strum.ID % 4);
@@ -652,6 +654,7 @@ class NoteSplashEditorState extends MusicBeatState
     function playStrumAnim(?name:String, noteData:Int)
     {
         var splash:NoteSplash = new NoteSplash(0, 0, imageSkin);
+        splash.inEditor = true;
         splash.config = config;
         if (noteData < 0) noteData = 0;
 

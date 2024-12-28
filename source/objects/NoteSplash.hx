@@ -38,6 +38,7 @@ class NoteSplash extends FlxSprite
 	public var babyArrow:StrumNote;
 	public var copyX:Bool = true;
 	public var copyY:Bool = true;
+	public var inEditor:Bool = false;
 
 	var noteDataMap:Map<Int, String> = new Map();
 
@@ -188,7 +189,6 @@ class NoteSplash extends FlxSprite
 		if (note != null && note.noteSplashData.disabled)
 				return;
 
-		var inEditor:Bool = ((cast FlxG.state) is NoteSplashEditorState || (cast FlxG.state) is VisualsSettingsSubState);
 		if (!inEditor)
 		{
 			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();

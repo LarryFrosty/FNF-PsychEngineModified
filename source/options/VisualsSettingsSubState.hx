@@ -27,6 +27,7 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			notes.add(note);
 			
 			var splash:NoteSplash = new NoteSplash(0, 0, NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix());
+			splash.inEditor = true;
 			splash.babyArrow = note;
 			splash.ID = i;
 			splash.kill();
