@@ -76,7 +76,7 @@ class NoteSplashEditorState extends MusicBeatState
         var tipText:FlxText = new FlxText();
         tipText.setFormat(null, 24);
         tipText.text = 'Press $buttonF1 for Help';
-        tipText.setPosition(properUI.x - properUI.width, UI.y);
+        tipText.setPosition(properUI.x - properUI.width + 10, UI.y);
         add(tipText);
 
         for (i in 0...4)
@@ -425,7 +425,7 @@ class NoteSplashEditorState extends MusicBeatState
         };
         tab.add(red);
 
-        var green = new PsychUINumericStepper(60, 50, 1, redShader[2], 0, 255, 0);
+        var green = new PsychUINumericStepper(60, 50, 1, redShader[1], 0, 255, 0);
         green.onValueChange = () -> {
             var shader = switch (changeShader.selectedLabel)
             {
@@ -437,7 +437,7 @@ class NoteSplashEditorState extends MusicBeatState
         };
         tab.add(green);
 
-        var blue = new PsychUINumericStepper(60, 70, 1, redShader[1], 0, 255, 0);
+        var blue = new PsychUINumericStepper(60, 70, 1, redShader[2], 0, 255, 0);
         blue.onValueChange = () -> {
             var shader = switch (changeShader.selectedLabel)
             {
