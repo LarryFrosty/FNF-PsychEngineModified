@@ -251,13 +251,6 @@ class NoteSplashEditorState extends MusicBeatState
             curAnim = name_input.text;
             playStrumAnim(curAnim, cast numericStepperData.value);
             setAnimDropDown();
-
-            if (errorText.alpha == 1)
-            {
-                config.animations.remove(curAnim);
-                curAnim = null;
-                setAnimDropDown();
-            }
             //if (animDropDown.list)
         }); 
         UI.add(addButton);
