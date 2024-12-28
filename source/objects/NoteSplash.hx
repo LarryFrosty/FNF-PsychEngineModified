@@ -197,7 +197,8 @@ class NoteSplash extends FlxSprite
 			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
 			if (note != null && note.noteSplashData.texture != null) loadedTexture = note.noteSplashData.texture;
 			else if (PlayState.SONG != null && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) loadedTexture = PlayState.SONG.splashSkin;
-			loadSplash(loadedTexture);
+
+			if (texture != loadedTexture) loadSplash(loadedTexture);
 		}
 
 		setPosition(x, y);
