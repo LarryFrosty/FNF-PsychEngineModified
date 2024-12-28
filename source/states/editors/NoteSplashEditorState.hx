@@ -71,7 +71,7 @@ class NoteSplashEditorState extends MusicBeatState
         shaderUI.y = UI.y + UI.height + 10;
         add(shaderUI);
 
-        final buttonF1:String = controls.mobileC ? "F" : "F1";
+        final buttonF1:String = /*controls.mobileC ? "F" :*/ "F1";
 
         var tipText:FlxText = new FlxText();
         tipText.setFormat(null, 24);
