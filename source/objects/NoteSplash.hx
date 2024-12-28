@@ -210,16 +210,17 @@ class NoteSplash extends FlxSprite
 		this.noteData = noteData;
 		var anim:String = playDefaultAnim();
 
-		var tempShader:RGBPalette = null;
+		var tempShader:PixelSplashShaderRef = null;
 		if (config.allowRGB)
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
 			if (inEditor || (note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB))
 			{
+				tempShader = new PixelSplashShaderRef();
+				tempShader.copyValues(Note.globalRgbShaders[noteData % Note.colArray.length]);
 				// If Note RGB is enabled:
 				if ((note == null || !note.noteSplashData.useGlobalShader) || inEditor)
 				{
-					tempShader = new RGBPalette();
 					var colors = config.rgb;
 					if (colors != null)
 					{
@@ -253,18 +254,14 @@ class NoteSplash extends FlxSprite
 							else if (i == 2) tempShader.b = color;
 						}
 					}
-					else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 
 					if (note != null)
 					{
 						if (note.noteSplashData.r != -1) tempShader.r = note.noteSplashData.r;
 						if (note.noteSplashData.g != -1) tempShader.g = note.noteSplashData.g;
 						if (note.noteSplashData.b != -1) tempShader.b = note.noteSplashData.b;
-	
-						if (note.noteSplashData.r != -1 || note.noteSplashData.g != 1 || note.noteSplashData.b != -1) tempShader = note.rgbShader.parent;
 					}
 				}
-				else tempShader = Note.globalRgbShaders[noteData % Note.colArray.length];
 			}
 		}
 		rgbShader.copyValues(tempShader);
