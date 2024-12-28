@@ -210,13 +210,13 @@ class NoteSplash extends FlxSprite
 		this.noteData = noteData;
 		var anim:String = playDefaultAnim();
 
-		var tempShader:PixelSplashShaderRef = null;
+		var tempShader:RGBPalette = null;
 		if (config.allowRGB)
 		{
 			Note.initializeGlobalRGBShader(noteData % Note.colArray.length);
 			if (inEditor || (note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB))
 			{
-				tempShader = new PixelSplashShaderRef();
+				tempShader = new RGBPalette();
 				tempShader.copyValues(Note.globalRgbShaders[noteData % Note.colArray.length]);
 				// If Note RGB is enabled:
 				if ((note == null || !note.noteSplashData.useGlobalShader) || inEditor)
