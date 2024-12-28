@@ -3,6 +3,7 @@ package objects;
 import backend.animation.PsychAnimationController;
 import shaders.RGBPalette;
 import states.editors.NoteSplashEditorState;
+import options.VisualsSettingsSubState;
 import flixel.system.FlxAssets.FlxShader;
 
 typedef RGB = {
@@ -187,7 +188,7 @@ class NoteSplash extends FlxSprite
 		if (note != null && note.noteSplashData.disabled)
 				return;
 
-		var inEditor:Bool = (cast FlxG.state) is NoteSplashEditorState;
+		var inEditor:Bool = ((cast FlxG.state) is NoteSplashEditorState || (cast FlxG.state) is VisualsSettingsSubState);
 		if (!inEditor)
 		{
 			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
