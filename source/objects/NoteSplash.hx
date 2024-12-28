@@ -40,6 +40,7 @@ class NoteSplash extends FlxSprite
 	public var copyY:Bool = true;
 	public var inEditor:Bool = false;
 
+	var spawned:Bool = false;
 	var noteDataMap:Map<Int, String> = new Map();
 
 	public static var defaultNoteSplash(default, never):String = "noteSplashes/noteSplashes";
@@ -189,6 +190,8 @@ class NoteSplash extends FlxSprite
 		if (note != null && note.noteSplashData.disabled)
 				return;
 
+		aliveTime = 0;
+
 		if (!inEditor)
 		{
 			var loadedTexture:String = defaultNoteSplash + getSplashSkinPostfix();
@@ -282,6 +285,7 @@ class NoteSplash extends FlxSprite
 
 		animation.finishCallback = function(name:String) {
 			kill();
+			spawned = false;
 		}
 
 		alpha = ClientPrefs.data.splashAlpha;
@@ -304,6 +308,8 @@ class NoteSplash extends FlxSprite
 
 		if (animation.curAnim != null)
 			animation.curAnim.frameRate = FlxG.random.int(minFps, maxFps);
+
+		spawned = true;
 	}
 
 	public function playDefaultAnim()
@@ -324,8 +330,17 @@ class NoteSplash extends FlxSprite
 		return animFrames.length > 0;
 	}
 
+	var aliveTime:Float = 0;
+	static var buggedKillTime:Float = 0.5; //automatically kills note splashes if they break to prevent it from flooding your HUD
 	override function update(elapsed:Float)
 	{
+		aliveTime += elapsed;
+		if(spawned && animation.curAnim == null && aliveTime >= buggedKillTime)
+		{
+			kill();
+			spawned = false;
+		}
+
 		if (babyArrow != null)
 		{
 			if (copyX)
