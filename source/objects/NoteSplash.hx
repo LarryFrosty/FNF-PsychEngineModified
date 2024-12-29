@@ -2,8 +2,6 @@ package objects;
 
 import backend.animation.PsychAnimationController;
 import shaders.RGBPalette;
-import states.editors.NoteSplashEditorState;
-import options.VisualsSettingsSubState;
 import flixel.system.FlxAssets.FlxShader;
 
 typedef RGB = {
@@ -32,10 +30,11 @@ typedef NoteSplashConfig = {
 class NoteSplash extends FlxSprite
 {
 	public var rgbShader:PixelSplashShaderRef;
-	public var noteData:Int = 0;
 	public var texture:String;
 	public var config(default, set):NoteSplashConfig;
 	public var babyArrow:StrumNote;
+	public var noteData:Int = 0;
+
 	public var copyX:Bool = true;
 	public var copyY:Bool = true;
 	public var inEditor:Bool = false;
@@ -104,11 +103,9 @@ class NoteSplash extends FlxSprite
 				for (i in Reflect.fields(config.animations))
 				{
 					var anim:NoteSplashAnim = Reflect.field(config.animations, i);
+					tempConfig.animations.set(i, anim);
 					if (anim.noteData % 4 == 0)
-					{
 						maxAnims++;
-					}
-					tempConfig.animations.set(i, Reflect.field(config.animations, i));
 				}
 
 				this.config = tempConfig;
@@ -188,7 +185,7 @@ class NoteSplash extends FlxSprite
 	public function spawnSplashNote(?x:Float = 0, ?y:Float = 0, ?noteData:Int = 0, ?note:Note, ?randomize:Bool = true)
 	{
 		if (note != null && note.noteSplashData.disabled)
-				return;
+			return;
 
 		aliveTime = 0;
 
@@ -412,7 +409,7 @@ class NoteSplash extends FlxSprite
 
 	function set_maxAnims(value:Int)
 	{
-		noteData = Std.int(FlxMath.bound(noteData, 0, (value * Note.colArray.length) - 1));
+		noteData = Std.int(FlxMath.wrap(noteData, 0, (value * Note.colArray.length) - 1));
 		return maxAnims = value;
 	}
 }
@@ -421,7 +418,7 @@ class PixelSplashShaderRef
 {
 	public var shader:PixelSplashShader = new PixelSplashShader();
 	public var enabled(default, set):Bool = true;
-	public var pixelAmount(default, set):Float;
+	public var pixelAmount(default, set):Float = 1;
 
 	public function copyValues(tempShader:RGBPalette)
 	{
@@ -464,8 +461,8 @@ class PixelSplashShaderRef
 		reset();
 		enabled = true;
 
-		if (PlayState.isPixelStage) pixelAmount = PlayState.daPixelZoom;
-		else pixelAmount = 1;
+		if (!PlayState.isPixelStage) pixelAmount = 1;
+		else pixelAmount = PlayState.daPixelZoom;
 		//trace('Created shader ' + Conductor.songPosition);
 	}
 }
