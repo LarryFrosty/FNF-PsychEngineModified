@@ -866,7 +866,8 @@ class PlayState extends MusicBeatState
 				videoCutscene.finishCallback = onVideoEnd;
 				videoCutscene.onSkip = onVideoEnd;
 			}
-			add(videoCutscene);
+			if (GameOverSubstate.instance != null && isDead) GameOverSubstate.instance.add(videoCutscene);
+			else add(videoCutscene);
 
 			if (playOnLoad)
 				videoCutscene.play();
@@ -1623,16 +1624,23 @@ class PlayState extends MusicBeatState
 
 	override public function onFocus():Void
 	{
-		if (health > 0 && !paused) resetRPC(Conductor.songPosition > 0.0);
+		if (!paused)
+		{
+			if (health > 0) resetRPC(Conductor.songPosition > 0.0);
+			if (videoCutscene != null) videoCutscene.resume();
+		}
 		super.onFocus();
 	}
 
 	override public function onFocusLost():Void
 	{
-		#if DISCORD_ALLOWED
-		if (health > 0 && !paused && autoUpdateRPC) DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-		#end
-
+		if (!paused)
+		{
+			#if DISCORD_ALLOWED
+			if (health > 0 && autoUpdateRPC) DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+			#end
+			if (videoCutscene != null) videoCutscene.pause();
+		}
 		super.onFocusLost();
 	}
 
