@@ -580,7 +580,7 @@ class PlayState extends MusicBeatState
 		noteTypes = null;
 		eventsPushed = null;
 
-		if(eventNotes.length > 1)
+		if(eventNotes.length > 0)
 		{
 			for (event in eventNotes) event.strumTime -= eventEarlyTrigger(event);
 			eventNotes.sort(sortByTime);
@@ -1489,7 +1489,7 @@ class PlayState extends MusicBeatState
 	}
 
 	function eventEarlyTrigger(event:EventNote):Float {
-		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true, [], [0]);
+		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true);
 		if(returnedValue != null && returnedValue != 0) {
 			return returnedValue;
 		}
