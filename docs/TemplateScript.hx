@@ -126,12 +126,12 @@ function onGameOverConfirm(retry:Bool)
 // Dialogue (When a dialogue is finished, it calls startCountdown again)
 function onNextDialogue(line:Int)
 {
-	// Triggered when the next dialogue line starts, dialogue line starts at 0
+	// Triggered when the next dialogue line starts, dialogue line starts at 0 (first line), although it won't be triggered on line 0
 }
 
 function onSkipDialogue(line:Int)
 {
-	// Triggered when you press Enter and skip a dialogue line that was still being typed, dialogue line starts at 0
+	// Triggered when you press Enter and skip a dialogue line that was still being typed, dialogue line starts at 0 (first line)
 }
 
 
