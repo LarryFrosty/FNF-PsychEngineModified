@@ -203,7 +203,7 @@ end
 
 -- Event notes hooks
 function onEvent(name, value1, value2, strumTime)
-	-- event note triggered
+	-- Event note triggered
 
 	-- print('Event triggered: ', name, value1, value2, strumTime);
 end
