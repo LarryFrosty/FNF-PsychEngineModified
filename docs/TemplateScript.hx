@@ -186,12 +186,6 @@ function opponentNoteHit(note:Note)
 	// Works the same as goodNoteHit, but for Opponent's notes being hit
 }
 
-function noteMissPressPre(direction:Int)
-{
-	// Called before the note press miss calculations
-	// Player pressed a button, but there was no note to hit (ghost miss)
-}
-
 function noteMissPress(direction:Int)
 {
 	// Called after the note press miss calculations
