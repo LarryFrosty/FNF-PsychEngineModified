@@ -99,11 +99,11 @@ end
 
 -- Dialogue (When a dialogue is finished, it calls startCountdown again)
 function onNextDialogue(line)
-	-- triggered when the next dialogue line starts, dialogue line starts at 0
+	-- triggered when the next dialogue line starts, dialogue line starts at 0 (first line), although it won't be triggered on line 0
 end
 
 function onSkipDialogue(line)
-	-- triggered when you press Enter and skip a dialogue line that was still being typed, dialogue line starts at 0
+	-- triggered when you press Enter and skip a dialogue line that was still being typed, dialogue line starts at 0 (first line)
 end
 
 
