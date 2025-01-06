@@ -43,7 +43,7 @@ class CustomFadeTransition extends FlxSubState {
 		super.update(elapsed);
 
 		final height:Float = FlxG.height * Math.max(camera.zoom, 0.001);
-		final targetPos:Float = transSprite.height + 50 * Math.max(camera.zoom, 0.001);
+		final targetPos:Float = !isTransIn ? 0 : transSprite.height + 50 * Math.max(camera.zoom, 0.001);
 		if(duration > 0)
 			transSprite.y += (height + targetPos) * elapsed / duration;
 		else
