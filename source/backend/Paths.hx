@@ -249,7 +249,7 @@ class Paths
 		var file:String = modFolders(folderKey);
 		if(FileSystem.exists(file)) return file;
 		#end
-		return 'assets/fonts/$folderKey';
+		return 'assets/$folderKey';
 	}
 
 	public static function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false, ?parentFolder:String = null)

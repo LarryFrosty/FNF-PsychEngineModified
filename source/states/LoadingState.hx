@@ -266,7 +266,7 @@ class LoadingState extends MusicBeatState
 		}
 		requestedBitmaps.clear();
 		originalBitmapKeys.clear();
-		return (loaded == loadMax && initialThreadCompleted);
+		return (loaded >= loadMax && initialThreadCompleted);
 	}
 
 	public static function loadNextDirectory()
