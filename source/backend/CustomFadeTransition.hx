@@ -5,7 +5,7 @@ import flixel.FlxSubState;
 
 class CustomFadeTransition extends FlxSubState {
 	public static var finishCallback:Void->Void;
-	static var transitionImages:Array<String> = ['markiplier'];
+	static var transitionImages:Array<String> = ['baldiplier', 'markiplier', 'hooh', 'cat'];
 	static var image:String;
 	var isTransIn:Bool = false;
 	var transBlack:FlxSprite;
@@ -101,7 +101,7 @@ class CustomFadeTransition extends FlxSubState {
 		else
 			transSprite.y = (targetPos) * elapsed;
 
-		if(transSprite.y < 0 && !isTransIn) transSprite.y = 0;
+		if(transSprite.y > 0 && !isTransIn) transSprite.y = 0;
 		if(transSprite.y >= targetPos)
 		{
 			close();
