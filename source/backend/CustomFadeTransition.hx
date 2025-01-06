@@ -21,7 +21,7 @@ class CustomFadeTransition extends FlxSubState {
 	override function create()
 	{
 		if (!isTransIn)
-			image = transitionImages[FlxG.random.int(0, transitionImages.length - 1, [transitionImages.indexOf(image)]);
+			image = transitionImages[FlxG.random.int(0, transitionImages.length - 1, [transitionImages.indexOf(image)])];
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length-1]];
 		var width:Int = Std.int(FlxG.width / Math.max(camera.zoom, 0.001));
