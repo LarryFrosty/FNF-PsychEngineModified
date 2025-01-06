@@ -99,7 +99,7 @@ class CustomFadeTransition extends FlxSubState {
 		if(duration > 0)
 			transSprite.y += (height + targetPos) * elapsed / duration;
 		else
-			transSprite.y = targetPos;
+			transSprite.y = (targetPos) * elapsed;
 
 		if(transSprite.y > 0 && !isTransIn) transSprite.y = 0;
 		if(transSprite.y >= targetPos)
