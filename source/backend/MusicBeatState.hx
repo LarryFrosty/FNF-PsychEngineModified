@@ -218,7 +218,7 @@ class MusicBeatState extends FlxState
 		curStep = lastChange.stepTime + Math.floor(shit);
 	}
 
-	public static function switchState(nextState:FlxState = null) {
+	public static function switchState(nextState:FlxState = null, duration:Float = 0.5) {
 		if(nextState == null) nextState = FlxG.state;
 		if(nextState == FlxG.state)
 		{
@@ -227,7 +227,7 @@ class MusicBeatState extends FlxState
 		}
 
 		if(FlxTransitionableState.skipNextTransIn) FlxG.switchState(nextState);
-		else startTransition(nextState);
+		else startTransition(nextState, duration);
 		FlxTransitionableState.skipNextTransIn = false;
 	}
 
@@ -238,12 +238,12 @@ class MusicBeatState extends FlxState
 	}
 
 	// Custom made Trans in
-	public static function startTransition(nextState:FlxState = null)
+	public static function startTransition(nextState:FlxState = null, duration:Float = 0.5)
 	{
 		if(nextState == null)
 			nextState = FlxG.state;
 
-		FlxG.state.openSubState(new CustomFadeTransition(0.5, false));
+		FlxG.state.openSubState(new CustomFadeTransition(duration, false));
 		if(nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else
