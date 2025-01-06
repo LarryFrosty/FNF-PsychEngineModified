@@ -250,8 +250,7 @@ class LoadingState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		FlxG.camera.visible = false;
-		FlxTransitionableState.skipNextTransIn = true;
-		MusicBeatState.switchState(target);
+		MusicBeatState.switchState(target, 0);
 		transitioning = true;
 		finishedLoading = true;
 		mutex = null;
