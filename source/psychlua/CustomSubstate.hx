@@ -80,7 +80,6 @@ class CustomSubstate extends MusicBeatSubstate
 		instance = this;
 		PlayState.instance.setOnHScript('customSubstate', instance);
 
-
 		PlayState.instance.callOnScripts('onCustomSubstateCreate', [name]);
 		super.create();
 		PlayState.instance.callOnScripts('onCustomSubstateCreatePost', [name]);
