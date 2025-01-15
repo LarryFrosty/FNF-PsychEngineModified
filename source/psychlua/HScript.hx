@@ -22,7 +22,7 @@ import haxe.Constraints.IMap;
 
 class HScript extends Iris
 {
-	public static  var globalVariables:HScriptGlobalMap = new HScriptGlobalMap();
+	public static var globalVariables:HScriptGlobalMap = new HScriptGlobalMap();
 
 	public var filePath:String;
 	public var modFolder:String;
