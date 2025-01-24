@@ -13,6 +13,9 @@ import states.TitleState;
 import mobile.backend.MobileScaleMode;
 import openfl.events.KeyboardEvent;
 import lime.system.System as LimeSystem;
+#if desktop
+import backend.ALSoftConfig; // Just to make sure DCE doesn't remove this, since it's not directly referenced anywhere else.
+#end
 #if mobile
 import mobile.states.CopyState;
 #end
