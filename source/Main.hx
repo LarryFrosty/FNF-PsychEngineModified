@@ -128,7 +128,6 @@ class Main extends Sprite
 		Highscore.load();
 
 		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end
-		#if HSCRIPT_ALLOWED crowplexus.iris.Iris.logLevel = psychlua.HScript.HScriptTools.hscriptLog; #end
 		Controls.instance = new Controls();
 		ClientPrefs.loadDefaultKeys();
 		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end

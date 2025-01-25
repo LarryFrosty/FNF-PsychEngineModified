@@ -51,29 +51,12 @@ class FunkinLua {
 	public var modFolder:String = null;
 	public var closed:Bool = false;
 
-	public var callbacks:Map<String, Dynamic> = new Map<String, Dynamic>();
-	public static var customFunctions:Map<String, Dynamic> = new Map<String, Dynamic>();
-
 	#if HSCRIPT_ALLOWED
 	public var hscript:HScript = null;
-	public function initHaxeModule(code:String = '', ?varsToBring:Dynamic) {
-		@:privateAccess {
-		if (hscript == null) {
-			trace('initializing haxe interp for: $scriptName');
-			hscript = new HScript(this);
-		}
-		try {
-			if (hscript.scriptCode != code) {
-				hscript.scriptCode = code;
-				hscript.parse(true);
-			}
-		} catch (e) {
-			throw e;
-		}
-		hscript.varsToBring = varsToBring;
-		}
-	}
 	#end
+
+	public var callbacks:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public static var customFunctions:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public function new(scriptName:String) {
 		lua = LuaL.newstate();
@@ -1471,7 +1454,7 @@ class FunkinLua {
 		#if DISCORD_ALLOWED DiscordClient.addLuaCallbacks(this); #end
 		#if ACHIEVEMENTS_ALLOWED Achievements.addLuaCallbacks(this); #end
 		#if TRANSLATIONS_ALLOWED Language.addLuaCallbacks(this); #end
-		HScript.implement(this);
+		#if HSCRIPT_ALLOWED HScript.implement(this); #end
 		#if flxanimate FlxAnimateFunctions.implement(this); #end
 		ReflectionFunctions.implement(this);
 		TextFunctions.implement(this);

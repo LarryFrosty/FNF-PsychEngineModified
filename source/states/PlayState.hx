@@ -3265,7 +3265,7 @@ class PlayState extends MusicBeatState
 		for (script in hscriptArray)
 			if(script != null)
 			{
-				script.run('onDestroy');
+				script.executeFunction('onDestroy');
 				script.destroy();
 			}
 
@@ -3431,16 +3431,20 @@ class PlayState extends MusicBeatState
 
 	public function initHScript(file:String)
 	{
-		var newScript:HScript = new HScript(null, file);
-		
-		try {
-			newScript.parse(true);
-			newScript.run('onCreate');
-			hscriptArray.push(newScript);
+		var newScript:HScript = null;
+		try
+		{
+			newScript = new HScript(null, file);
+			newScript.executeFunction('onCreate');
 			trace('initialized hscript interp successfully: $file');
-		} catch (e:crowplexus.hscript.Expr.Error) {
-			newScript.errorCaught(e);
-			newScript.destroy();
+			hscriptArray.push(newScript);
+		}
+		catch(e:Dynamic)
+		{
+			addTextToDebug('ERROR ON LOADING ($file) - $e', FlxColor.RED);
+			var newScript:HScript = cast (Iris.instances.get(file), HScript);
+			if(newScript != null)
+				newScript.destroy();
 		}
 	}
 	#end
@@ -3513,13 +3517,23 @@ class PlayState extends MusicBeatState
 			if(script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
 				continue;
 
-			var callValue:Dynamic = script.run(funcToCall, args);
-			if (callValue == null) continue;
-			if (!excludeValues.contains(callValue)) {
-				if ((callValue == LuaUtils.Function_StopHScript || callValue == LuaUtils.Function_StopAll) && !ignoreStops)
-					return callValue;
-				if (callValue != null && !excludeValues.contains(callValue))
-					returnVal = callValue;
+			try
+			{
+				var callValue = script.call(funcToCall, args);
+				var myValue:Dynamic = callValue.returnValue;
+
+				if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
+				{
+					returnVal = myValue;
+					break;
+				}
+
+				if(myValue != null && !excludeValues.contains(myValue))
+					returnVal = myValue;
+			}
+			catch(e:Dynamic)
+			{
+				addTextToDebug('ERROR (${script.origin}: $funcToCall) - $e', FlxColor.RED);
 			}
 		}
 		#end

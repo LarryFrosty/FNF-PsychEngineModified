@@ -11,41 +11,55 @@ import psychlua.FunkinLua;
 
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
-import crowplexus.iris.ErrorSeverity;
-import crowplexus.hscript.Expr.Error as IrisError;
-
-import haxe.ds.StringMap;
-import haxe.ds.IntMap;
-import haxe.ds.ObjectMap;
-import haxe.ds.EnumValueMap;
-import haxe.Constraints.IMap;
 
 class HScript extends Iris
 {
-	public static var globalVariables:HScriptGlobalMap = new HScriptGlobalMap();
-
 	public var filePath:String;
 	public var modFolder:String;
-	public var executed:Bool = false;
 
 	#if LUA_ALLOWED
 	public var parentLua:FunkinLua;
-	#end
-
-	public function errorCaught(e:IrisError, ?funcName:String) {
-		#if LUA_ALLOWED
-		if (parentLua != null) {
-			FunkinLua.lastCalledScript = parentLua;
-			FunkinLua.luaTrace(HScriptTools.errorToString(e, funcName, this), false, false, executed ? FlxColor.RED : 0xffb30000);
-			return;
+	public static function initHaxeModule(parent:FunkinLua)
+	{
+		if(parent.hscript == null)
+		{
+			trace('initializing haxe interp for: ${parent.scriptName}');
+			parent.hscript = new HScript(parent);
 		}
-		#end
-		PlayState.instance.addTextToDebug(HScriptTools.errorToString(e, funcName, this), executed ? FlxColor.RED : 0xffb30000);
 	}
+
+	public static function initHaxeModuleCode(parent:FunkinLua, code:String, ?varsToBring:Any = null)
+	{
+		var hs:HScript = try parent.hscript catch (e) null;
+		if(hs == null)
+		{
+			trace('initializing haxe interp for: ${parent.scriptName}');
+			parent.hscript = new HScript(parent, code, varsToBring);
+		}
+		else
+		{
+			try
+			{
+				hs.scriptCode = code;
+				hs.varsToBring = varsToBring;
+				hs.execute();
+			}
+			catch(e:Dynamic)
+			{
+				FunkinLua.luaTrace('ERROR (${hs.origin}) - $e', false, false, FlxColor.RED);
+			}
+		}
+	}
+	#end
 
 	public var origin:String;
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
 	{
+		if (file == null)
+			file = '';
+	
+		super(null, {name: "hscript-iris", autoRun: false, autoPreset: false});
+
 		#if LUA_ALLOWED
 		parentLua = parent;
 		if (parent != null)
@@ -56,7 +70,7 @@ class HScript extends Iris
 		#end
 
 		filePath = file;
-		if (filePath != null && filePath.length > 0 && parent == null)
+		if (filePath != null && filePath.length > 0)
 		{
 			this.origin = filePath;
 			#if MODS_ALLOWED
@@ -65,8 +79,6 @@ class HScript extends Iris
 				this.modFolder = myFolder[1];
 			#end
 		}
-
-		super(null, {name: "hscript-iris", autoRun: false, autoPreset: false});
 
 		var scriptThing:String = file;
 		if(parent == null && file != null)
@@ -77,16 +89,12 @@ class HScript extends Iris
 				scriptThing = File.getContent(f);
 			}
 		}
+		this.scriptCode = scriptThing;
 
 		preset();
-		this.scriptCode = scriptThing;
 		this.varsToBring = varsToBring;
 
-		for (key => value in globalVariables)
-		{
-			if (key != null && key.length > 0)
-				set(key, value);
-		}
+		execute();
 	}
 
 	var varsToBring(default, set):Any = null;
@@ -94,12 +102,6 @@ class HScript extends Iris
 		super.preset();
 
 		// Some very commonly used classes
-		set('Type', Type); 
-		set('Reflect', Reflect); 
-		#if sys 
-		set('File', sys.io.File); 
-		set('FileSystem', sys.FileSystem); 
-		#end
 		set('FlxG', flixel.FlxG);
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
@@ -308,8 +310,8 @@ class HScript extends Iris
 		set('Function_StopLua', LuaUtils.Function_StopLua); //doesnt do much cuz HScript has a lower priority than Lua
 		set('Function_StopHScript', LuaUtils.Function_StopHScript);
 		set('Function_StopAll', LuaUtils.Function_StopAll);
-		
-		set('add', FlxG.state.add);
+
+        set('add', FlxG.state.add);
 		set('insert', FlxG.state.insert);
 		set('remove', FlxG.state.remove);
 
@@ -321,95 +323,120 @@ class HScript extends Iris
 		}
 	}
 
-	override function execute() {
-		var result = super.execute();
-		executed = true;
-		return result;
+	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):IrisCall {
+		if (funcToRun == null) return null;
+
+		if(!exists(funcToRun)) {
+			#if LUA_ALLOWED
+			FunkinLua.luaTrace(origin + ' - No function named: $funcToRun', false, false, FlxColor.RED);
+			#else
+			PlayState.instance.addTextToDebug(origin + ' - No function named: $funcToRun', FlxColor.RED);
+			#end
+			return null;
+		}
+
+		try
+		{
+			final callValue:IrisCall = call(funcToRun, funcArgs);
+			return callValue.returnValue;
+		}
+		catch(e:Dynamic)
+		{
+			trace('ERROR ${funcToRun}: $e');
+		}
+		return null;
 	}
 
-	override function parse(force:Bool = false) {
-		executed = false;
-		return super.parse(force);
-	}
-
-	#if LUA_ALLOWED
-	public static function initHaxeModuleCode(funk:FunkinLua, codeToRun:String, ?varsToBring:Any) funk.initHaxeModule(codeToRun, varsToBring);
-	public static function initHaxeModule(funk:FunkinLua) funk.initHaxeModule();
-	#end
-	public function executeCode(?funcToRun:String, ?args:Array<Dynamic>) return run(funcToRun, args);
 	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic> = null):IrisCall {
 		if (funcToRun == null || !exists(funcToRun)) return null;
 		return call(funcToRun, funcArgs);
 	}
 
-	public function run(?func:String, ?args:Array<Dynamic>, safe:Bool = true):Dynamic { // its the objectively better one
-		try {
-			if (func != null) {
-				if (!executed) execute();
-				if (!exists(func)) {
-					if (!safe) {
-						#if LUA_ALLOWED
-						if (parentLua != null) {
-							FunkinLua.lastCalledScript = parentLua;
-							FunkinLua.luaTrace('$origin - No function in HScript named "$func"!', false, false, FlxColor.RED);
-							return null;
-						}
-						#end
-						PlayState.instance.addTextToDebug('$origin - No function named "func"!', FlxColor.RED);
-					}
-					return null;
-				}
-				var result:IrisCall = call(func, args);
-				return result?.returnValue ?? null;
-			} else {
-				return execute();
-			}
-		} catch (e:IrisError) {
-			errorCaught(e);
-			return null;
-		}
-	}
-
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua) {
-		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			try {
-				initHaxeModuleCode(funk, codeToRun, varsToBring);
-				var result:Dynamic = funk.hscript.run(funcToRun, funcArgs, false);
-				if (LuaUtils.typeSupported(result)) return result;
-			} catch (e:IrisError) {
-				funk.hscript.errorCaught(e);
+		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):IrisCall {
+			#if HSCRIPT_ALLOWED
+			initHaxeModuleCode(funk, codeToRun, varsToBring);
+			try
+			{
+				final retVal:IrisCall = funk.hscript.executeCode(funcToRun, funcArgs);
+				if (retVal != null)
+				{
+					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
+				}
 			}
+			catch(e:Dynamic)
+			{
+				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
+			}
+
+			#else
+			FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			#end
 			return null;
 		});
 		
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			if (funk.hscript != null) {
-				var result:Dynamic = funk.hscript.run(funcToRun, funcArgs, false);
-				if (LuaUtils.typeSupported(result)) return result;
+			#if HSCRIPT_ALLOWED
+			try
+			{
+				final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
+				if (retVal != null)
+				{
+					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
+				}
+			}
+			catch(e:Dynamic)
+			{
+				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
 			}
 			return null;
+			#else
+			FunkinLua.luaTrace("runHaxeFunction: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			return null;
+			#end
 		});
 		// This function is unnecessary because import already exists in HScript as a native feature
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
-			if (funk.hscript == null) funk.initHaxeModule();
-
 			var str:String = '';
-			if (libPackage != null && libPackage.length > 0) str  += '$libPackage.';
-			str += libName;
+			if(libPackage.length > 0)
+				str = libPackage + '.';
+			else if(libName == null)
+				libName = '';
 
-			var cls:Dynamic = Type.resolveClass(str);
-			if (cls == null) cls = Type.resolveEnum(str);
-			if (cls == null) {
-				FunkinLua.luaTrace('addHaxeLibrary: Class "$str" wasn\'t found!', false, false, FlxColor.RED);
-				return false;
-			} else {
-				funk.hscript.set(libName, cls);
-				return true;
+			var c:Dynamic = Type.resolveClass(str + libName);
+			if (c == null)
+				c = Type.resolveEnum(str + libName);
+
+			#if HSCRIPT_ALLOWED
+			if (funk.hscript != null)
+			{
+				try {
+					if (c != null)
+						funk.hscript.set(libName, c);
+				}
+				catch (e:Dynamic) {
+					FunkinLua.luaTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+				}
 			}
+			FunkinLua.luaTrace("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", false, true);
+			#else
+			FunkinLua.luaTrace("addHaxeLibrary: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			#end
 		});
 	}
 	#end
+
+	override public function set(name:String, value:Dynamic, allowOverride:Bool = false):Void {
+		// should always override by default
+		super.set(name, value, true);
+	}
+
+	/*override function irisPrint(v):Void
+	{
+		FunkinLua.luaTrace('ERROR (${this.origin}:${interp.posInfos().lineNumber}): ${v}');
+		trace('[${ruleSet.name}:${interp.posInfos().lineNumber}]: ${v}\n');
+	}*/
 
 	override public function destroy()
 	{
@@ -435,67 +462,6 @@ class HScript extends Iris
 		}
 
 		return varsToBring = values;
-	}
-}
-
-class HScriptTools {
-	public static function hscriptLog(severity:ErrorSeverity, x:Dynamic, ?pos:haxe.PosInfos) {
-		var message:String = Std.string(x);
-		var instance:HScript = cast(Iris.instances.get(pos?.fileName), HScript);
-		var origin:String = instance?.origin ?? 'hscript';
-		#if hscriptPos
-		if (pos.lineNumber != -1) {
-			origin += ':' + pos.lineNumber;
-		}
-		#end
-		var fullTrace:String = '($origin) - $message';
-		var color:FlxColor;
-		switch (severity) {
-			case FATAL:
-				color = 0xff800000;
-				fullTrace = 'FATAL ' + fullTrace;
-			case ERROR:
-				color = FlxColor.RED;
-				fullTrace = 'ERROR ' + fullTrace;
-			case WARN:
-				color = FlxColor.YELLOW;
-				fullTrace = 'WARNING ' + fullTrace;
-			default:
-				color = FlxColor.CYAN;
-		}
-		#if LUA_ALLOWED
-		if (instance.parentLua != null) {
-			FunkinLua.lastCalledScript = instance.parentLua;
-			FunkinLua.luaTrace(fullTrace, false, false, color);
-			return;
-		}
-		#end
-		PlayState.instance.addTextToDebug(fullTrace, color);
-	}
-
-	public static function errorToString(e:IrisError, ?funcName:String, ?instance:HScript) {
-		var message = switch (#if hscriptPos e.e #else e #end) {
-			case EInvalidChar(c): "Invalid character: '" + (StringTools.isEof(c) ? "EOF" : String.fromCharCode(c)) + "' (" + c + ")";
-			case EUnexpected(s): "Unexpected token: \"" + s + "\"";
-			case EUnterminatedString: "Unterminated string";
-			case EUnterminatedComment: "Unterminated comment";
-			case EInvalidPreprocessor(str): "Invalid preprocessor (" + str + ")";
-			case EUnknownVariable(v): "Unknown variable: " + v;
-			case EInvalidIterator(v): "Invalid iterator: " + v;
-			case EInvalidOp(op): "Invalid operator: " + op;
-			case EInvalidAccess(f): "Invalid access to field " + f;
-			case ECustom(msg): msg;
-			default: "Unknown Error";
-		};
-		var mainHeader:String = 'ERROR';
-		if (instance != null && !instance.executed) mainHeader = 'ERROR ON LOADING';
-		var scriptHeader:String = (instance != null ? instance.origin : 'HScript');
-		if (funcName != null) scriptHeader += ':$funcName';
-		var lineHeader:String = #if hscriptPos ':${e.line}' #else '' #end;
-		if (instance == null #if LUA_ALLOWED || instance.parentLua == null #end)
-			return '$mainHeader ($scriptHeader$lineHeader) - $message';
-		else
-			return '$mainHeader ($scriptHeader) - HScript$lineHeader: $message';
 	}
 }
 
@@ -547,110 +513,6 @@ class CustomFlxColor {
 	public static function fromString(str:String):Int
 	{
 		return cast FlxColor.fromString(str);
-	}
-}
-
-/**
-    A custom type of map which sets values to scripts in global.
-**/
-typedef HScriptGlobalMap = HScriptTypedGlobalMap<String, Dynamic>;
-
-@:transitive
-@:multiType(@:followWithAbstracts K)
-@:access(crowplexus.iris.Iris)
-abstract HScriptTypedGlobalMap<K, V>(IMap<K, V>) 
-{
-	public function new();
-
-	public inline function set(key:K, value:V)
-    {
-		this.set(key, value);
-        
-        var key:String = cast key;
-        var value:Dynamic = cast value;
-        for (iris in Iris.instances)
-        {
-            if (iris.interp != null)
-                iris.set(key, value);
-        }
-    }
-
-	@:arrayAccess public inline function get(key:K)
-		return this.get(key);
-
-	public inline function exists(key:K)
-		return this.exists(key);
-
-	public inline function remove(key:K)
-		return this.remove(key);
-
-	public inline function keys():Iterator<K> 
-		return this.keys();
-
-	public inline function iterator():Iterator<V> 
-		return this.iterator();
-
-	public inline function keyValueIterator():KeyValueIterator<K, V> 
-		return this.keyValueIterator();
-
-	public inline function copy():Map<K, V> 
-		return cast this.copy();
-
-	public inline function toString():String 
-		return this.toString();
-
-	public inline function clear():Void 
-		this.clear();
-
-	@:arrayAccess @:noCompletion public inline function arrayWrite(k:K, v:V):V 
-    {
-		this.set(k, v);
-        var key:String = cast k;
-        var value:Dynamic = cast v;
-        for (iris in Iris.instances)
-        {
-            if (iris.interp != null)
-                iris.set(key, value);
-        }
-		return v;
-	}
-
-	@:to static inline function toStringMap<K:String, V>(t:IMap<K, V>):StringMap<V> 
-		return new StringMap<V>();
-
-	@:to static inline function toIntMap<K:Int, V>(t:IMap<K, V>):IntMap<V> 
-		return new IntMap<V>();
-
-	@:to static inline function toEnumValueMapMap<K:EnumValue, V>(t:IMap<K, V>):EnumValueMap<K, V> 
-		return new EnumValueMap<K, V>();
-
-	@:to static inline function toObjectMap<K:{}, V>(t:IMap<K, V>):ObjectMap<K, V> 
-		return new ObjectMap<K, V>();
-
-	@:from static inline function fromStringMap<V>(map:StringMap<V>):HScriptTypedGlobalMap<String, V> 
-		return cast map;
-
-	@:from static inline function fromIntMap<V>(map:IntMap<V>):HScriptTypedGlobalMap<Int, V> 
-		return cast map;
-
-	@:from static inline function fromObjectMap<K:{}, V>(map:ObjectMap<K, V>):HScriptTypedGlobalMap<K, V> 
-		return cast map;
-}
-#elseif LUA_ALLOWED
-class HScript {
-	public static function implement(funk:FunkinLua) {
-		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			return null;
-		});
-		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			FunkinLua.luaTrace("runHaxeFunction: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			return null;
-		});
-		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
-			FunkinLua.luaTrace("addHaxeLibrary: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			return false;
-		});
 	}
 }
 #end
