@@ -110,7 +110,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			var wheel:Int = FlxG.mouse.wheel;
 			if(FlxG.keys.justPressed.UP) wheel++;
 			if(FlxG.keys.justPressed.DOWN) wheel--;
-			/*#if FLX_TOUCH
+			#if FLX_TOUCH
 			for (touch in FlxG.touches.list)
 			{
 				var moveY:Int = 0;
@@ -148,7 +148,7 @@ class PsychUIDropDownMenu extends PsychUIInputText
 				if (touch.justReleased)
 					moveY = addition = curY = prevY = 0;
 			}
-			#end*/
+			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
 		}
 	}
