@@ -1444,7 +1444,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				}
 				else if(!ignoreClickForThisFrame)
 				{
-					if(touch.justPressed)
+					if(touch.justPressed && !touch.overlaps(touchPad))
 						resetSelectedNotes();
 		
 					dummyArrow.visible = false;
@@ -2004,6 +2004,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		var columnCount:Int = (GRID_COLUMNS_PER_PLAYER * GRID_PLAYERS) + (SHOW_EVENT_COLUMN ? 1 : 0);
 		gridBg = new ChartingGridSprite(columnCount, gridColors[0], gridColors[1]);
 		gridBg.screenCenter(X);
+		gridBg.x -= 180;
 
 		prevGridBg = new ChartingGridSprite(columnCount, gridColorsOther[0], gridColorsOther[1]);
 		nextGridBg = new ChartingGridSprite(columnCount, gridColorsOther[0], gridColorsOther[1]);

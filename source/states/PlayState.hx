@@ -3266,8 +3266,7 @@ class PlayState extends MusicBeatState
 		for (script in hscriptArray)
 			if(script != null)
 			{
-				var ny:Dynamic = script.get('onDestroy');
-				if(ny != null && Reflect.isFunction(ny)) ny();
+				if(newScript.exists('onDestroy')) newScript.call('onDestroy');
 				script.destroy();
 			}
 
@@ -3437,8 +3436,7 @@ class PlayState extends MusicBeatState
 		try
 		{
 			newScript = new HScript(null, file);
-			var ny:Dynamic = newScript.get('onCreate');
-			if (ny != null && Reflect.isFunction(ny)) ny();
+			if (newScript.exists('onCreate')) newScript.call('onCreate');
 			trace('initialized hscript interp successfully: $file');
 			hscriptArray.push(newScript);
 		}
