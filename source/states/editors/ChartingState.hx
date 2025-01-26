@@ -137,7 +137,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var mainBox:PsychUIBox;
 	var mainBoxPosition:FlxPoint = FlxPoint.get(920, 40);
 	var infoBox:PsychUIBox;
-	var infoBoxPosition:FlxPoint = FlxPoint.get(760, 80);
+	var infoBoxPosition:FlxPoint = FlxPoint.get(775, 80);
 	var upperBox:PsychUIBox;
 	
 	var camUI:FlxCamera;
@@ -1347,7 +1347,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 							var closest = closeNotes[0];
 							if(closest != null && (!closest.isEvent || !lockedEvents))
 							{
-								if(touchPad.buttonY.pressed || holdingAlt) // Select Note/Event
+								if(touchPad.buttonH.pressed || holdingAlt) // Select Note/Event
 								{
 									var sel = selectedNotes.copy();
 									if(!selectedNotes.contains(closest))
@@ -1355,7 +1355,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 										selectedNotes.push(closest);
 										addUndoAction(SELECT_NOTE, {old: sel, current: selectedNotes.copy()});
 									}
-									else if(!touchPad.buttonY.pressed || !holdingAlt)
+									else if(!touchPad.buttonH.pressed || !holdingAlt)
 									{
 										resetSelectedNotes();
 										selectedNotes.remove(closest);
@@ -3453,8 +3453,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		{
 			try
 			{
-				var filePath:String = Paths.json(PlayState.SONG.song + '/events');
-				var eventsFile:SwagSong = Song.parseJSON(filePath, filePath.substr(filePath.lastIndexOf('/')));
+				var filePath:String = Paths.json(Paths.formatToSongPath(PlayState.SONG.song) + '/events');
+				var eventsFile:SwagSong = Song.parseJSON(File.getContent(filePath), filePath.substr(filePath.lastIndexOf('/')));
 				if(eventsFile == null || Reflect.hasField(eventsFile, 'scrollSpeed') || eventsFile.events == null)
 				{
 					showOutput('Error: File loaded cannot be found or is not a Psych Engine chart/events file.', true);
