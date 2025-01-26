@@ -175,12 +175,13 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	{
 		var str:Array<String> = controls.mobileC ? ["CAMERA",
 		"X/Y - Camera Zoom In/Out",
-		"G + Arrow Buttons - Move Camera",
+		"Drag the Screen - Move Camera",
 		"Z - Reset Camera Zoom",
 		"",
 		"CHARACTER",
 		"A - Reset Current Offset",
 		"V/D - Previous/Next Animation",
+		"G - Replay Animation",
 		"Arrow Buttons - Move Offset",
 		"",
 		"OTHER",
@@ -917,7 +918,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
             	cameraPosition[0] = FlxG.camera.scroll.x + mouse.x;
             	cameraPosition[1] = FlxG.camera.scroll.y + mouse.y;
 			}
-			else if (FlxG.mouse.pressed && !FlxG.mouse.overlaps(UI_characterbox))
+			else if (FlxG.mouse.pressed && !FlxG.mouse.overlaps(UI_characterbox) && !FlxG.mouse.overlaps(touchPad))
 			{
 				FlxG.camera.scroll.x = cameraPosition[0] - mouse.x;
             	FlxG.camera.scroll.y = cameraPosition[1] - mouse.y;
@@ -1044,7 +1045,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			}
 			else holdingFrameTime = 0;
 
-			if(FlxG.keys.justPressed.SPACE)
+			if(FlxG.keys.justPressed.SPACE || touchPad.buttonG.justPressed)
 				character.playAnim(character.getAnimationName(), true);
 
 			var frames:Int = -1;
