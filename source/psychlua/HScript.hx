@@ -48,12 +48,12 @@ class HScript extends Iris
 				hs.varsToBring = varsToBring;
 				hs.parse(true);
 				var ret:Dynamic = hs.execute();
-				returnValue = ret;
+				hs.returnValue = ret;
 			}
 			catch(e:Dynamic)
 			{
 				FunkinLua.luaTrace('ERROR (${hs.origin}) - $e', false, false, FlxColor.RED);
-				returnValue = null;
+				hs.returnValue = null;
 			}
 		}
 	}
@@ -378,9 +378,9 @@ class HScript extends Iris
 				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
 			}
 
-			if (returnValue != null)
+			if (funk.hscript.returnValue != null)
 			{
-				return returnValue;
+				return funk.hscript.returnValue;
 			}
 
 			#else
