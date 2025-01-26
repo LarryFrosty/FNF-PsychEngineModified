@@ -111,42 +111,21 @@ class PsychUIDropDownMenu extends PsychUIInputText
 			if(FlxG.keys.justPressed.UP) wheel++;
 			if(FlxG.keys.justPressed.DOWN) wheel--;
 			#if FLX_TOUCH
-			for (touch in FlxG.touches.list)
-			{
-				var moveY:Int = 0;
-				var addition:Int = 0;
-				var curY:Int = 0;
-				var prevY:Int = 0;
-
-				if (touch.pressed)
-				{
-					curY = touch.y;
-
-					// these might need to be swaped idk i can't test
-					if (curY > prevY)
-						addition++;
-					else
-						addition--;
-
-					// change the option every 10 pixels you move
-					if (addition >= 10 || addition <= 10)
-					{
-						// these here might also need to be swapped
-						if (addition >= 10)
-							moveY++
-						else
-							moveY--;
-
-						addition = 0;
+			for (swipe in FlxG.swipes) {
+				var f = swipe.startPosition.x - swipe.endPosition.x;
+				var g = swipe.startPosition.y - swipe.endPosition.y;
+				if (25 <= Math.sqrt(f * f + g * g)) {
+					if ((-45 <= swipe.startPosition.angleBetween(swipe.endPosition) && 45 >= swipe.startPosition.angleBetween(swipe.endPosition))) {
+						// Go down
+						wheel++;
+						if(wheel >= list.length) wheel = list.length-1;
 					}
-
-					prevY = curY;
+					else if (-180 <= swipe.startPosition.angleBetween(swipe.endPosition) && -135 >= swipe.startPosition.angleBetween(swipe.endPosition) || (135 <= swipe.startPosition.angleBetween(swipe.endPosition) && 180 >= swipe.startPosition.angleBetween(swipe.endPosition))) {
+						// Go up
+						--wheel;
+						if(wheel < 0) wheel = 0;
+					}
 				}
-
-				wheel += moveY;
-
-				if (touch.justReleased)
-					moveY = addition = curY = prevY = 0;
 			}
 			#end
 			if(wheel != 0) showDropDown(true, curScroll - wheel, _curFilter);
