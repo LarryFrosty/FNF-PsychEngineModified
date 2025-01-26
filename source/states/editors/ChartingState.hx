@@ -1771,6 +1771,16 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		}
 		else noteSelectionSine = 0;
 
+		#if android
+		if (FlxG.android.justReleased.BACK)
+		{
+			PlayState.chartingMode = false;
+			MusicBeatState.switchState(new states.editors.MasterEditorMenu());
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			FlxG.mouse.visible = false;
+		}
+		#end
+
 		outputTxt.alpha = outputAlpha;
 		outputTxt.visible = (outputAlpha > 0);
 		FlxG.camera.scroll.y = scrollY;
@@ -2004,7 +2014,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		var columnCount:Int = (GRID_COLUMNS_PER_PLAYER * GRID_PLAYERS) + (SHOW_EVENT_COLUMN ? 1 : 0);
 		gridBg = new ChartingGridSprite(columnCount, gridColors[0], gridColors[1]);
 		gridBg.screenCenter(X);
-		gridBg.x -= 180;
+		gridBg.x -= 170;
 
 		prevGridBg = new ChartingGridSprite(columnCount, gridColorsOther[0], gridColorsOther[1]);
 		nextGridBg = new ChartingGridSprite(columnCount, gridColorsOther[0], gridColorsOther[1]);
@@ -3439,7 +3449,83 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			PlayState.SONG.needsVoices = allowVocalsCheckBox.checked;
 			loadMusic();
 		});
-		var reloadAudioButton:PsychUIButton = new PsychUIButton(objX + 120, objY, 'Reload Audio', function() loadMusic(true), 80);
+		var loadEventsButton:PsychUIButton = new PsychUIButton(objX + 120, objY, 'Load Events', function()
+		{
+			try
+			{
+				var filePath:String = Paths.json(PlayState.SONG.song + '/events');
+				var eventsFile:SwagSong = Song.parseJSON(filePath, filePath.substr(filePath.lastIndexOf('/')));
+				if(eventsFile == null || Reflect.hasField(eventsFile, 'scrollSpeed') || eventsFile.events == null)
+				{
+					showOutput('Error: File loaded cannot be found or is not a Psych Engine chart/events file.', true);
+					return;
+				}
+	
+				var loadedEvents:Array<Dynamic> = eventsFile.events;
+				if(loadedEvents.length < 1)
+				{
+					showOutput('Events file loaded is empty.', true);
+					return;
+				}
+	
+				openSubState(new BasePrompt('Events Found! Choose an action.',
+					function(state:BasePrompt)
+					{
+						var btnY = 390;
+						var btn:PsychUIButton = new PsychUIButton(0, btnY, 'Replace All', function()
+						{
+							for (event in events)
+							{
+								if(event != null)
+								{
+									event.destroy();
+									selectedNotes.remove(event);
+								}
+							}
+							undoActions = [];
+							events = [];
+	
+							for (event in loadedEvents)
+								events.push(createEvent(event));
+	
+							softReloadNotes();
+							state.close();
+							showOutput('Events loaded successfully!');
+						});
+						btn.normalStyle.bgColor = FlxColor.RED;
+						btn.normalStyle.textColor = FlxColor.WHITE;
+						btn.screenCenter(X);
+						btn.x -= 125;
+						btn.cameras = state.cameras;
+						state.add(btn);
+								
+						var btn:PsychUIButton = new PsychUIButton(0, btnY, 'Add', function()
+						{
+							for (event in loadedEvents)
+								events.push(createEvent(event));
+	
+							softReloadNotes();
+							state.close();
+							showOutput('Events added successfully!');
+						});
+						btn.screenCenter(X);
+						btn.cameras = state.cameras;
+						state.add(btn);
+						
+						var btn:PsychUIButton = new PsychUIButton(0, btnY, 'Cancel', state.close);
+						btn.screenCenter(X);
+						btn.x += 125;
+						btn.cameras = state.cameras;
+						state.add(btn);
+					}
+				));
+			}
+			catch(e:Exception)
+			{
+				showOutput('Error: ${e.message}', true);
+				trace(e.stack);
+			}
+		}, 80);
 
 		#if (mac || android)
 		var reloadJsonButton:PsychUIButton = new PsychUIButton(objX + 205, objY, 'Reload JSON', function()
@@ -3498,7 +3584,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		tab_group.add(new FlxText(songNameInputText.x, songNameInputText.y - 15, 80, 'Song Name:'));
 		tab_group.add(songNameInputText);
 		tab_group.add(allowVocalsCheckBox);
-		tab_group.add(reloadAudioButton);
+		tab_group.add(loadEventsButton);
 		#if (mac || android)
 		tab_group.add(reloadJsonButton);
 		#end
