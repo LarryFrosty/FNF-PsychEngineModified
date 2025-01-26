@@ -438,7 +438,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		reloadNotesDropdowns();
 		if(!_shouldReset)
 		{
-			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset - ClientPrefs.data.noteOffset;
+			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
 			if(FlxG.sound.music.time >= vocals.length)
 				vocals.pause();
 			if(FlxG.sound.music.time >= opponentVocals.length)
@@ -913,7 +913,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 						if(shiftAdd > 0)
 						{
 							loadSection(curSec - shiftAdd);
-							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset - ClientPrefs.data.noteOffset + 0.000001;
+							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
 						}
 					}
 					else if(touchPad.buttonRight.justPressed || FlxG.keys.justPressed.D)
@@ -923,7 +923,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 						if(shiftAdd > 0)
 						{
 							loadSection(curSec + shiftAdd);
-							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset - ClientPrefs.data.noteOffset + 0.000001;
+							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
 						}
 					}
 				}
@@ -965,7 +965,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				}
 			}
 
-			if(!songFinished) Conductor.songPosition = FlxMath.bound(FlxG.sound.music.time + Conductor.offset - ClientPrefs.data.noteOffset, 0, FlxG.sound.music.length - 1);
+			if(!songFinished) Conductor.songPosition = FlxMath.bound(FlxG.sound.music.time + Conductor.offset, 0, FlxG.sound.music.length - 1);
 			updateScrollY();
 		}
 
