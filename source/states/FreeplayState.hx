@@ -457,7 +457,7 @@ class FreeplayState extends MusicBeatState
 
 			if (touchPad.buttonZ.pressed)
 			{
-				MusicBeatState.switchState(new ChartingState());
+				MusicBeatState.switchState(new states.editors.ChartingState());
 			}
 			else
 			{
