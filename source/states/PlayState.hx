@@ -3436,13 +3436,15 @@ class PlayState extends MusicBeatState
 		try
 		{
 			newScript = new HScript(null, file);
-			newScript.call('onCreate');
+			var ny:Dynamic = newScript.get('onCreate');
+			if (ny != null && Reflect.isFunction(ny)) ny();
 			trace('initialized hscript interp successfully: $file');
 			hscriptArray.push(newScript);
 		}
-		catch(e:Dynamic)
+		catch(e:IrisError)
 		{
-			addTextToDebug('ERROR ON LOADING ($file) - $e', FlxColor.RED);
+			var line:String = #if hscriptPos ':' + e.line #else '' #end;
+			addTextToDebug('ERROR ON LOADING ($file)$line - ' + Printer.errorToString(e, false), FlxColor.RED);
 			var newScript:HScript = cast (Iris.instances.get(file), HScript);
 			if(newScript != null)
 				newScript.destroy();
@@ -3532,9 +3534,10 @@ class PlayState extends MusicBeatState
 				if(myValue != null && !excludeValues.contains(myValue))
 					returnVal = myValue;
 			}
-			catch(e:Dynamic)
+			catch(e:IrisError)
 			{
-				addTextToDebug('ERROR (${script.origin}: $funcToCall) - $e', FlxColor.RED);
+				var line:String = #if hscriptPos ':' + e.line #else '' #end;
+				addTextToDebug('ERROR (${script.origin}:$line: $funcToCall) - ' + Printer.errorToString(e, false), FlxColor.RED);
 			}
 		}
 		#end

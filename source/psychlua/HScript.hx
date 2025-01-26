@@ -13,11 +13,13 @@ import psychlua.FunkinLua;
 import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
 import crowplexus.iris.ErrorSeverity;
+import crowplexus.hscript.Expr.Error as IrisError;
 
 class HScript extends Iris
 {
 	public var filePath:String;
 	public var modFolder:String;
+	public var returnValue:Dynamic;
 
 	#if LUA_ALLOWED
 	public var parentLua:FunkinLua;
@@ -45,11 +47,13 @@ class HScript extends Iris
 				hs.scriptCode = code;
 				hs.varsToBring = varsToBring;
 				hs.parse(true);
-				hs.execute();
+				var ret:Dynamic = hs.execute();
+				returnValue = ret;
 			}
 			catch(e:Dynamic)
 			{
 				FunkinLua.luaTrace('ERROR (${hs.origin}) - $e', false, false, FlxColor.RED);
+				returnValue = null;
 			}
 		}
 	}
@@ -85,7 +89,6 @@ class HScript extends Iris
 		if (scriptName == null && parent != null)
 			scriptName = parent.scriptName;
 		#end
-		this.varsToBring = varsToBring;
 		super(scriptThing, new IrisConfig(scriptName, false, false));
 		var customInterp:CustomInterp = new CustomInterp();
 		customInterp.parentInstance = FlxG.state;
@@ -100,39 +103,17 @@ class HScript extends Iris
 		}
 		#end
 		if (!manualRun) {
-			var _active:Bool = tryRunning();
-			if (_active == false)
-				return;
+			try {
+				preset();
+				this.varsToBring = varsToBring;
+				var ret:Dynamic = execute();
+				returnValue = ret;
+			} catch(e:IrisError) {
+				returnValue = null;
+				this.destroy();
+				throw e;
+			}
 		}
-		Iris.warn = function(x, ?pos:haxe.PosInfos) {
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('[$origin]: $x', FlxColor.YELLOW);
-			Iris.logLevel(WARN, x, pos);
-		}
-		Iris.error = function(x, ?pos:haxe.PosInfos) {
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('[$origin]: $x', FlxColor.ORANGE);
-
-			Iris.logLevel(ERROR, x, pos);
-		}
-		Iris.fatal = function(x, ?pos:haxe.PosInfos) {
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('[$origin]: $x', FlxColor.RED);
-			Iris.logLevel(FATAL, x, pos);
-		}
-	}
-
-	function tryRunning(destroyOnError:Bool = true):Bool {
-		try {
-			preset();
-			execute();
-			return true;
-		} catch(e:haxe.Exception) {
-			if(destroyOnError) this.destroy();
-			throw e;
-			return false;
-		}
-		return false;
 	}
 
 	var varsToBring(default, set):Any = null;
@@ -397,6 +378,11 @@ class HScript extends Iris
 				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
 			}
 
+			if (returnValue != null)
+			{
+				return returnValue;
+			}
+
 			#else
 			FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
 			#end
@@ -454,12 +440,6 @@ class HScript extends Iris
 	}
 	#end
 
-	/*override function irisPrint(v):Void
-	{
-		FunkinLua.luaTrace('ERROR (${this.origin}:${interp.posInfos().lineNumber}): ${v}');
-		trace('[${ruleSet.name}:${interp.posInfos().lineNumber}]: ${v}\n');
-	}*/
-
 	override public function destroy()
 	{
 		origin = null;
@@ -470,7 +450,7 @@ class HScript extends Iris
 	function set_varsToBring(values:Any) {
 		if (varsToBring != null)
 			for (key in Reflect.fields(varsToBring))
-				if(exists(key.trim()))
+				if (exists(key.trim()))
 					interp.variables.remove(key.trim());
 
 		if (values != null)
@@ -505,38 +485,26 @@ class CustomFlxColor {
 	public static var CYAN(default, null):Int = FlxColor.CYAN;
 
 	public static function fromInt(Value:Int):Int 
-	{
 		return cast FlxColor.fromInt(Value);
-	}
 
 	public static function fromRGB(Red:Int, Green:Int, Blue:Int, Alpha:Int = 255):Int
-	{
 		return cast FlxColor.fromRGB(Red, Green, Blue, Alpha);
-	}
+
 	public static function fromRGBFloat(Red:Float, Green:Float, Blue:Float, Alpha:Float = 1):Int
-	{	
 		return cast FlxColor.fromRGBFloat(Red, Green, Blue, Alpha);
-	}
 
 	public static inline function fromCMYK(Cyan:Float, Magenta:Float, Yellow:Float, Black:Float, Alpha:Float = 1):Int
-	{
 		return cast FlxColor.fromCMYK(Cyan, Magenta, Yellow, Black, Alpha);
-	}
 
 	public static function fromHSB(Hue:Float, Sat:Float, Brt:Float, Alpha:Float = 1):Int
-	{	
 		return cast FlxColor.fromHSB(Hue, Sat, Brt, Alpha);
-	}
+
 	public static function fromHSL(Hue:Float, Sat:Float, Light:Float, Alpha:Float = 1):Int
-	{	
 		return cast FlxColor.fromHSL(Hue, Sat, Light, Alpha);
-	}
+
 	public static function fromString(str:String):Int
-	{
 		return cast FlxColor.fromString(str);
-	}
 }
-#end
 
 class CustomInterp extends crowplexus.hscript.Interp
 {
@@ -562,7 +530,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 			return v;
 		}
 
-		if(parentInstance != null) {
+		if(parentInstance != null && Type.getInstanceFields(Type.getClass(parentInstance)).contains(id)) {
 			var v = Reflect.getProperty(parentInstance, id);
 			return v;
 		}
@@ -572,3 +540,4 @@ class CustomInterp extends crowplexus.hscript.Interp
 		return null;
 	}
 }
+#end
