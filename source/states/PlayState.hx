@@ -51,6 +51,7 @@ import psychlua.HScript;
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Printer as IrisPrinter;
 #end
 
 /**
@@ -3444,7 +3445,7 @@ class PlayState extends MusicBeatState
 		catch(e:IrisError)
 		{
 			var line:String = #if hscriptPos ':' + e.line #else '' #end;
-			addTextToDebug('ERROR ON LOADING ($file)$line - ' + Printer.errorToString(e, false), FlxColor.RED);
+			addTextToDebug('ERROR ON LOADING ($file)$line - ' + IrisPrinter.errorToString(e, false), FlxColor.RED);
 			var newScript:HScript = cast (Iris.instances.get(file), HScript);
 			if(newScript != null)
 				newScript.destroy();
@@ -3537,7 +3538,7 @@ class PlayState extends MusicBeatState
 			catch(e:IrisError)
 			{
 				var line:String = #if hscriptPos ':' + e.line #else '' #end;
-				addTextToDebug('ERROR (${script.origin}:$line: $funcToCall) - ' + Printer.errorToString(e, false), FlxColor.RED);
+				addTextToDebug('ERROR (${script.origin}:$line: $funcToCall) - ' + IrisPrinter.errorToString(e, false), FlxColor.RED);
 			}
 		}
 		#end
