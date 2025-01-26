@@ -30,7 +30,7 @@
     {
       "button": "buttonB",
       "graphic": "b",
-      "x": 896,
+      "x": 1022,
       "y": 587,
       "width": 132,
       "height": 125,
@@ -39,7 +39,7 @@
     {
       "button": "buttonC",
       "graphic": "c",
-      "x": 1022,
+      "x": 896,
       "y": 587,
       "width": 132,
       "height": 125,
