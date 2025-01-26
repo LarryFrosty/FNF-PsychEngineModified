@@ -101,11 +101,6 @@ class PsychUIDropDownMenu extends PsychUIInputText
 		}
 		else if(FlxG.mouse.released && button.animation.curAnim != null && button.animation.curAnim.name != 'normal') button.animation.play('normal', true);
 
-		if(FlxG.mouse.pressed && FlxG.mouse.justMoved)
-		{
-			PsychUIInputText.focusOn = this;
-		}
-
 		if(lastFocus != PsychUIInputText.focusOn)
 		{
 			showDropDown(PsychUIInputText.focusOn == this);
