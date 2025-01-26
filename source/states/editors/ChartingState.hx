@@ -137,7 +137,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var mainBox:PsychUIBox;
 	var mainBoxPosition:FlxPoint = FlxPoint.get(920, 40);
 	var infoBox:PsychUIBox;
-	var infoBoxPosition:FlxPoint = FlxPoint.get(765, 80);
+	var infoBoxPosition:FlxPoint = FlxPoint.get(620, 80);
 	var upperBox:PsychUIBox;
 	
 	var camUI:FlxCamera;
@@ -495,12 +495,12 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			"Up/Down (On The Right) - Decrease/Increase Note Sustain Length",
 			"Hold Y to Increase/Decrease move by 4x",
 			"",
+			"B - Exit to Menu",
 			"C - Preview Chart",
 			"A - Playtest Chart",
 			"X - Stop/Resume Song",
 			"",
 			"Hold H and touch to Select Note(s)",
-			"Z - Hide Action TouchPad Buttons",
 			"V/D - Zoom in/out",
 			""
 			#if FLX_PITCH
@@ -791,16 +791,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 					}
 					var vis:Bool = !fullTipText.visible;
 					tipBg.visible = tipBg.active = fullTipText.visible = fullTipText.active = vis;
-				}
-
-				if (touchPad.buttonZ.justPressed)
-				{
-					if(controls.mobileC){
-						touchPad.forEachAlive(function(button:TouchButton){
-							if(button.tag != 'Z' && button.tag != 'LEFT' && button.tag != 'RIGHT' && button.tag != 'UP' && button.tag != 'DOWN')
-								touchPad.buttonUp2.visible = touchPad.buttonDown2.visible = button.visible = !button.visible;
-						});
-					}
 				}
 
 				if (touchPad.buttonG.justPressed)
@@ -1771,15 +1761,13 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		}
 		else noteSelectionSine = 0;
 
-		#if android
-		if (FlxG.android.justReleased.BACK)
+		if (controls.mobileC && (FlxG.android.justReleased.BACK || touchPad.buttonB.justPressed))
 		{
 			PlayState.chartingMode = false;
 			MusicBeatState.switchState(new states.editors.MasterEditorMenu());
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			FlxG.mouse.visible = false;
 		}
-		#end
 
 		outputTxt.alpha = outputAlpha;
 		outputTxt.visible = (outputAlpha > 0);

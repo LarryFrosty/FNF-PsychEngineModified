@@ -455,8 +455,15 @@ class FreeplayState extends MusicBeatState
 				return;
 			}
 
-			LoadingState.prepareToSong();
-			LoadingState.loadAndSwitchState(new PlayState());
+			if (touchPad.buttonZ.pressed)
+			{
+				MusicBeatState.switchState(new ChartingState());
+			}
+			else
+			{
+				LoadingState.prepareToSong();
+				LoadingState.loadAndSwitchState(new PlayState());
+			}
 			#if !SHOW_LOADING_SCREEN FlxG.sound.music.stop(); #end
 			stopMusicPlay = true;
 

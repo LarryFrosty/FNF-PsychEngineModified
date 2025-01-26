@@ -28,6 +28,15 @@
       "color": "0x99062D"
     },
     {
+      "button": "buttonB",
+      "graphic": "b",
+      "x": 896,
+      "y": 587,
+      "width": 132,
+      "height": 125,
+      "color": "0xFFCB00"
+    },
+    {
       "button": "buttonC",
       "graphic": "c",
       "x": 1022,
@@ -44,15 +53,6 @@
       "width": 132,
       "height": 125,
       "color": "0x4A35B9"
-    },
-    {
-      "button": "buttonZ",
-      "graphic": "z",
-      "x": 896,
-      "y": 587,
-      "width": 132,
-      "height": 125,
-      "color": "0xCCB98E"
     },
     {
       "button": "buttonA",
