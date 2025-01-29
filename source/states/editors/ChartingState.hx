@@ -132,7 +132,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var sectionFirstNoteID:Int = 0;
 	var sectionFirstEventID:Int = 0;
 	static var curSec:Int = 0;
-	static var lastPosition:Float = 0:
+	static var lastPosition:Float = 0;
 
 	var chartEditorSave:FlxSave;
 	var mainBox:PsychUIBox;
