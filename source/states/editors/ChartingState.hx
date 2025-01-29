@@ -131,7 +131,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 	var sectionFirstNoteID:Int = 0;
 	var sectionFirstEventID:Int = 0;
-	var curSec:Int = 0;
+	static var curSec:Int = 0;
 
 	var chartEditorSave:FlxSave;
 	var mainBox:PsychUIBox;
@@ -193,8 +193,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var selectionStart:FlxPoint = FlxPoint.get();
 	var selectionBox:FlxSprite;
 
-	var _shouldReset:Bool = true;
-	public function new(?shouldReset:Bool = true)
+	var _shouldReset:Bool = false;
+	public function new(?shouldReset:Bool = false)
 	{
 		this._shouldReset = shouldReset;
 		super();
@@ -438,6 +438,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		reloadNotesDropdowns();
 		if(!_shouldReset)
 		{
+			loadSection();
 			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
 			if(FlxG.sound.music.time >= vocals.length)
 				vocals.pause();
