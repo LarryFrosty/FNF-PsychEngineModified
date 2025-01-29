@@ -131,7 +131,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 	var sectionFirstNoteID:Int = 0;
 	var sectionFirstEventID:Int = 0;
-	var curSec:Int = 0;
+	static var curSec:Int = 0;
+	static var lastPosition:Float = 0;
 
 	var chartEditorSave:FlxSave;
 	var mainBox:PsychUIBox;
@@ -193,8 +194,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var selectionStart:FlxPoint = FlxPoint.get();
 	var selectionBox:FlxSprite;
 
-	var _shouldReset:Bool = true;
-	public function new(?shouldReset:Bool = true)
+	var _shouldReset:Bool = false;
+	public function new(?shouldReset:Bool = false)
 	{
 		this._shouldReset = shouldReset;
 		super();
@@ -438,6 +439,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		reloadNotesDropdowns();
 		if(!_shouldReset)
 		{
+			Conductor.songPosition = lastPosition;
+			loadSection();
 			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
 			if(FlxG.sound.music.time >= vocals.length)
 				vocals.pause();
@@ -625,7 +628,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		updateHeads(true);
 		
 		autoSaveTime = 0;
-		Conductor.songPosition = 0;
+		lastPosition = Conductor.songPosition = 0;
 		if(FlxG.sound.music != null) FlxG.sound.music.time = 0;
 		curSec = 0;
 		loadSection();
@@ -913,7 +916,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 						if(shiftAdd > 0)
 						{
 							loadSection(curSec - shiftAdd);
-							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
+							lastPosition = Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
 						}
 					}
 					else if(touchPad.buttonRight.justPressed || FlxG.keys.justPressed.D)
@@ -923,7 +926,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 						if(shiftAdd > 0)
 						{
 							loadSection(curSec + shiftAdd);
-							Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
+							lastPosition = Conductor.songPosition = FlxG.sound.music.time = cachedSectionTimes[curSec] - Conductor.offset + 0.000001;
 						}
 					}
 				}
@@ -932,7 +935,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 					var timeToGoBack:Float = 0;
 					if(!FlxG.keys.pressed.SHIFT) timeToGoBack = cachedSectionTimes[curSec] + (curSec > 0 ? 0.000001 : 0);
 					else loadSection(0);
-					Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = timeToGoBack;
+					lastPosition = Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = timeToGoBack;
 				}
 				else if(touchPad.buttonUp.pressed || FlxG.keys.pressed.W != touchPad.buttonDown.pressed || FlxG.keys.pressed.S || FlxG.mouse.wheel != 0)
 				{
@@ -965,7 +968,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				}
 			}
 
-			if(!songFinished) Conductor.songPosition = FlxMath.bound(FlxG.sound.music.time + Conductor.offset, 0, FlxG.sound.music.length - 1);
+			if(!songFinished) lastPosition = Conductor.songPosition = FlxMath.bound(FlxG.sound.music.time + Conductor.offset, 0, FlxG.sound.music.length - 1);
 			updateScrollY();
 		}
 
@@ -2113,7 +2116,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	{
 		trace('song completed');
 		setSongPlaying(false);
-		Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = FlxG.sound.music.length - 1;
+		lastPosition = Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = FlxG.sound.music.length - 1;
 		curSec = PlayState.SONG.notes.length - 1;
 		forceDataUpdate = true;
 	}
@@ -4983,7 +4986,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			curSec = PlayState.SONG.notes.length - 1;
 		}
 		FlxG.sound.music.time = time;
-		Conductor.songPosition = time;
+		lastPosition = Conductor.songPosition = time;
 		forceDataUpdate = true;
 		loadSection();
 	}
