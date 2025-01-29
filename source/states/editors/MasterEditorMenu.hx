@@ -72,6 +72,8 @@ class MasterEditorMenu extends MusicBeatState
 		#end
 		changeSelection();
 
+		ChartingState.shouldReset = true;
+
 		FlxG.mouse.visible = false;
 
 		addTouchPad(#if MODS_ALLOWED 'LEFT_FULL' #else 'UP_DOWN' #end, 'A_B');

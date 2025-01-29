@@ -194,12 +194,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var selectionStart:FlxPoint = FlxPoint.get();
 	var selectionBox:FlxSprite;
 
-	var _shouldReset:Bool = false;
-	public function new(?shouldReset:Bool = false)
-	{
-		this._shouldReset = shouldReset;
-		super();
-	}
+	public static var shouldReset:Bool = true;
 
 	var bg:FlxSprite;
 	var theme:ChartingTheme = DEFAULT;
@@ -221,7 +216,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		if(Difficulty.list.length < 1) Difficulty.resetList();
 		_keysPressedBuffer.resize(keysArray.length);
 
-		if(_shouldReset) Conductor.songPosition = 0;
 		persistentUpdate = false;
 		FlxG.mouse.visible = true;
 		FlxG.sound.list.add(vocals);
@@ -437,16 +431,13 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		loadMusic();
 		reloadNotesDropdowns();
-		if(!_shouldReset)
-		{
-			Conductor.songPosition = lastPosition;
-			loadSection();
-			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
-			if(FlxG.sound.music.time >= vocals.length)
-				vocals.pause();
-			if(FlxG.sound.music.time >= opponentVocals.length)
-				opponentVocals.pause();
-		}
+		Conductor.songPosition = shouldReset ? (lastPosition = 0) : lastPosition;
+		loadSection(shouldReset ? 0 : curSec);
+		vocals.time = opponentVocals.time = FlxG.sound.music.time = Math max(0, Conductor.songPosition - Conductor.offset);
+		if(FlxG.sound.music.time >= vocals.length)
+			vocals.pause();
+		if(FlxG.sound.music.time >= opponentVocals.length)
+			opponentVocals.pause();
 
 		reloadNotes();
 		updateGridVisibility();
@@ -468,6 +459,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		stageDropDown.list = loadFileList('stages/', 'data/stageList.txt');
 		onChartLoaded();
+
+		if(shouldReset) shouldReset = false;
 
 		var tipText:FlxText = new FlxText(FlxG.width - 210, FlxG.height - 30, 200, 'Press ${controls.mobileC ? 'F' : 'F1'} for Help', 20);
 		tipText.cameras = [camUI];

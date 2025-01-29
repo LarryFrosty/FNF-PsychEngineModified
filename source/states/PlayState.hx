@@ -3280,6 +3280,9 @@ class PlayState extends MusicBeatState
 			videoCutscene = null;
 		}
 
+		if(!PlayState.chartingMode)
+			ChartingState.shouldReset = true;
+
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 
