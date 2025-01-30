@@ -71,11 +71,12 @@ class LuaUtils
 			return value;
 		}
 
-		if(CoolUtil.hasClassField(instance, variable))
-			Reflect.setProperty(instance, variable, value);
-		else if(MusicBeatState.getVariables().exists(variable))
+		if(instance is MusicBeatState && MusicBeatState.getVariables().exists(variable))
+		{
 			MusicBeatState.getVariables().set(variable, value);
-
+			return value;
+		}
+		Reflect.setProperty(instance, variable, value);
 		return value;
 	}
 	public static function getVarInArray(instance:Dynamic, variable:String, allowMaps:Bool = false):Any
@@ -107,14 +108,13 @@ class LuaUtils
 			return instance.get(variable);
 		}
 
-		if(CoolUtil.hasClassField(instance, variable))
-			return Reflect.getProperty(instance, variable);
-		else if(MusicBeatState.getVariables().exists(variable))
+		if(instance is MusicBeatState && MusicBeatState.getVariables().exists(variable))
 		{
 			var retVal:Dynamic = MusicBeatState.getVariables().get(variable);
-			return retVal;
+			if(retVal != null)
+				return retVal;
 		}
-		return null;
+		return Reflect.getProperty(instance, variable);
 	}
 
 	public static function getModSetting(saveTag:String, ?modName:String = null)
