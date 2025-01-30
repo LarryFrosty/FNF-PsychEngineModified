@@ -104,16 +104,16 @@ class HScript extends Iris
 		}
 		#end
 		if (!manualRun) {
-			try {
+			//try {
 				preset();
 				this.varsToBring = varsToBring;
 				var ret:Dynamic = execute();
 				returnValue = ret;
-			} catch(e:IrisError) {
+			/*} catch(e:IrisError) {
 				returnValue = null;
 				this.destroy();
 				throw e;
-			}
+			}*/
 		}
 	}
 
@@ -531,7 +531,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 			return v;
 		}
 
-		if(parentInstance != null && CoolUtil.hasClassField(parentInstance, id)) {
+		if(parentInstance != null && Type.getInstanceFields(Type.getClass(parentInstance)).contains(id)) {
 			var v = Reflect.getProperty(parentInstance, id);
 			return v;
 		}
