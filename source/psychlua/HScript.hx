@@ -14,6 +14,7 @@ import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
 import crowplexus.iris.ErrorSeverity;
 import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Expr.Printer as IrisPrinter;
 
 class HScript extends Iris
 {
@@ -50,9 +51,9 @@ class HScript extends Iris
 				var ret:Dynamic = hs.execute();
 				hs.returnValue = ret;
 			}
-			catch(e:Dynamic)
+			catch(e:IrisError)
 			{
-				FunkinLua.luaTrace('ERROR (${hs.origin}) - $e', false, false, FlxColor.RED);
+				FunkinLua.luaTrace('ERROR (${hs.origin}) - ' + IrisPrinter.errorToString(e, false), false, false, FlxColor.RED);
 				hs.returnValue = null;
 			}
 		}
@@ -530,7 +531,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 			return v;
 		}
 
-		if(parentInstance != null && Type.getInstanceFields(Type.getClass(parentInstance)).contains(id)) {
+		if(parentInstance != null && CoolUtil.hasClassField(parentInstance, id)) {
 			var v = Reflect.getProperty(parentInstance, id);
 			return v;
 		}

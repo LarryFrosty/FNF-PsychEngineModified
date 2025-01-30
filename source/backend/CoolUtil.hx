@@ -168,4 +168,59 @@ class CoolUtil
 		FlxG.stage.window.alert(message, title);
 		#end
 	}
+
+	public static function getClass(cls:Dynamic):Dynamic
+	{
+		switch (Type.typeof(cls))
+		{
+			case TClass(_):
+				// Is a class instance. Convert it to the class
+				cls = Type.getClass(cls);
+			case TObject if (cls is Class):
+				// Is a class. Do nothing
+			default:
+				// Not a class instance nor a class
+				return null;
+		}
+		return cls;
+	}
+
+	public static function hasStaticField(cls:Dynamic, field:String):Bool
+	{
+		if(getClass(cls) == null) return false;
+
+		var fields:Array<String> = Type.getClassFields(cls);
+		if(fields.length > 0 && fields.contains(field))
+			return true;
+		else
+		{
+			while (true)
+			{
+				cls = Type.getSuperClass(cls);
+				if(cls == null) break;
+				fields = Type.getClassFields(cls);
+				if(fields.length > 0 && fields.contains(field))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function hasInstanceField(cls:Dynamic, field:String):Bool
+	{
+		if(getClass(cls) == null) return false;
+
+		var fields:Array<String> = Type.getInstanceFields(cls);
+		// Type.getInstanceFields ALSO returns the parent class's fields
+		// So a while loop is not necessary here
+		return fields.length > 0 && fields.contains(field);
+	}
+
+	public static function hasClassField(cls:Dynamic, field:String):Bool
+	{
+		if(getClass(cls) == null) return false;
+
+		return (hasInstanceField(cls) || hasStaticField(cls));
+	}
 }

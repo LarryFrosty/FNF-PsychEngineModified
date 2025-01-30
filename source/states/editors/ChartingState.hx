@@ -433,7 +433,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		reloadNotesDropdowns();
 		Conductor.songPosition = shouldReset ? (lastPosition = 0) : lastPosition;
 		loadSection(shouldReset ? 0 : curSec);
-		vocals.time = opponentVocals.time = FlxG.sound.music.time = Math.max(0, Conductor.songPosition - Conductor.offset);
+		vocals.time = opponentVocals.time = FlxG.sound.music.time = Math.max(0, Conductor.songPosition - Conductor.offset - ClientPrefs.data.noteOffset);
 		if(FlxG.sound.music.time >= vocals.length)
 			vocals.pause();
 		if(FlxG.sound.music.time >= opponentVocals.length)
