@@ -3445,8 +3445,8 @@ class PlayState extends MusicBeatState
 		}
 		catch(e:haxe.Exception)
 		{
-			var line:String = #if hscriptPos ':' + e.line #else '' #end;
-			addTextToDebug('ERROR ON LOADING ($file)$line - ' + IrisPrinter.errorToString(e, false), FlxColor.RED);
+			//var line:String = #if hscriptPos ':' + e.line #else '' #end;
+			addTextToDebug('ERROR ON LOADING ($file)$line - ${e.message}', FlxColor.RED);
 			var newScript:HScript = cast (Iris.instances.get(file), HScript);
 			if(newScript != null)
 				newScript.destroy();
