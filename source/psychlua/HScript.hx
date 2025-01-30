@@ -104,7 +104,10 @@ class HScript extends Iris
 		}
 		#end
 		if (!manualRun) {
-			tryRunning();
+			preset();
+			this.varsToBring = varsToBring;
+			var ret:Dynamic = execute();
+			returnValue = ret;
 		}
 	}
 
