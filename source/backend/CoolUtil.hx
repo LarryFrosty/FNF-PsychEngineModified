@@ -221,6 +221,6 @@ class CoolUtil
 	{
 		if(getClass(cls) == null) return false;
 
-		return (hasInstanceField(cls) || hasStaticField(cls));
+		return (hasInstanceField(cls, field) || hasStaticField(cls, field));
 	}
 }
