@@ -3443,7 +3443,7 @@ class PlayState extends MusicBeatState
 			trace('initialized hscript interp successfully: $file');
 			hscriptArray.push(newScript);
 		}
-		catch(e:IrisError)
+		catch(e:haxe.Exception)
 		{
 			var line:String = #if hscriptPos ':' + e.line #else '' #end;
 			addTextToDebug('ERROR ON LOADING ($file)$line - ' + IrisPrinter.errorToString(e, false), FlxColor.RED);
