@@ -19,7 +19,7 @@ import crowplexus.hscript.Printer;
 typedef HScriptInfos = {
 	> haxe.PosInfos,
 	var ?funcName:String;
-	var ?showInfo:Bool;
+	var ?showInfo:Null<Bool>;
 }
 
 class HScript extends Iris
