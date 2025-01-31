@@ -135,7 +135,7 @@ class Main extends Sprite
 		Iris.warn = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(WARN, x, pos);
 			var newPos:HScriptInfos = cast pos;
-			if (newPos.showInfo == null) newPos showInfo = true;
+			if (newPos.showInfo == null) newPos.showInfo = true;
 			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
 			if (PlayState.instance != null)
 				PlayState.instance.addTextToDebug('WARNING: $msgInfo', FlxColor.YELLOW);
@@ -143,7 +143,7 @@ class Main extends Sprite
 		Iris.error = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(ERROR, x, pos);
 			var newPos:HScriptInfos = cast pos;
-			if (newPos.showInfo == null) newPos showInfo = true;
+			if (newPos.showInfo == null) newPos.showInfo = true;
 			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
 			if (PlayState.instance != null)
 				PlayState.instance.addTextToDebug('ERROR: $msgInfo', FlxColor.RED);
@@ -151,7 +151,7 @@ class Main extends Sprite
 		Iris.fatal = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(FATAL, x, pos);
 			var newPos:HScriptInfos = cast pos;
-			if (newPos.showInfo == null) newPos showInfo = true;
+			if (newPos.showInfo == null) newPos.showInfo = true;
 			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
 			if (PlayState.instance != null)
 				PlayState.instance.addTextToDebug('FATAL: $msgInfo', 0xFFBB0000);
