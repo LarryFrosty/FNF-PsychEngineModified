@@ -19,7 +19,10 @@ import crowplexus.hscript.Printer;
 typedef HScriptInfos = {
 	> haxe.PosInfos,
 	var ?funcName:String;
-	var ?showInfo:Null<Bool>;
+	var ?showLine:Null<Bool>;
+	#if LUA_ALLOWED
+	var ?isLua:Null<Bool>;
+	#end
 }
 
 class HScript extends Iris
@@ -59,7 +62,9 @@ class HScript extends Iris
 			}
 			catch(e:IrisError)
 			{
-				Iris.error(Printer.errorToString(e, false), hs.interp.posInfos());
+				var pos:HScriptInfos = cast hs.interp.posInfos();
+				pos.isLua = true;
+				Iris.error(Printer.errorToString(e, false), pos);
 				hs.returnValue = null;
 			}
 		}
@@ -192,7 +197,7 @@ class HScript extends Iris
 			{
 				if(this.modFolder == null)
 				{
-					PlayState.instance.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					Iris.error('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', this.interp.posInfos());
 					return null;
 				}
 				modName = this.modFolder;
@@ -297,7 +302,7 @@ class HScript extends Iris
 			if(funk == null) funk = parentLua;
 			
 			if(funk != null) funk.addLocalCallback(name, func);
-			else FunkinLua.luaTrace('createCallback ($name): 3rd argument is null', false, false, FlxColor.RED);
+			else Iris.error('createCallback ($name): 3rd argument is null', this.interp.posInfos());
 		});
 		#end
 
@@ -376,10 +381,18 @@ class HScript extends Iris
 		
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
 			#if HSCRIPT_ALLOWED
-			final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
-			if (retVal != null)
+			if (funk.hscript != null)
 			{
-				return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
+				final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
+				if (retVal != null)
+				{
+					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
+				}
+			}
+			else
+			{
+				var pos:HScriptInfos = cast {fileName: funk.scriptName, showLine: false};
+				Iris.error("runHaxeFunction: HScript has not been initialized yet! Use \"runHaxeCode\" to initialize it", pos);
 			}
 			return null;
 			#else
@@ -400,19 +413,19 @@ class HScript extends Iris
 				c = Type.resolveEnum(str + libName);
 
 			#if HSCRIPT_ALLOWED
-			if (funk.hscript != null)
-			{
-				try {
-					if (c != null)
-						funk.hscript.set(libName, c);
-				}
-				catch (e:IrisError) {
-					var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
-					pos.funcName = funk.lastCalledFunction;
-					Iris.error(Printer.errorToString(e, false), pos);
-				}
+			if (funk.hscript == null)
+				initHaxeModule(funk);
+			
+			try {
+				if (c != null)
+					funk.hscript.set(libName, c);
 			}
-			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!");
+			catch (e:IrisError) {
+				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
+				pos.funcName = funk.lastCalledFunction;
+				Iris.error(Printer.errorToString(e, false), pos);
+			}
+			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", this.interp.posInfos());
 			#else
 			Iris.error("HScript isn't supported on this platform!");
 			#end
