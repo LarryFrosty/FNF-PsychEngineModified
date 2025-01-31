@@ -239,7 +239,7 @@ class FreeplayState extends MusicBeatState
 			return;
 
 		if (FlxG.sound.music.volume < 0.7)
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+			FlxG.sound.music.volume += 0.5 * elapsed;
 
 		lerpScore = Math.floor(FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 24)));
 		lerpRating = FlxMath.lerp(intendedRating, lerpRating, Math.exp(-elapsed * 12));
@@ -453,6 +453,13 @@ class FreeplayState extends MusicBeatState
 				updateTexts(elapsed);
 				super.update(elapsed);
 				return;
+			}
+
+			@:privateAccess
+			if(PlayState._lastLoadedModDirectory != Mods.currentModDirectory)
+			{
+				trace('CHANGED MOD DIRECTORY, RELOADING STUFF');
+				Paths.freeGraphicsFromMemory();
 			}
 
 			if (touchPad.buttonZ.pressed)
