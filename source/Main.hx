@@ -136,7 +136,7 @@ class Main extends Sprite
 			Iris.logLevel(WARN, x, pos);
 			var newPos:HScriptInfos = cast pos;
 			if (newPos.showInfo == null) newPos.showInfo = true;
-			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '' + '${newPos.fileName}:${newPos.lineNumber}: $x');
+			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:${newPos.lineNumber}: $x';
 			if (newPos.showInfo == false) {
 				msgInfo = '${newPos.fileName}: $x';
 			}				
@@ -147,7 +147,7 @@ class Main extends Sprite
 			Iris.logLevel(ERROR, x, pos);
 			var newPos:HScriptInfos = cast pos;
 			if (newPos.showInfo == null) newPos.showInfo = true;
-			var msgInfo:String = newPos.funcName != null ? ('(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:${newPos.lineNumber}: $x';
+			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:${newPos.lineNumber}: $x';
 			if (newPos.showInfo == false) {
 				msgInfo = '${newPos.fileName}: $x';
 			}
@@ -158,7 +158,7 @@ class Main extends Sprite
 			Iris.logLevel(FATAL, x, pos);
 			var newPos:HScriptInfos = cast pos;
 			if (newPos.showInfo == null) newPos.showInfo = true;
-			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '' + '${newPos.fileName}:${newPos.lineNumber}: $x');
+			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:${newPos.lineNumber}: $x';
 			if (newPos.showInfo == false) {
 				msgInfo = '${newPos.fileName}: $x';
 			}
