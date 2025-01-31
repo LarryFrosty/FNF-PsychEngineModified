@@ -13,6 +13,10 @@ import states.TitleState;
 import mobile.backend.MobileScaleMode;
 import openfl.events.KeyboardEvent;
 import lime.system.System as LimeSystem;
+#if HSCRIPT_ALLOWED
+import crowplexus.iris.Iris;
+import psychlua.HScript.HScriptInfos;
+#end
 #if desktop
 import backend.ALSoftConfig; // Just to make sure DCE doesn't remove this, since it's not directly referenced anywhere else.
 #end
@@ -126,6 +130,30 @@ class Main extends Sprite
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
 		Highscore.load();
+
+		#if HSCRIPT_ALLOWED
+		Iris.warn = function(x, ?pos:haxe.PosInfos) {
+			Iris.logLevel(WARN, x, pos);
+			var newPos:HScriptInfos = cast pos;
+			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
+			if (PlayState.instance != null)
+				PlayState.instance.addTextToDebug('WARNING: $msgInfo', FlxColor.YELLOW);
+		}
+		Iris.error = function(x, ?pos:haxe.PosInfos) {
+			Iris.logLevel(ERROR, x, pos);
+			var newPos:HScriptInfos = cast pos;
+			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
+			if (PlayState.instance != null)
+				PlayState.instance.addTextToDebug('ERROR: $msgInfo', FlxColor.RED);
+		}
+		Iris.fatal = function(x, ?pos:haxe.PosInfos) {
+			Iris.logLevel(FATAL, x, pos);
+			var newPos:HScriptInfos = cast pos;
+			var msgInfo:String = (newPos.showInfo == true ? (newPos.funcName != null ? '(${newPos.funcName}) - ' : '') + '${newPos.fileName}:${newPos.lineNumber}: ' : '$x');
+			if (PlayState.instance != null)
+				PlayState.instance.addTextToDebug('FATAL: $msgInfo', 0xFFBB0000);
+		}
+		#end
 
 		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end
 		Controls.instance = new Controls();

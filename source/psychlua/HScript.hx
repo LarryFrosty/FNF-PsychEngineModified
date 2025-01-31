@@ -13,8 +13,14 @@ import psychlua.FunkinLua;
 import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
 import crowplexus.iris.ErrorSeverity;
-import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer as IrisPrinter;
+import crowplexus.hscript.Expr.Error; as IrisError;
+import crowplexus.hscript.Printer;
+
+typedef HScriptInfos = {
+	> haxe.PosInfos,
+	var ?funcName:String;
+	var ?showInfo:Bool;
+}
 
 class HScript extends Iris
 {
@@ -53,7 +59,7 @@ class HScript extends Iris
 			}
 			catch(e:IrisError)
 			{
-				FunkinLua.luaTrace('ERROR (${hs.origin}) - ' + IrisPrinter.errorToString(e, false), false, false, FlxColor.RED);
+				Iris.error(Printer.errorToString(e, false), this.interp.posInfos());
 				hs.returnValue = null;
 			}
 		}
@@ -103,30 +109,17 @@ class HScript extends Iris
 			this.modFolder = parent.modFolder;
 		}
 		#end
+		preset();
+		this.varsToBring = varsToBring;
 		if (!manualRun) {
 			try {
-				preset();
-				this.varsToBring = varsToBring;
 				var ret:Dynamic = execute();
 				returnValue = ret;
-			} catch(e:haxe.Exception) {
+			} catch(e:IrisError) {
 				returnValue = null;
 				this.destroy();
 				throw e;
 			}
-		}
-	}
-
-	function tryRunning() {
-		try {
-			preset();
-			this.varsToBring = varsToBring;
-			var ret:Dynamic = execute();
-			returnValue = ret;
-		} catch(e:IrisError) {
-			returnValue = null;
-			this.destroy();
-			throw e;
 		}
 	}
 
@@ -316,18 +309,8 @@ class HScript extends Iris
 
 				set(libName, Type.resolveClass(str + libName));
 			}
-			catch (e:Dynamic) {
-				var msg:String = e.message.substr(0, e.message.indexOf('\n'));
-				#if LUA_ALLOWED
-				if(parentLua != null)
-				{
-					FunkinLua.lastCalledScript = parentLua;
-					FunkinLua.luaTrace('$origin: ${parentLua.lastCalledFunction} - $msg', false, false, FlxColor.RED);
-					return;
-				}
-				#end
-				if(PlayState.instance != null) PlayState.instance.addTextToDebug('$origin - $msg', FlxColor.RED);
-				else trace('$origin - $msg');
+			catch (e:IrisError) {
+				Iris.error(Printer.errorToString(e, false), this.interp.posInfos());
 			}
 		});
 		#if LUA_ALLOWED
@@ -387,9 +370,11 @@ class HScript extends Iris
 					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 				}
 			}
-			catch(e:Dynamic)
+			catch(e:IrisError)
 			{
-				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
+				var pos:HScriptInfos = cast this.interp.posInfos();
+				pos.funcName = funcToRun;
+				Iris.error(Printer.errorToString(e, false), pos);
 			}
 
 			if (funk.hscript.returnValue != null)
@@ -398,7 +383,7 @@ class HScript extends Iris
 			}
 
 			#else
-			FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			Iris.error("HScript isn't supported on this platform!");
 			#end
 			return null;
 		});
@@ -413,13 +398,15 @@ class HScript extends Iris
 					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 				}
 			}
-			catch(e:Dynamic)
+			catch(e:IrisError)
 			{
-				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
+				var pos:HScriptInfos = cast this.interp.posInfos();
+				pos.funcName = funcToRun;
+				Iris.error(Printer.errorToString(e, false), pos);
 			}
 			return null;
 			#else
-			FunkinLua.luaTrace("runHaxeFunction: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			Iris.error("HScript isn't supported on this platform!");
 			return null;
 			#end
 		});
@@ -442,13 +429,16 @@ class HScript extends Iris
 					if (c != null)
 						funk.hscript.set(libName, c);
 				}
-				catch (e:Dynamic) {
-					FunkinLua.luaTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, false, FlxColor.RED);
+				catch (e:IrisError) {
+					@:privateAccess
+					var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
+					pos.funcName = funk.lastCalledFunction;
+					Iris.error(Printer.errorToString(e, false), pos);
 				}
 			}
-			FunkinLua.luaTrace("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", false, true);
+			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!");
 			#else
-			FunkinLua.luaTrace("addHaxeLibrary: HScript isn't supported on this platform!", false, false, FlxColor.RED);
+			Iris.error("HScript isn't supported on this platform!");
 			#end
 		});
 	}
