@@ -52,7 +52,7 @@ import psychlua.HScript;
 import psychlua.HScript.HScriptInfos;
 import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer as Printer;
+import crowplexus.hscript.Printer;
 #end
 
 /**
