@@ -140,6 +140,7 @@ class Main extends Sprite
 			#if LUA_ALLOWED
 			if (newPos.isLua == true) {
 				msgInfo += 'HScript:';
+				newPos.showLine = false;
 			}
 			#end
 			if (newPos.showLine == true) {
@@ -175,6 +176,7 @@ class Main extends Sprite
 			#if LUA_ALLOWED
 			if (newPos.isLua == true) {
 				msgInfo += 'HScript:';
+				newPos.showLine = false;
 			}
 			#end
 			if (newPos.showLine == true) {
