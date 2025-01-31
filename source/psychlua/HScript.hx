@@ -415,17 +415,19 @@ class HScript extends Iris
 			#if HSCRIPT_ALLOWED
 			if (funk.hscript == null)
 				initHaxeModule(funk);
-			
+
+			var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
+			if (funk.lastCalledFunction != '')
+				 pos.funcName = funk.lastCalledFunction;
+
 			try {
 				if (c != null)
 					funk.hscript.set(libName, c);
 			}
 			catch (e:IrisError) {
-				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
-				pos.funcName = funk.lastCalledFunction;
 				Iris.error(Printer.errorToString(e, false), pos);
 			}
-			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", this.interp.posInfos());
+			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", pos);
 			#else
 			Iris.error("HScript isn't supported on this platform!");
 			#end
