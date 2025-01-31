@@ -361,7 +361,6 @@ class HScript extends Iris
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua) {
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			#if HSCRIPT_ALLOWED
 			initHaxeModuleCode(funk, codeToRun, varsToBring);
 			final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
 			if (retVal != null)
@@ -372,15 +371,10 @@ class HScript extends Iris
 			{
 				return funk.hscript.returnValue;
 			}
-
-			#else
-			Iris.error("HScript isn't supported on this platform!");
-			#end
 			return null;
 		});
 		
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			#if HSCRIPT_ALLOWED
 			if (funk.hscript != null)
 			{
 				final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
@@ -395,28 +389,24 @@ class HScript extends Iris
 				Iris.error("runHaxeFunction: HScript has not been initialized yet! Use \"runHaxeCode\" to initialize it", pos);
 			}
 			return null;
-			#else
-			Iris.error("HScript isn't supported on this platform!");
-			return null;
-			#end
 		});
 		// This function is unnecessary because import already exists in HScript as a native feature
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
 			var str:String = '';
-			if(libPackage.length > 0)
+			if (libPackage.length > 0)
 				str = libPackage + '.';
-			else if(libName == null)
+			else if (libName == null)
 				libName = '';
 
 			var c:Dynamic = Type.resolveClass(str + libName);
 			if (c == null)
 				c = Type.resolveEnum(str + libName);
 
-			#if HSCRIPT_ALLOWED
 			if (funk.hscript == null)
 				initHaxeModule(funk);
 
 			var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
+			pos.showLine = false;
 			if (funk.lastCalledFunction != '')
 				 pos.funcName = funk.lastCalledFunction;
 
@@ -427,10 +417,9 @@ class HScript extends Iris
 			catch (e:IrisError) {
 				Iris.error(Printer.errorToString(e, false), pos);
 			}
-			Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", pos);
-			#else
-			Iris.error("HScript isn't supported on this platform!");
-			#end
+			FunkinLua.lastCalledScript = funk;
+			if (FunkinLua.getBool('luaDebugMode') && FunkinLua.getBool('luaDeprecatedWarnings'))
+				Iris.warn("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", pos);
 		});
 	}
 	#end
@@ -534,5 +523,25 @@ class CustomInterp extends crowplexus.hscript.Interp
 
 		return null;
 	}
+}
+#else
+class HScript
+{
+	#if LUA_ALLOWED
+	public static function implement(funk:FunkinLua) {
+		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			return null;
+		});
+		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			return null;
+		});
+		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			return null;
+		});
+	}
+	#end
 }
 #end
