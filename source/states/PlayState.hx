@@ -3446,7 +3446,7 @@ class PlayState extends MusicBeatState
 		}
 		catch(e:IrisError)
 		{
-			var pos:HScriptInfos = {fileName: file, showInfo: false};
+			var pos:HScriptInfos = cast {fileName: file, showInfo: false};
 			Iris.error(Printer.errorToString(e, false), pos);
 			var newScript:HScript = cast (Iris.instances.get(file), HScript);
 			if(newScript != null)
