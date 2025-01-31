@@ -3519,13 +3519,12 @@ class PlayState extends MusicBeatState
 
 		for(script in hscriptArray)
 		{
-			@:privateAccess
 			if(script == null || !script.exists(funcToCall) || exclusions.contains(script.origin))
 				continue;
 
-			try
+			var callValue = script.executeFunction(funcToCall, args);
+			if(callValue != null)
 			{
-				var callValue = script.call(funcToCall, args);
 				var myValue:Dynamic = callValue.returnValue;
 
 				if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
@@ -3536,13 +3535,6 @@ class PlayState extends MusicBeatState
 
 				if(myValue != null && !excludeValues.contains(myValue))
 					returnVal = myValue;
-			}
-			catch(e:IrisError)
-			{
-				@:privateAccess
-				var pos:HScriptInfos = cast script.interp.posInfos();
-				pos.funcName = funcToCall;
-				Iris.error(Printer.errorToString(e, false), pos);
 			}
 		}
 		#end

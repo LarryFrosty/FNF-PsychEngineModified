@@ -147,10 +147,9 @@ class Main extends Sprite
 			Iris.logLevel(ERROR, x, pos);
 			var newPos:HScriptInfos = cast pos;
 			if (newPos.showInfo == null) newPos.showInfo = true;
-			var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '' + '${newPos.fileName}:${newPos.lineNumber}: $x');
+			var msgInfo:String = newPos.funcName != null ? ('(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:${newPos.lineNumber}: $x';
 			if (newPos.showInfo == false) {
 				msgInfo = '${newPos.fileName}: $x';
-				PlayState.instance.addTextToDebug('showInfo is false', FlxColor.RED);
 			}
 			if (PlayState.instance != null)
 				PlayState.instance.addTextToDebug('ERROR: $msgInfo', FlxColor.RED);

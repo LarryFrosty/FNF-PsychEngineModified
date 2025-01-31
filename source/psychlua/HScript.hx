@@ -333,26 +333,22 @@ class HScript extends Iris
 		set('Function_StopAll', LuaUtils.Function_StopAll);
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):IrisCall {
+	public function executeFunction(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):IrisCall {
 		if (funcToRun == null) return null;
 
 		if(!exists(funcToRun)) {
-			#if LUA_ALLOWED
-			FunkinLua.luaTrace(origin + ' - No function named: $funcToRun', false, false, FlxColor.RED);
-			#else
-			PlayState.instance.addTextToDebug(origin + ' - No function named: $funcToRun', FlxColor.RED);
-			#end
+			Iris.error('No function named: $funcToRun', this.interp.posInfos());
 			return null;
 		}
 
-		try
-		{
+		try {
 			final callValue:IrisCall = call(funcToRun, funcArgs);
 			return callValue;
 		}
-		catch(e:Dynamic)
-		{
-			trace('ERROR ${funcToRun}: $e');
+		catch(e:IrisError) {
+			var pos:HScriptInfos = cast this.interp.posInfos();
+			pos.funcName = funcToRun;
+			Iris.error(Printer.errorToString(e, false), pos);
 		}
 		return null;
 	}
@@ -362,22 +358,12 @@ class HScript extends Iris
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
 			#if HSCRIPT_ALLOWED
 			initHaxeModuleCode(funk, codeToRun, varsToBring);
-			try
+			final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
+			if (retVal != null)
 			{
-				final retVal:IrisCall = funk.hscript.executeCode(funcToRun, funcArgs);
-				if (retVal != null)
-				{
-					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
-				}
+				return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 			}
-			catch(e:IrisError)
-			{
-				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
-				pos.funcName = funcToRun;
-				Iris.error(Printer.errorToString(e, false), pos);
-			}
-
-			if (funk.hscript.returnValue != null)
+			else if (funk.hscript.returnValue != null)
 			{
 				return funk.hscript.returnValue;
 			}
@@ -390,19 +376,10 @@ class HScript extends Iris
 		
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
 			#if HSCRIPT_ALLOWED
-			try
+			final retVal:IrisCall = funk.hscript.executeFunction(funcToRun, funcArgs);
+			if (retVal != null)
 			{
-				final retVal:IrisCall = funk.hscript.call(funcToRun, funcArgs);
-				if (retVal != null)
-				{
-					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
-				}
-			}
-			catch(e:IrisError)
-			{
-				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
-				pos.funcName = funcToRun;
-				Iris.error(Printer.errorToString(e, false), pos);
+				return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
 			}
 			return null;
 			#else
