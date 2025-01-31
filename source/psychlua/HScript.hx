@@ -59,7 +59,7 @@ class HScript extends Iris
 			}
 			catch(e:IrisError)
 			{
-				Iris.error(Printer.errorToString(e, false), this.interp.posInfos());
+				Iris.error(Printer.errorToString(e, false), hs.interp.posInfos());
 				hs.returnValue = null;
 			}
 		}
@@ -372,7 +372,7 @@ class HScript extends Iris
 			}
 			catch(e:IrisError)
 			{
-				var pos:HScriptInfos = cast this.interp.posInfos();
+				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
 				pos.funcName = funcToRun;
 				Iris.error(Printer.errorToString(e, false), pos);
 			}
@@ -400,7 +400,7 @@ class HScript extends Iris
 			}
 			catch(e:IrisError)
 			{
-				var pos:HScriptInfos = cast this.interp.posInfos();
+				var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
 				pos.funcName = funcToRun;
 				Iris.error(Printer.errorToString(e, false), pos);
 			}
@@ -430,7 +430,6 @@ class HScript extends Iris
 						funk.hscript.set(libName, c);
 				}
 				catch (e:IrisError) {
-					@:privateAccess
 					var pos:HScriptInfos = cast funk.hscript.interp.posInfos();
 					pos.funcName = funk.lastCalledFunction;
 					Iris.error(Printer.errorToString(e, false), pos);

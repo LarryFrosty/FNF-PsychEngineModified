@@ -49,6 +49,7 @@ import psychlua.HScript;
 #end
 
 #if HSCRIPT_ALLOWED
+import psychlua.HScript.HScriptInfos;
 import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer as Printer;
@@ -3541,7 +3542,7 @@ class PlayState extends MusicBeatState
 				@:privateAccess
 				var pos:HScriptInfos = cast script.interp.posInfos();
 				pos.funcName = funcToCall;
-				Iris.error(Printer.toString(e, false), pos);
+				Iris.error(Printer.errorToString(e, false), pos);
 			}
 		}
 		#end
