@@ -196,7 +196,7 @@ class ReflectionFunctions
 			}
 		});
 		
-		funk.set("callMethod", function(funcToRun:String, ?args:Array<Dynamic> = null) {
+		funk.set("callMethod", function(funcToRun:String, ?args:Array<Dynamic>) {
 			var parent:Dynamic = PlayState.instance;
 			var split:Array<String> = funcToRun.split('.');
 			var varParent:Dynamic = MusicBeatState.getVariables().get(split[0].trim());
@@ -213,11 +213,12 @@ class ReflectionFunctions
 			}
 			return Reflect.callMethod(null, parent, parseInstances(args));
 		});
-		funk.set("callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic> = null) {
+		funk.set("callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic>) {
 			return callMethodFromObject(Type.resolveClass(className), funcToRun, parseInstances(args));
 		});
 
 		funk.set("createInstance", function(variableToSave:String, className:String, ?args:Array<Dynamic> = null) {
+			if (!Std.isOfType(args, Array)) args = [];
 			variableToSave = variableToSave.trim().replace('.', '');
 			if(MusicBeatState.getVariables().get(variableToSave) == null)
 			{

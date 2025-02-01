@@ -286,7 +286,7 @@ class FunkinLua {
 		});
 
 		set("setVar", function(varName:String, value:Dynamic) {
-			MusicBeatState.getVariables().set(varName, ReflectionFunctions.parseSingleInstance(value));
+			MusicBeatState.getVariables().set(varName, ReflectionFunctions.parseInstances(value));
 			return value;
 		});
 		set("getVar", function(varName:String) {
