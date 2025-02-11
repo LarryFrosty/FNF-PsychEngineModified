@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {install: false}
+          - {install: true}
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -45,7 +45,7 @@ jobs:
           yes | haxelib set flixel-tools 1.5.1 --quiet
           yes | haxelib set hscript-iris 1.1.3 --quiet
           yes | haxelib set tjson 1.4.0 --quiet
-          yes | haxelib set hxvlc 1.9.2 --quiet
+          yes | haxelib set hxvlc 2.0.1 --quiet
           yes | haxelib git flxanimate https://github.com/Dot-Stuff/flxanimate 768740a56b26aa0c072720e0d1236b94afe68e3e --quiet
           yes | haxelib git linc_luajit https://github.com/mcagabe19-stuff/linc_luajit-rewriten --quiet
           yes | haxelib git funkin.vis https://github.com/FunkinCrew/funkVis 9cac20547dd41505928eeca9c762c7e6b348f6f3 --quiet --skip-dependencies
