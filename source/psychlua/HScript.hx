@@ -26,6 +26,7 @@ typedef HScriptInfos = {
 
 class HScript extends Iris
 {
+	private static var globalVariables:Map<String, Dynamic> = new Map(); // Use HScript.setGlobal, I recommend not editing this array
 	public var filePath:String;
 	public var modFolder:String;
 	public var returnValue:Dynamic;
@@ -78,6 +79,27 @@ class HScript extends Iris
 		}
 	}
 	#end
+
+	// Functions for setting and removing global variables
+	public static function setGlobal(name:String, value:Dynamic):Void
+	{
+		globalVariables.set(name, value);
+		for (hscript in Iris.instances)
+		{
+			if (hscript.interp == null || hscript.interp.variables == null) return;
+			hscript.interp.variables.set(name, value);
+		}
+	}
+
+	public static function removeGlobal(name:String):Void
+	{
+		globalVariables.remove(name);
+		for (hscript in Iris.instances)
+		{
+			if (hscript.interp == null || hscript.interp.variables == null) return;
+			hscript.interp.variables.remove(name);
+		}
+	}
 
 	public var origin:String;
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?manualRun:Bool = false)
@@ -196,6 +218,8 @@ class HScript extends Iris
 			}
 			return false;
 		});
+		set('setGlobal', setGlobal);
+		set('removeGlobal', removeGlobal);
 		set('debugPrint', function(text:String, ?color:FlxColor = null) {
 			if(color == null) color = FlxColor.WHITE;
 			PlayState.instance.addTextToDebug(text, color);
@@ -344,6 +368,12 @@ class HScript extends Iris
 		set('Function_StopLua', LuaUtils.Function_StopLua); //doesnt do much cuz HScript has a lower priority than Lua
 		set('Function_StopHScript', LuaUtils.Function_StopHScript);
 		set('Function_StopAll', LuaUtils.Function_StopAll);
+
+		for (key => value in globalVariables)
+		{
+			if (key != null && key.length > 0)
+				set(key, value);
+		}
 	}
 
 	#if LUA_ALLOWED
