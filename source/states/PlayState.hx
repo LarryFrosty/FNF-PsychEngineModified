@@ -2810,7 +2810,7 @@ class PlayState extends MusicBeatState
 
 				if (doubleNote.noteData == funnyNote.noteData) {
 					// if the note has a 0ms distance (is on top of the current note), kill it
-					 h.abs(doubleNote.strumTime - funnyNote.strumTime) < 1.0)
+					 if (Math.abs(doubleNote.strumTime - funnyNote.strumTime) < 1.0)
 						invalidateNote(doubleNote);
 					else if (doubleNote.strumTime < funnyNote.strumTime)
 					{
