@@ -1653,33 +1653,25 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	/*
+	#if DISCORD_ALLOWED
 	override public function onFocus():Void
 	{
-		if (!paused)
+		if (!paused && health > 0)
 		{
-			if (health > 0) resetRPC(Conductor.songPosition > 0.0);
-			#if VIDEOS_ALLOWED
-			if (videoCutscene != null) videoCutscene.resume();
-			#end
+			resetRPC(Conductor.songPosition > 0.0);
 		}
 		super.onFocus();
 	}
 
 	override public function onFocusLost():Void
 	{
-		if (!paused)
+		if (!paused && health > 0 && autoUpdateRPC)
 		{
-			#if DISCORD_ALLOWED
-			if (health > 0 && autoUpdateRPC) DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-			#end
-			#if VIDEOS_ALLOWED
-			if (videoCutscene != null) videoCutscene.pause();
-			#end
+			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 		}
 		super.onFocusLost();
 	}
-	*/
+	#end
 
 	// Updating Discord Rich Presence.
 	public var autoUpdateRPC:Bool = true; //performance setting for custom RPC things
