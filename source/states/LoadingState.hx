@@ -579,6 +579,13 @@ class LoadingState extends MusicBeatState
 					completedThread();
 				});
 			}
+
+			if(threadsCompleted == threadsMax)
+			{
+				clearInvalids();
+				startThreads();
+				initialThreadCompleted = true;
+			}
 			return true;
 		}, isIntrusive))
 		.onError((err:Dynamic) -> {
