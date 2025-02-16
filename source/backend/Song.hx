@@ -114,7 +114,7 @@ class Song
 				note[1] = (note[1] % 4) + (gottaHitNote ? 0 : 4);
 
 				if(note[2] > 0)
-					note[2] += Conductor.stepCrochet;
+					note[2] = Math.round(note[2] + Conductor.stepCrochet);
 
 				if(!Std.isOfType(note[3], String))
 					note[3] = Note.defaultNoteTypes[note[3]]; //compatibility with Week 7 and 0.1-0.3 psych charts

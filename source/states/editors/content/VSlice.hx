@@ -239,7 +239,7 @@ class VSlice
 				while(noteSec + 1 < sectionTimes.length && sectionTimes[noteSec + 1] <= note.t)
 					noteSec++;
 
-				var psychNote:Array<Dynamic> = [note.t, note.d, (note.l != null && note.l > 0 ? (note.l + Conductor.stepCrochet) : 0)];
+				var psychNote:Array<Dynamic> = [note.t, note.d, (note.l != null && note.l > 0 ? Math.round(note.l + Conductor.stepCrochet) : 0)];
 				if(note.k != null && note.k.length > 0 && note.k != 'normal') psychNote.push(note.k);
 
 				if(sectionData[noteSec] != null)
@@ -347,7 +347,7 @@ class VSlice
 					{
 						var vsliceNote:VSliceNote = {t: note[0], d: note[1]};
 						if(note[2] > 0)
-							vsliceNote.l = note[2] - Conductor.stepCrochet;
+							vsliceNote.l = Math.round(note[2] - Conductor.stepCrochet);
 						if(note[3] != null && note[3].length > 0)
 							vsliceNote.k = note[3];
 						
