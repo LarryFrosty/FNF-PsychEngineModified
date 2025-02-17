@@ -12,6 +12,7 @@ import psychlua.FunkinLua;
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
+import crowplexus.hscript.Expr;
 import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 
@@ -563,6 +564,50 @@ class CustomInterp extends crowplexus.hscript.Interp
 		error(EUnknownVariable(id));
 
 		return null;
+	}
+
+	override function assign(e1:Expr, e2:Expr):Dynamic {
+		var v = expr(e2);
+		switch (crowplexus.hscript.Tools.expr(e1)) {
+			case EIdent(id):
+				var l = locals.get(id);
+				if (l == null) {
+					if (variables.exists(id))
+						setVar(id, v);
+					else if (HScript.globalVariables.exists(id))
+						HScript.globalVariables.set(id, v);
+					else if (parentInstance != null && _instanceFields.contains(id))
+						Reflect.setProperty(parentInstance, id, v);
+					else
+						error(EUnknownVariable(id));
+				}
+				else {
+					if (l.const != true)
+						l.r = v;
+					else
+						warn(ECustom("Cannot reassign final, for constant expression -> " + id));
+				}
+			case EField(e, f, s):
+				var e = expr(e);
+				if (e == null)
+					if (!s)
+						error(EInvalidAccess(f));
+					else
+						return null;
+				v = set(e, f, v);
+			case EArray(e, index):
+				var arr:Dynamic = expr(e);
+				var index:Dynamic = expr(index);
+				if (isMap(arr)) {
+					setMapValue(arr, index, v);
+				} else {
+					arr[index] = v;
+				}
+
+			default:
+				error(EInvalidOp("="));
+		}
+		return v;
 	}
 }
 #else
