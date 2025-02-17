@@ -566,6 +566,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 		return null;
 	}
 
+	// Add support for unknown variable errors and parentInstance/globalVariables
 	override function assign(e1:Expr, e2:Expr):Dynamic {
 		var v = expr(e2);
 		switch (crowplexus.hscript.Tools.expr(e1)) {
