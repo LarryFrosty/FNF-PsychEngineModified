@@ -84,7 +84,7 @@ class HScript extends Iris
 				var pos:HScriptInfos = cast hs.interp.posInfos();
 				pos.isLua = true;
 				if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
-				Iris.error(Printer.errorToString(e, false), pos);
+				Iris.error('$e', pos);
 				hs.returnValue = null;
 			}
 		}
