@@ -16,6 +16,8 @@ import crowplexus.hscript.Expr;
 import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 
+import haxe.ValueException;
+
 typedef HScriptInfos = {
 	> haxe.PosInfos,
 	var ?funcName:String;
@@ -77,6 +79,9 @@ class HScript extends Iris
 				if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
 				Iris.error(Printer.errorToString(e, false), pos);
 				hs.returnValue = null;
+			}
+			catch (e:ValueException) { // this is thrown for invalid field access and stuff
+				Iris.error('$funcToRun: $e'); 
 			}
 		}
 	}
@@ -533,6 +538,23 @@ class CustomInterp extends crowplexus.hscript.Interp
 	public function new()
 	{
 		super();
+	}
+
+	override function fcall(o:Dynamic, funcToRun:String, args:Array<Dynamic>):Dynamic { 
+		for (_using in usings) { 
+			var v = _using.call(o, funcToRun, args); 
+			if (v != null) 
+				return v; 
+		}
+
+		var f = get(o, funcToRun);
+
+		if (f == null) { 
+			Iris.error('Tried to call null function $funcToRun', posInfos()); 
+			return null; 
+		} 
+  
+		return Reflect.callMethod(o, f, args); 
 	}
 
 	override function resolve(id: String): Dynamic {
