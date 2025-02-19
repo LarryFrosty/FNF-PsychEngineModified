@@ -80,13 +80,6 @@ class HScript extends Iris
 				Iris.error(Printer.errorToString(e, false), pos);
 				hs.returnValue = null;
 			}
-			catch (e:ValueException) { // this is thrown for invalid field access and stuff
-				var pos:HScriptInfos = cast hs.interp.posInfos();
-				pos.isLua = true;
-				if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
-				Iris.error('$e', pos);
-				hs.returnValue = null;
-			}
 		}
 	}
 	#end
@@ -454,6 +447,18 @@ class HScript extends Iris
 			#end
 			Iris.error(Printer.errorToString(e, false), pos);
 		}
+		catch (e:ValueException) { // this is thrown for invalid field access and stuff
+			var pos:HScriptInfos = cast this.interp.posInfos();
+			pos.funcName = funcToRun;
+			#if LUA_ALLOWED
+			if (parentLua != null)
+			{
+				pos.isLua = true;
+				if (parentLua.lastCalledFunction != '') pos.funcName = parentLua.lastCalledFunction;
+			}
+			#end
+			Iris.error(Printer.errorToString(e, false), pos);
+		}
 		return null;
 	}
 
@@ -554,7 +559,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 		var f = get(o, funcToRun);
 
 		if (f == null) { 
-			Iris.error('Tried to call null function $funcToRun', posInfos()); 
+			Iris.error('Tried to call null function: "$funcToRun"', posInfos()); 
 			return null; 
 		} 
   
