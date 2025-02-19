@@ -81,7 +81,11 @@ class HScript extends Iris
 				hs.returnValue = null;
 			}
 			catch (e:ValueException) { // this is thrown for invalid field access and stuff
-				Iris.error('$funcToRun: $e'); 
+				var pos:HScriptInfos = cast hs.interp.posInfos();
+				pos.isLua = true;
+				if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
+				Iris.error(Printer.errorToString(e, false), pos);
+				hs.returnValue = null;
 			}
 		}
 	}
