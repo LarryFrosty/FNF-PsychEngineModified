@@ -198,13 +198,13 @@ class PauseSubState extends MusicBeatSubstate
 				if (controls.UI_LEFT_P)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-					curTime -= 1000 * PlayState.instance.playbackRate;
+					curTime -= 1000 / PlayState.instance.playbackRate;
 					holdTime = 0;
 				}
 				if (controls.UI_RIGHT_P)
 				{
 					FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-					curTime += 1000 * PlayState.instance.playbackRate;
+					curTime += 1000 / PlayState.instance.playbackRate;
 					holdTime = 0;
 				}
 
@@ -213,7 +213,7 @@ class PauseSubState extends MusicBeatSubstate
 					holdTime += elapsed;
 					if(holdTime > 0.5)
 					{
-						curTime += 45000 * elapsed * (controls.UI_LEFT ? -1 : 1) * PlayState.instance.playbackRate;
+						curTime += 45000 * elapsed * (controls.UI_LEFT ? -1 : 1) / PlayState.instance.playbackRate;
 					}
 
 					if(curTime >= FlxG.sound.music.length) curTime -= FlxG.sound.music.length / PlayState.instance.playbackRate;
