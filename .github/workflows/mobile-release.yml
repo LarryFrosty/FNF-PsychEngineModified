@@ -37,7 +37,7 @@ jobs:
       - name: Install Libraries
         if: matrix.config.install
         run: |
-          yes | haxelib git hxcpp https://github.com/LarryFrosty/hxcpp-archivs --quiet
+          yes | haxelib git hxcpp https://github.com/LarryFrosty/hxcpp-archive --quiet
           yes | haxelib git lime https://github.com/LarryFrosty/lime-archive --quiet
           yes | haxelib set openfl 9.3.3 --quiet
           yes | haxelib set flixel 5.6.1 --quiet
