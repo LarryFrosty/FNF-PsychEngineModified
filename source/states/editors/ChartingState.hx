@@ -139,7 +139,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var mainBox:PsychUIBox;
 	var mainBoxPosition:FlxPoint = FlxPoint.get(920, 40);
 	var infoBox:PsychUIBox;
-	var infoBoxPosition:FlxPoint = FlxPoint.get(680, 360);
+	var infoBoxPosition:FlxPoint = FlxPoint.get(680, 80);
 	var upperBox:PsychUIBox;
 	
 	var camUI:FlxCamera;
@@ -1761,8 +1761,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			var sineValue:Float = 0.75 + Math.cos(Math.PI * noteSelectionSine * (isMovingNotes ? 8 : 2)) / 4;
 			//trace(sineValue);
 
-			var qPress = (touchPad.buttonUp2.justPressed || FlxG.keys.justPressed.Q);
-			var ePress = (touchPad.buttonDown2.justPressed || FlxG.keys.justPressed.E);
+			var qPress = (touchPad.buttonDown2.justPressed || FlxG.keys.justPressed.Q);
+			var ePress = (touchPad.buttonUp2.justPressed || FlxG.keys.justPressed.E);
 			var addSus = (touchPad.buttonY.pressed || FlxG.keys.pressed.SHIFT ? 4 : 1) * (Conductor.stepCrochet / 2);
 			if(qPress) addSus *= -1;
 
