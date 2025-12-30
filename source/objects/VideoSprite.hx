@@ -109,7 +109,12 @@ class VideoSprite extends FlxSpriteGroup {
 	{
 		if(canSkip)
 		{
-			if(Controls.instance.pressed('accept'))
+			#if android
+			var holdingTouch:Bool = false;
+			for (touch in FlxG.touches.list)
+				if (touch.pressed) holdingTouch = true;
+			#end
+			if(Controls.instance.pressed('accept') #if android || holdingTouch #end)
 			{
 				holdingTime = Math.max(0, Math.min(_timeToSkip, holdingTime + elapsed));
 			}

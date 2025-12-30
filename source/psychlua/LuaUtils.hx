@@ -229,6 +229,12 @@ class LuaUtils
 		return Reflect.getProperty(leArray, variable);
 	}
 
+	public static function getObjectLoop(objectName:String, ?allowMaps:Bool = false):Dynamic
+	{
+		var split:Array<String> = objectName.split('.');
+		return split.length > 1 ? getVarInArray(getPropertyLoop(split, true, allowMaps), split[split.length-1], allowMaps) : getObjectDirectly(objectName);
+	}
+
 	public static function getPropertyLoop(split:Array<String>, ?getProperty:Bool=true, ?allowMaps:Bool = false):Dynamic
 	{
 		var obj:Dynamic = getObjectDirectly(split[0]);
@@ -248,7 +254,7 @@ class LuaUtils
 			
 			default:
 				var obj:Dynamic = MusicBeatState.getVariables().get(objectName);
-				if(obj == null) obj = getVarInArray(MusicBeatState.getState(), objectName, allowMaps);
+				if(obj == null) obj = getVarInArray(getTargetInstance(), objectName, allowMaps);
 				return obj;
 		}
 	}
@@ -389,10 +395,7 @@ class LuaUtils
 
 	public static function tweenPrepare(tag:String, vars:String) {
 		if(tag != null) cancelTween(tag);
-		var variables:Array<String> = vars.split('.');
-		var sexyProp:Dynamic = LuaUtils.getObjectDirectly(variables[0]);
-		if(variables.length > 1) sexyProp = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(variables), variables[variables.length-1]);
-		return sexyProp;
+		return getObjectLoop(vars);
 	}
 
 	public static function getBuildTarget():String
@@ -407,26 +410,10 @@ class LuaUtils
 		return 'linux';
 		#elseif mac
 		return 'mac';
-		#elseif hl
-		return 'hashlink';
-		#elseif (html5 || emscripten || nodejs || winjs || electron)
+		#elseif html5
 		return 'browser';
 		#elseif android
 		return 'android';
-		#elseif webos
-		return 'webos';
-		#elseif tvos
-		return 'tvos';
-		#elseif watchos
-		return 'watchos';
-		#elseif air
-		return 'air';
-		#elseif flash
-		return 'flash';
-		#elseif (ios || iphone || iphonesim)
-		return 'ios';
-		#elseif neko
-		return 'neko';
 		#elseif switch
 		return 'switch';
 		#else

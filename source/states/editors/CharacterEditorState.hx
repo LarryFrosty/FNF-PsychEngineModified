@@ -1036,7 +1036,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			}
 			else holdingFrameTime = 0;
 
-			if(FlxG.keys.justPressed.SPACE)
+			if(FlxG.keys.justPressed.SPACE || touchPad.buttonG.justPressed)
 				character.playAnim(character.getAnimationName(), true);
 
 			var frames:Int = -1;

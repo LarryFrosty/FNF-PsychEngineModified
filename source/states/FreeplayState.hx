@@ -17,6 +17,8 @@ import openfl.utils.Assets;
 
 import haxe.Json;
 
+import lime.utils.Assets;
+
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
@@ -40,6 +42,8 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
+	public static var opponentMode:Bool = false;
+
 	var bg:FlxSprite;
 	var intendedColor:Int;
 
@@ -60,6 +64,8 @@ class FreeplayState extends MusicBeatState
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
+
+		opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
 
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
@@ -337,7 +343,7 @@ class FreeplayState extends MusicBeatState
 		if((FlxG.keys.justPressed.CONTROL || touchPad.buttonC.justPressed) && !player.playingMusic)
 		{
 			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
+			openSubState(new GameplayChangersSubstate(this));
 			removeTouchPad();
 		}
 		else if(FlxG.keys.justPressed.SPACE || touchPad.buttonX.justPressed)
@@ -454,8 +460,16 @@ class FreeplayState extends MusicBeatState
 				trace('CHANGED MOD DIRECTORY, RELOADING STUFF');
 				Paths.freeGraphicsFromMemory();
 			}
-			LoadingState.prepareToSong();
-			LoadingState.loadAndSwitchState(new PlayState());
+
+			if (touchPad.buttonZ.pressed)
+			{
+				MusicBeatState.switchState(new states.editors.ChartingState());
+			}
+			else
+			{
+				LoadingState.prepareToSong();
+				LoadingState.loadAndSwitchState(new PlayState());
+			}
 			#if !SHOW_LOADING_SCREEN FlxG.sound.music.stop(); #end
 			stopMusicPlay = true;
 
@@ -507,8 +521,8 @@ class FreeplayState extends MusicBeatState
 
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.list.length-1);
 		#if !switch
-		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
-		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty);
+		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty, opponentMode);
+		intendedRating = Highscore.getRating(songs[curSelected].songName, curDifficulty, opponentMode);
 		#end
 
 		lastDifficultyName = Difficulty.getString(curDifficulty, false);
@@ -517,6 +531,8 @@ class FreeplayState extends MusicBeatState
 			diffText.text = '< ' + displayDiff.toUpperCase() + ' >';
 		else
 			diffText.text = displayDiff.toUpperCase();
+
+		if (opponentMode) diffText.text += ' (OPPONENT)';
 
 		positionHighscore();
 		missingText.visible = false;

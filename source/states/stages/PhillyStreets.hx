@@ -121,6 +121,8 @@ class PhillyStreets extends BaseStage
 		var phillyForeground:BGSprite = new BGSprite('phillyStreets/phillyForeground', 88, 317, 1, 1);
 		add(phillyForeground);
 		darkenable.push(phillyForeground);
+
+		setDefaultGF('nene');
 		
 		if(!ClientPrefs.data.lowQuality)
 		{
@@ -131,19 +133,24 @@ class PhillyStreets extends BaseStage
 			darkenable.push(picoFade);
 		}
 
-		abot = new ABotSpeaker(gfGroup.x, gfGroup.y + 550);
-		updateABotEye(true);
-		add(abot);
+		var _song = PlayState.SONG;
+		if(_song.gfVersion == 'nene')
+		{
+			abot = new ABotSpeaker(gfGroup.x, gfGroup.y + 550);
+			updateABotEye(true);
+			add(abot);
+		}
 		
 		if(ClientPrefs.data.shaders)
 			setupRainShader();
 
-		var _song = PlayState.SONG;
-		if(_song.gameOverSound == null || _song.gameOverSound.trim().length < 1) GameOverSubstate.deathSoundName = 'fnf_loss_sfx-pico';
-		if(_song.gameOverLoop == null || _song.gameOverLoop.trim().length < 1) GameOverSubstate.loopSoundName = 'gameOver-pico';
-		if(_song.gameOverEnd == null || _song.gameOverEnd.trim().length < 1) GameOverSubstate.endSoundName = 'gameOverEnd-pico';
-		if(_song.gameOverChar == null || _song.gameOverChar.trim().length < 1) GameOverSubstate.characterName = 'pico-dead';
-		setDefaultGF('nene');
+		if(_song.player1 == 'pico-player')
+		{
+			if(_song.gameOverSound == null || _song.gameOverSound.trim().length < 1) GameOverSubstate.deathSoundName = 'fnf_loss_sfx-pico';
+			if(_song.gameOverLoop == null || _song.gameOverLoop.trim().length < 1) GameOverSubstate.loopSoundName = 'gameOver-pico';
+			if(_song.gameOverEnd == null || _song.gameOverEnd.trim().length < 1) GameOverSubstate.endSoundName = 'gameOverEnd-pico';
+			if(_song.gameOverChar == null || _song.gameOverChar.trim().length < 1) GameOverSubstate.characterName = 'pico-dead';
+		}
 		
 		if (isStoryMode)
 		{
@@ -188,7 +195,7 @@ class PhillyStreets extends BaseStage
 		add(spraycanPile);
 		darkenable.push(spraycanPile);
 
-		if(gf != null)
+		if(gf != null && gf.curCharacter == 'nene'))
 		{
 			gf.animation.callback = function(name:String, frameNumber:Int, frameIndex:Int)
 			{
@@ -400,8 +407,8 @@ class PhillyStreets extends BaseStage
 
 	override function startSong()
 	{
-		abot.snd = FlxG.sound.music;
-		gf.animation.finishCallback = onNeneAnimationFinished;
+		if(abot != null) abot.snd = FlxG.sound.music;
+		if(gf != null && gf.curCharacter == 'nene') gf.animation.finishCallback = onNeneAnimationFinished;
 	}
 	
 	function onNeneAnimationFinished(name:String)
@@ -532,7 +539,7 @@ class PhillyStreets extends BaseStage
 			rainShader.update(elapsed);
 		}
 		
-		if(gf == null || !game.startedCountdown) return;
+		if(gf == null || gf.curCharacter != 'nene' || !game.startedCountdown) return;
 
 		animationFinished = gf.isAnimationFinished();
 		transitionState();
@@ -590,7 +597,7 @@ class PhillyStreets extends BaseStage
 
 	override function sectionHit()
 	{
-		updateABotEye();
+		if(abot != null) updateABotEye();
 	}
 
 	var lightsStop:Bool = false;
@@ -604,17 +611,20 @@ class PhillyStreets extends BaseStage
 	override function beatHit()
 	{
 		//if(curBeat % 2 == 0) abot.beatHit();
-		switch(currentNeneState) {
-			case STATE_READY:
-				if (blinkCountdown == 0)
-				{
-					gf.playAnim('idleKnife', false);
-					blinkCountdown = FlxG.random.int(MIN_BLINK_DELAY, MAX_BLINK_DELAY);
-				}
-				else blinkCountdown--;
+		if(gf != null && gf.curCharacter == 'nene')
+		{
+			switch(currentNeneState) {
+				case STATE_READY:
+					if (blinkCountdown == 0)
+					{
+						gf.playAnim('idleKnife', false);
+						blinkCountdown = FlxG.random.int(MIN_BLINK_DELAY, MAX_BLINK_DELAY);
+					}
+					else blinkCountdown--;
 
-			default:
-				// In other states, don't interrupt the existing animation.
+				default:
+					// In other states, don't interrupt the existing animation.
+			}
 		}
 
 		if(ClientPrefs.data.lowQuality) return;
@@ -969,7 +979,7 @@ class PhillyStreets extends BaseStage
 				}
 				
 				game.health -= 0.4;
-				if(game.health <= 0.0 && !game.practiceMode)
+				if(game.health <= 0.0 && !game.practiceMode && boyfriend.curCharacter == 'pico-player')
 				{
 					GameOverSubstate.deathSoundName = 'fnf_loss_sfx-pico-explode';
 					GameOverSubstate.loopSoundName = 'gameOverStart-pico-explode';

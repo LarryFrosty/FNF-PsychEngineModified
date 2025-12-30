@@ -12,6 +12,7 @@ import psychlua.FunkinLua;
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
+import crowplexus.hscript.Expr;
 import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 
@@ -28,6 +29,8 @@ typedef HScriptInfos = {
 
 class HScript extends Iris
 {
+	public static var globalVariables:Map<String, Dynamic> = new Map();
+
 	public var filePath:String;
 	public var modFolder:String;
 	public var returnValue:Dynamic;
@@ -161,7 +164,6 @@ class HScript extends Iris
 		set('Countdown', backend.BaseStage.Countdown);
 		set('PlayState', PlayState);
 		set('Paths', Paths);
-		set('StorageUtil', StorageUtil);
 		set('Conductor', Conductor);
 		set('ClientPrefs', ClientPrefs);
 		#if ACHIEVEMENTS_ALLOWED
@@ -332,47 +334,6 @@ class HScript extends Iris
 		});
 		#if LUA_ALLOWED
 		set('parentLua', parentLua);
-
-		set("addTouchPad", (DPadMode:String, ActionMode:String) -> {
-			PlayState.instance.makeLuaTouchPad(DPadMode, ActionMode);
-			PlayState.instance.addLuaTouchPad();
-		  });
-  
-		set("removeTouchPad", () -> {
-			PlayState.instance.removeLuaTouchPad();
-		});
-  
-		set("addTouchPadCamera", () -> {
-			if(PlayState.instance.luaTouchPad == null){
-				FunkinLua.luaTrace('addTouchPadCamera: TPAD does not exist.');
-				return;
-			}
-			PlayState.instance.addLuaTouchPadCamera();
-		});
-  
-		set("touchPadJustPressed", function(button:Dynamic):Bool {
-			if(PlayState.instance.luaTouchPad == null){
-			  //FunkinLua.luaTrace('touchPadJustPressed: TPAD does not exist.');
-			  return false;
-			}
-		  return PlayState.instance.luaTouchPadJustPressed(button);
-		});
-  
-		set("touchPadPressed", function(button:Dynamic):Bool {
-			if(PlayState.instance.luaTouchPad == null){
-				//FunkinLua.luaTrace('touchPadPressed: TPAD does not exist.');
-				return false;
-			}
-			return PlayState.instance.luaTouchPadPressed(button);
-		});
-  
-		set("touchPadJustReleased", function(button:Dynamic):Bool {
-			if(PlayState.instance.luaTouchPad == null){
-				//FunkinLua.luaTrace('touchPadJustReleased: TPAD does not exist.');
-				return false;
-			}
-			return PlayState.instance.luaTouchPadJustReleased(button);
-		});
 		#else
 		set('parentLua', null);
 		#end
@@ -621,6 +582,11 @@ class CustomInterp extends crowplexus.hscript.Interp
 			return v;
 		}
 
+		if (HScript.globalVariables.exists(id)) {
+			var v = HScript.globalVariables.get(id);
+			return v;
+		}
+
 		if(parentInstance != null && _instanceFields.contains(id)) {
 			var v = Reflect.getProperty(parentInstance, id);
 			return v;
@@ -629,6 +595,48 @@ class CustomInterp extends crowplexus.hscript.Interp
 		error(EUnknownVariable(id));
 
 		return null;
+	}
+
+	override function assign(e1:Expr, e2:Expr):Dynamic {
+		var v = expr(e2);
+		switch (Tools.expr(e1)) {
+			case EIdent(id):
+				var l = locals.get(id);
+				if (l == null) {
+					if (variables.exists(id))
+						setVar(id, v);
+					else if (parentInstance != null && _instanceFields.contains(id))
+						Reflect.setProperty(parentInstance, id, v);
+					else
+						error(EUnknownVariable(id));
+				}
+				else {
+					if (l.const != true)
+						l.r = v;
+					else
+						warn(ECustom("Cannot reassign final, for constant expression -> " + id));
+				}
+			case EField(e, f, s):
+				var e = expr(e);
+				if (e == null)
+					if (!s)
+						error(EInvalidAccess(f));
+					else
+						return null;
+				v = set(e, f, v);
+			case EArray(e, index):
+				var arr: Dynamic = expr(e);
+				var index: Dynamic = expr(index);
+				if (isMap(arr)) {
+					setMapValue(arr, index, v);
+				} else {
+					arr[index] = v;
+				}
+
+			default:
+				error(EInvalidOp("="));
+		}
+		return v;
 	}
 }
 #else

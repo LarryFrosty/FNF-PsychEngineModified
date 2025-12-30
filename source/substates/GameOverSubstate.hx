@@ -67,9 +67,10 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		if(boyfriend == null)
 		{
-			boyfriend = new Character(PlayState.instance.boyfriend.getScreenPosition().x, PlayState.instance.boyfriend.getScreenPosition().y, characterName, true);
-			boyfriend.x += boyfriend.positionArray[0] - PlayState.instance.boyfriend.positionArray[0];
-			boyfriend.y += boyfriend.positionArray[1] - PlayState.instance.boyfriend.positionArray[1];
+			var char:Character = !PlayState.opponentMode ? PlayState.instance.boyfriend : PlayState.instance.dad;
+			boyfriend = new Character(char.getScreenPosition().x, char.getScreenPosition().y, characterName, !PlayState.opponentMode);
+			boyfriend.x += boyfriend.positionArray[0] - char.positionArray[0];
+			boyfriend.y += boyfriend.positionArray[1] - char.positionArray[1];
 		}
 		boyfriend.skipDance = true;
 		add(boyfriend);

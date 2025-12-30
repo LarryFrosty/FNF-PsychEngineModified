@@ -5,6 +5,9 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
+import states.FreeplayState;
+
+@:access(states.FreeplayState)
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
 	private var curSelected:Int = 0;
@@ -69,6 +72,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
+		optionsArray.push(new GameplayOption('Play as Opponent', 'opponentmode', BOOL, false));
 	}
 
 	public function getOptionByName(name:String)
@@ -82,12 +86,15 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		return null;
 	}
 
-	public function new()
+	var instance:FreeplayState;
+	public function new(instance:FreeplayState = null)
 	{
 		controls.isInSubstate = true;
 
 		super();
-		
+
+		this.instance = instance;
+
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.6;
 		add(bg);
@@ -158,6 +165,11 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		if (controls.BACK)
 		{
 			close();
+			if (instance != null && FreeplayState.opponentMode != ClientPrefs.getGameplaySetting('opponentmode'))
+			{
+				FreeplayState.opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
+				instance.changeDiff();
+			}
 			ClientPrefs.saveSettings();
 			controls.isInSubstate = false;
 			FlxG.sound.play(Paths.sound('cancelMenu'));

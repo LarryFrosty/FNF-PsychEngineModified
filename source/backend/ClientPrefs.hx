@@ -77,7 +77,7 @@ import states.TitleState;
 		'instakill' => false,
 		'practice' => false,
 		'botplay' => false,
-		'opponentplay' => false
+		'opponentmode' => false
 	];
 
 	public var comboOffset:Array<Int> = [0, 0, 0, 0];
@@ -86,10 +86,11 @@ import states.TitleState;
 	public var goodWindow:Float = 90.0;
 	public var badWindow:Float = 135.0;
 	public var safeFrames:Float = 10.0;
-	public var guitarHeroSustains:Bool = true;
+	public var guitarHeroSustains:Bool = false;
 	public var discordRPC:Bool = true;
 	public var loadingScreen:Bool = true;
 	public var language:String = 'en-US';
+	public var customTransition:Bool = false;
 }
 
 class ClientPrefs {
