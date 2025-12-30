@@ -193,6 +193,8 @@
 	<!-- Allow Access to Engine Files in iOS -->
 	<haxedef name="SHARE_MOBILE_FILES" if="ios" />
 
+	<architecture name="arm64" exclude="armv7" if="android"/>
+
 	<!--Macro fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />
 	<haxeflag name="--macro" value="include('my.pack')" />
