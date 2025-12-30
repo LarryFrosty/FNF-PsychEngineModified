@@ -30,7 +30,7 @@ class StorageUtil
 {
 	#if sys
 	public static function getStorageDirectory():String
-		return #if android haxe.io.Path.addTrailingSlash(AndroidContext.getExternalFilesDir()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
+		return #if android haxe.io.Path.addTrailingSlash(StorageUtil.getExternalStorageDirectory()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
 
 	public static function saveContent(fileName:String, fileData:String, ?alert:Bool = true):Void
 	{
