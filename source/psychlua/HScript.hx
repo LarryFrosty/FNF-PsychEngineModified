@@ -14,6 +14,7 @@ import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
 import crowplexus.hscript.Expr;
 import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Tools;
 import crowplexus.hscript.Printer;
 
 import haxe.ValueException;

@@ -195,7 +195,7 @@ class PhillyStreets extends BaseStage
 		add(spraycanPile);
 		darkenable.push(spraycanPile);
 
-		if(gf != null && gf.curCharacter == 'nene'))
+		if(gf != null && gf.curCharacter == 'nene')
 		{
 			gf.animation.callback = function(name:String, frameNumber:Int, frameIndex:Int)
 			{
