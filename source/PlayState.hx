@@ -14,7 +14,7 @@ class PlayState extends FlxState
 	var player:Player;
 	var enemy:Enemy;
 	override function create() {
-		camGame = new FlxCamera()
+		camGame = new FlxCamera();
 		camGame.bgColor.alpha = 0;
 		FlxG.cameras.reset(camGame);
 
