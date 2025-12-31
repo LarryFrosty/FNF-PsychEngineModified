@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="stick.png">
+	<!-- Created using the Spritesheet and XML generator -->
+	<!-- https://uncertainprod.github.io/FNF-Spritesheet-XML-generator-Web -->
+	<SubTexture name="idle0000" x="270" y="0" width="110" height="358" frameX="-15" frameY="-92" frameWidth="150" frameHeight="640"/>
+	<SubTexture name="walk0000" x="0" y="346" width="150" height="351" frameX="26" frameY="-91" frameWidth="150" frameHeight="640"/>
+	<SubTexture name="walk0001" x="270" y="0" width="110" height="358" frameX="-15" frameY="-92" frameWidth="150" frameHeight="640"/>
+	<SubTexture name="attack0000" x="0" y="0" width="270" height="346" frameX="0" frameY="-98" frameWidth="285" frameHeight="640"/>
+</TextureAtlas>
