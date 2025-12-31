@@ -34,6 +34,7 @@ class Main extends Sprite
 		#if mobile
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(AndroidContext.getExternalFilesDir()));
 		#end
+		backend.CrashHandler.init();
 
 		FlxG.save.bind('gametest', 'gametest');
 
