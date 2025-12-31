@@ -28,7 +28,7 @@ class Player extends FlxSprite
 	}
 
 	override function update(elapsed:Float) {
-		if (isTouching(DOWN) && Controls.justPressed('jump')) {
+		if (isTouching(DOWN) && Controls.pressed('jump')) {
 			velocity.y = -600;
 		}
 

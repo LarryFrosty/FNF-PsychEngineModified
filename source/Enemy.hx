@@ -20,5 +20,7 @@ class Enemy extends FlxSprite
 			idleTimer = FlxG.random.float(0.5, 2);
 		}
 		else idleTimer -= elapsed;
+
+		super.update(elapsed);
 	}
 }
