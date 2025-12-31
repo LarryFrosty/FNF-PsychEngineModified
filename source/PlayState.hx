@@ -51,7 +51,8 @@ class PlayState extends FlxState
 		ground.immovable = true;
 		add(ground);
 
-		staminaBar = new FlxBar(Controls.buttonA.x, Controls.buttonA.y, null, Controls.buttonA.width, 10, player, 'stamina', 0, maxStamina);
+		staminaBar = new FlxBar(Controls.buttonA.x, Controls.buttonA.y, null, Std
+int(Controls.buttonA.width), 10, player, 'stamina', 0, maxStamina);
 		staminaBar.camera = Controls.camControl;
 		staminaBar.alpha = 0;
 		add(staminaBar);
