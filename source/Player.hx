@@ -12,7 +12,7 @@ class Player extends FlxSprite
 	var attackTimer:FlxTimer;
 	public function new(x:Float = 0, y:Float = 0) {
 		super(x, y);
-		frames = FlxAtlasFrames.fromSparrow('assets/images/stick.png', File.getContent('assets/images/stick.xml'));
+		frames = FlxAtlasFrames.fromSparrow(AssetPaths.stick__png, File.getContent(AssetPaths.stick__xml));
 		animation.addByPrefix('idle', 'idle', 6);
 		animation.addByPrefix('walk', 'walk', 6);
 		animation.addByPrefix('run', 'walk', 12);
