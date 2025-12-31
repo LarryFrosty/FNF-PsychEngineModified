@@ -25,6 +25,8 @@ class PlayState extends FlxState
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
+		Controls.setupMobileControls();
+
 		FlxG.worldBounds.set(FlxG.width*2, FlxG.height);
 
 		sky = FlxGradient.createGradientFlxSprite(FlxG.width*2, FlxG.height, [0xFFD4F3FF, 0xFF318CFF]);
@@ -55,8 +57,6 @@ class PlayState extends FlxState
 		staminaBar.camera = Controls.camControl;
 		staminaBar.alpha = 0;
 		add(staminaBar);
-
-		Controls.setupMobileControls();
 
 		super.create();
 	}
