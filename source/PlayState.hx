@@ -1,6 +1,7 @@
 import flixel.util.FlxGradient;
 import flixel.util.FlxDirectionFlags;
 import flixel.ui.FlxBar;
+import backend.Controls;
 
 class PlayState extends FlxState
 {
@@ -11,8 +12,10 @@ class PlayState extends FlxState
 	public var ground:FlxSprite;
 	public var sky:FlxSprite;
 
-	var player:Player;
-	var enemy:Enemy;
+	public var player:Player;
+	public var enemy:Enemy;
+
+	public var staminaBar:FlxBar;
 	override function create() {
 		camGame = new FlxCamera();
 		camGame.bgColor.alpha = 0;

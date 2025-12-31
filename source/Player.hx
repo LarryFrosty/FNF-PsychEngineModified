@@ -1,11 +1,12 @@
+import flixel.graphics.frames.FlxAtlasFrames;
 import backend.Controls;
 
 class Player extends FlxSprite
 {
 	public var sprinting:Bool = false;
-	public var sprintingCooldown:Bool = false;
+	public var sprintCooldown:Bool = false;
+	public var stamina:Float = 0;
 	public var maxStamina:Float = 100;
-	public var stamina:Float = maxStamina;
 	public var attacking:Bool = false;
 	public var attackCooldown:Bool = false;
 	var attackTimer:FlxTimer;
@@ -23,6 +24,7 @@ class Player extends FlxSprite
 		offset.y -= 65;
 		acceleration.y = 1400;
 		drag.x = 1800;
+		stamina = maxStamina;
 	}
 
 	override function update(elapsed:Float) {
@@ -45,7 +47,7 @@ class Player extends FlxSprite
 			facing = RIGHT;
 		}
 		else if (!attacking) {
-			player.animation.play('idle');
+			animation.play('idle');
 		}
 
 		if (Controls.justPressed('sprint') && !sprintCooldown) {
@@ -72,7 +74,7 @@ class Player extends FlxSprite
 			attacking = true;
 			attackCooldown = true;
 			attackTimer?.cancel();
-			attackTimer = new FlxTimer().start(0.3, ()->{
+			attackTimer = new FlxTimer().start(0.3, (t:FlxTimer)->{
 				attacking = false;
 				attackCooldown = false;
 				attackTimer = null;

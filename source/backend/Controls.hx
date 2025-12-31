@@ -17,12 +17,13 @@ class Controls
 
 		#if android
 		// cant be bothered
-		return switch(key) {
-			case 'left': TouchUtil.justPressed(buttonLeft, camControl);
-			case 'right': TouchUtil.justPressed(buttonRight, camControl);
-			case 'sprint': TouchUtil.justPressed(buttonA, camControl);
-			case 'interact': TouchUtil.justPressed(buttonB, camControl);
-			case 'jump': TouchUtil.justPressed(buttonJump, camControl);
+		switch(key) {
+			case 'left': return TouchUtil.justPressed(buttonLeft, camControl);
+			case 'right': return TouchUtil.justPressed(buttonRight, camControl);
+			case 'sprint': return TouchUtil.justPressed(buttonA, camControl);
+			case 'interact': return TouchUtil.justPressed(buttonB, camControl);
+			case 'jump': return TouchUtil.justPressed(buttonJump, camControl);
+			case _: return false;
 		}
 		#end
 		return false;
@@ -33,12 +34,13 @@ class Controls
 
 		#if android
 		// cant be bothered
-		return switch(key) {
-			case 'left': TouchUtil.pressed(buttonLeft, camControl);
-			case 'right': TouchUtil.pressed(buttonRight, camControl);
-			case 'sprint': TouchUtil.pressed(buttonA, camControl);
-			case 'interact': TouchUtil.pressed(buttonB, camControl);
-			case 'jump': TouchUtil.pressed(buttonJump, camControl);
+		switch(key) {
+			case 'left': return TouchUtil.pressed(buttonLeft, camControl);
+			case 'right': return TouchUtil.pressed(buttonRight, camControl);
+			case 'sprint': return TouchUtil.pressed(buttonA, camControl);
+			case 'interact': return TouchUtil.pressed(buttonB, camControl);
+			case 'jump': return TouchUtil.pressed(buttonJump, camControl);
+			case _: return false;
 		}
 		#end
 		return false;
@@ -49,12 +51,13 @@ class Controls
 
 		#if android
 		// cant be bothered
-		return switch(key) {
-			case 'left': TouchUtil.justReleased(buttonLeft, camControl);
-			case 'right': TouchUtil.justReleased(buttonRight, camControl);
-			case 'sprint': TouchUtil.justReleased(buttonA, camControl);
-			case 'interact': TouchUtil.justReleased(buttonB, camControl);
-			case 'jump': TouchUtil.justReleased(buttonJump, camControl);
+		switch(key) {
+			case 'left': return TouchUtil.justReleased(buttonLeft, camControl);
+			case 'right': return TouchUtil.justReleased(buttonRight, camControl);
+			case 'sprint': return TouchUtil.justReleased(buttonA, camControl);
+			case 'interact': return TouchUtil.justReleased(buttonB, camControl);
+			case 'jump': return TouchUtil.justReleased(buttonJump, camControl);
+			case _: return false;
 		}
 		#end
 		return false;
