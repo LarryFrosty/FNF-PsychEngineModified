@@ -101,6 +101,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
-          name: PsychEngineModified-release
+          name: BaldiplierEngine-test
           path: export/release/android/bin/app/build/outputs/apk/release
           if-no-files-found: error
