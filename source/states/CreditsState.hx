@@ -38,7 +38,7 @@ class CreditsState extends MusicBeatState
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
 		var desc:String = '"im the sigma"';
-		var larryCred:Array<String> = ['larryfrosty'];
+		var larryCred:Array<String> = ['missing-icon'];
 		if (FlxG.random.bool(45)) {
 			larryCred = FlxG.random.getObject(baldipliers, [90, 25, 5]) ?? ['larryfrosty'];
 			if (larryCred.length > 1)
