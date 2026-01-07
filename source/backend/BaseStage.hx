@@ -19,6 +19,8 @@ enum Countdown
 
 class BaseStage extends FlxBasic
 {
+	private var objects:Array<FlxBasic> = [];
+
 	private var game(get, never):Dynamic;
 	public var onPlayState(get, never):Bool;
 
@@ -95,9 +97,18 @@ class BaseStage extends FlxBasic
 	public function noteMissPress(direction:Int) {}
 
 	// Things to replace FlxGroup stuff and inject sprites directly into the state
-	function add(object:FlxBasic) return FlxG.state.add(object);
-	function remove(object:FlxBasic, splice:Bool = false) return FlxG.state.remove(object, splice);
-	function insert(position:Int, object:FlxBasic) return FlxG.state.insert(position, object);
+	function add(object:FlxBasic) {
+		objects.push(object);
+		return FlxG.state.add(object);
+	}
+	function remove(object:FlxBasic, splice:Bool = false) {
+		objects.remove(object);
+		return FlxG.state.remove(object, splice);
+	}
+	function insert(position:Int, object:FlxBasic) {
+		objects.insert(position, object);
+		return FlxG.state.insert(position, object);
+	}
 	
 	public function addBehindGF(obj:FlxBasic) return insert(members.indexOf(game.gfGroup), obj);
 	public function addBehindBF(obj:FlxBasic) return insert(members.indexOf(game.boyfriendGroup), obj);
@@ -177,4 +188,13 @@ class BaseStage extends FlxBasic
 		return game.defaultCamZoom;
 	}
 	inline private function get_camFollow():FlxObject return game.camFollow;
+
+	override function destroy():Void
+	{
+		for (obj in objects) {
+			remove(obj, true);
+			obj?.destroy();
+		}
+		super.destroy();
+	}
 }
