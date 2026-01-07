@@ -9,6 +9,7 @@ class CreditsState extends MusicBeatState
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private var iconArray:Array<AttachedSprite> = [];
 	private var creditsStuff:Array<Array<String>> = [];
+	private var baldipliers:Array<Array<String>> = [['baldiplier', 'bald'], ['daldiplier', 'dark'], ['golden-baldiplier', 'golden']];
 
 	var bg:FlxSprite;
 	var descText:FlxText;
@@ -36,8 +37,17 @@ class CreditsState extends MusicBeatState
 		#if MODS_ALLOWED
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
-
+		var desc:String = '"im the sigma"';
+		var larryCred:Array<String> = ['larryfrosty'];
+		if (FlxG.random.bool(45)) {
+			larryCred = FlxG.random.getObject(baldipliers, [90, 25, 5]) ?? ['larryfrosty'];
+			if (larryCred.length > 1)
+				desc = '"Make sure to keep your pliers ${larryCred[1]}."';
+		}
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+			['The Sigmas'],
+			['LarryFrosty', larryCred[0], desc, 'https://youtube.com/@larryfrosty?si=HBFHaclYVeS6kn8v', '52a8eb'],
+			[''],
 			['Mobile Porting Team'],
 			['HomuHomu833',			'homura',             'Head Porter of Psych Engine and Author of linc_luajit-rewriten',                       'https://youtube.com/@HomuHomu833',		'FFE7C0'],
 			['Karim Akra',			'karim',			'Second Porter of Psych Engine',						'https://youtube.com/@Karim0690',		'FFB4F0'],
