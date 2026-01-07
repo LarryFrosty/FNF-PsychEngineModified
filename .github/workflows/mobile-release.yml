@@ -1,4 +1,4 @@
-name: Test Branch
+name: Android
 on:
   push:
     branches: [ fnf-test ]
