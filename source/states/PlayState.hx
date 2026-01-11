@@ -1541,7 +1541,7 @@ class PlayState extends MusicBeatState
 				stageUI = oldUI;
 				Paths.setCurrentLevel(oldLevel);
 				stage?.destroy();
-				stages.remove(stage);
+				stages.remove(event.value1);
 		}
 		stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
 	}
