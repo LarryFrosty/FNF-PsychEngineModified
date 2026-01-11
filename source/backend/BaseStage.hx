@@ -191,9 +191,11 @@ class BaseStage extends FlxBasic
 
 	override function destroy():Void
 	{
-		for (obj in objects) {
-			remove(obj, true);
-			obj?.destroy();
+		var i = objects.length-1;
+		while (i >= 0) {
+			remove(objects[i], true);
+			objects[i]?.destroy();
+			i--;
 		}
 		super.destroy();
 	}
