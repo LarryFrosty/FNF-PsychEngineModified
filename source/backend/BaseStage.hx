@@ -49,7 +49,7 @@ class BaseStage extends FlxBasic
 	public var defaultCamZoom(get, set):Float;
 	public var camFollow(get, never):FlxObject;
 
-	public function new()
+	public function new(name:String)
 	{
 		if(game == null)
 		{
@@ -58,7 +58,7 @@ class BaseStage extends FlxBasic
 		}
 		else 
 		{
-			game.stages.push(this);
+			game.stages.set(name, this);
 			super();
 			create();
 		}

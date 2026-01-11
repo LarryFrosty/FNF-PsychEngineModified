@@ -266,7 +266,7 @@ class MusicBeatState extends FlxState
 			beatHit();
 	}
 
-	public var stages:Array<BaseStage> = [];
+	public var stages:Map<String, BaseStage> = [];
 	public function beatHit():Void
 	{
 		//trace('Beat: ' + curBeat);

@@ -1526,6 +1526,7 @@ class PlayState extends MusicBeatState
 				var stageData:StageFile = StageData.getStageFile(event.value1);
 				Paths.setCurrentLevel(stageData.directory);
 
+				stageUI = "normal";
 				if (stageData.stageUI != null && stageData.stageUI.trim().length > 0)
 					stageUI = stageData.stageUI;
 				else if (stageData.isPixelStage == true) //Backward compatibility
@@ -1540,6 +1541,7 @@ class PlayState extends MusicBeatState
 				stageUI = oldUI;
 				Paths.setCurrentLevel(oldLevel);
 				stage?.destroy();
+				stages.remove(stage);
 		}
 		stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
 	}
@@ -2463,18 +2465,22 @@ class PlayState extends MusicBeatState
 	}
 
 	public function getStage(stage:String):Null<BaseStage> {
+		if (stages.get(stage) != null) {
+			stages.get(stage).create();
+			return stages.get(stage);
+		}
 		return switch(stage) {
-			case 'stage': new StageWeek1(); 			//Week 1
-			case 'spooky': new Spooky();				//Week 2
-			case 'philly': new Philly();				//Week 3
-			case 'limo': new Limo();					//Week 4
-			case 'mall': new Mall();					//Week 5 - Cocoa, Eggnog
-			case 'mallEvil': new MallEvil();			//Week 5 - Winter Horrorland
-			case 'school': new School();				//Week 6 - Senpai, Roses
-			case 'schoolEvil': new SchoolEvil();		//Week 6 - Thorns
-			case 'tank': new Tank();					//Week 7 - Ugh, Guns, Stress
-			case 'phillyStreets': new PhillyStreets(); 	//Weekend 1 - Darnell, Lit Up, 2Hot
-			case 'phillyBlazin': new PhillyBlazin();	//Weekend 1 - Blazin
+			case 'stage': new StageWeek1('stage'); 			//Week 1
+			case 'spooky': new Spooky('spooky');				//Week 2
+			case 'philly': new Philly('philly');				//Week 3
+			case 'limo': new Limo('limo');					//Week 4
+			case 'mall': new Mall('mall');					//Week 5 - Cocoa, Eggnog
+			case 'mallEvil': new MallEvil('mallEvil');			//Week 5 - Winter Horrorland
+			case 'school': new School('school');				//Week 6 - Senpai, Roses
+			case 'schoolEvil': new SchoolEvil('schoolEvil');		//Week 6 - Thorns
+			case 'tank': new Tank('tank');					//Week 7 - Ugh, Guns, Stress
+			case 'phillyStreets': new PhillyStreets('phillyStreets'); 	//Weekend 1 - Darnell, Lit Up, 2Hot
+			case 'phillyBlazin': new PhillyBlazin('phillyBlazin');	//Weekend 1 - Blazin
 			default: null;
 		}
 	}
