@@ -1521,12 +1521,24 @@ class PlayState extends MusicBeatState
 
 			case 'Change Stage':
 				var oldGF:String = PlayState.SONG.gfVersion;
+				var oldUI:String = stageUI;
+				var oldLevel:String = Paths.currentLevel;
+				var stageData:StageFile = StageData.getStageFile(event.value1);
+				Paths.setCurrentLevel(stageData.directory);
+
+				if (stageData.stageUI != null && stageData.stageUI.trim().length > 0)
+					stageUI = stageData.stageUI;
+				else if (stageData.isPixelStage == true) //Backward compatibility
+					stageUI = "pixel";
+
 				var stage:BaseStage = getStage(event.value1);
 				stage?.createPost();
 				if (oldGF != PlayState.SONG.gfVersion && gf != null) {
 					addCharacterToList(PlayState.SONG.gfVersion, 2);
 					PlayState.SONG.gfVersion = oldGF;
 				}
+				stageUI = oldUI;
+				Paths.setCurrentLevel(oldLevel);
 				stage?.destroy();
 		}
 		stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
