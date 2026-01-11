@@ -2368,49 +2368,47 @@ class PlayState extends MusicBeatState
 				FlxG.sound.play(Paths.sound(value1), flValue2);
 
 			case 'Change Stage':
+				var stageData:StageFile = StageData.getStageFile(value1);
+				Paths.setCurrentLevel(stageData.directory);
+				defaultCamZoom = stageData.defaultZoom;
+
+				stageUI = "normal";
+				if (stageData.stageUI != null && stageData.stageUI.trim().length > 0)
+					stageUI = stageData.stageUI;
+				else if (stageData.isPixelStage == true) //Backward compatibility
+					stageUI = "pixel";
+
+				BF_X = stageData.boyfriend[0];
+				BF_Y = stageData.boyfriend[1];
+				GF_X = stageData.girlfriend[0];
+				GF_Y = stageData.girlfriend[1];
+				DAD_X = stageData.opponent[0];
+				DAD_Y = stageData.opponent[1];
+
+				if(stageData.camera_speed != null)
+					cameraSpeed = stageData.camera_speed;
+
+				boyfriendCameraOffset = stageData.camera_boyfriend;
+				if(boyfriendCameraOffset == null)
+					boyfriendCameraOffset = [0, 0];
+
+				opponentCameraOffset = stageData.camera_opponent;
+				if(opponentCameraOffset == null)
+					opponentCameraOffset = [0, 0];
+
+				girlfriendCameraOffset = stageData.camera_girlfriend;
+				if(girlfriendCameraOffset == null)
+					girlfriendCameraOffset = [0, 0];
+
+				boyfriendGroup.setPosition(BF_X, BF_Y);
+				dadGroup.setPosition(DAD_X, DAD_Y);
+				gfGroup.setPosition(GF_X, GF_Y);
+
+				moveCameraSection();
+				FlxG.camera.snapToTarget();
+
 				var newStage:BaseStage = getStage(value1);
 				if (newStage != null) {
-					var stageData:StageFile = StageData.getStageFile(value1);
-
-					Paths.setCurrentLevel(stageData.directory);
-
-					defaultCamZoom = stageData.defaultZoom;
-
-					stageUI = "normal";
-					if (stageData.stageUI != null && stageData.stageUI.trim().length > 0)
-						stageUI = stageData.stageUI;
-					else if (stageData.isPixelStage == true) //Backward compatibility
-						stageUI = "pixel";
-
-					BF_X = stageData.boyfriend[0];
-					BF_Y = stageData.boyfriend[1];
-					GF_X = stageData.girlfriend[0];
-					GF_Y = stageData.girlfriend[1];
-					DAD_X = stageData.opponent[0];
-					DAD_Y = stageData.opponent[1];
-
-					if(stageData.camera_speed != null)
-						cameraSpeed = stageData.camera_speed;
-
-					boyfriendCameraOffset = stageData.camera_boyfriend;
-					if(boyfriendCameraOffset == null)
-						boyfriendCameraOffset = [0, 0];
-
-					opponentCameraOffset = stageData.camera_opponent;
-					if(opponentCameraOffset == null)
-						opponentCameraOffset = [0, 0];
-
-					girlfriendCameraOffset = stageData.camera_girlfriend;
-					if(girlfriendCameraOffset == null)
-						girlfriendCameraOffset = [0, 0];
-
-					boyfriendGroup.setPosition(BF_X, BF_Y);
-					dadGroup.setPosition(DAD_X, DAD_Y);
-					gfGroup.setPosition(GF_X, GF_Y);
-
-					moveCameraSection();
-					FlxG.camera.snapToTarget();
-
 					stage?.destroy();
 					stage = newStage;
 				}
