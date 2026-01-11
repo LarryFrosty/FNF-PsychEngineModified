@@ -1523,7 +1523,10 @@ class PlayState extends MusicBeatState
 				var oldGF:String = PlayState.SONG.gfVersion;
 				var stage:BaseStage = getStage(value1);
 				stage?.createPost();
-				if (oldGF != PlayState.SONG.gfVersion && gf != null) addCharacterToList(PlayState.SONG.gfVersion, 2);
+				if (oldGF != PlayState.SONG.gfVersion && gf != null) {
+					addCharacterToList(PlayState.SONG.gfVersion, 2);
+					PlayState.SONG.gfVersion = oldGF;
+				}
 				stage?.destroy();
 		}
 		stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
