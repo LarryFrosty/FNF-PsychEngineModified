@@ -2417,13 +2417,13 @@ class PlayState extends MusicBeatState
 				moveCameraSection();
 				FlxG.camera.snapToTarget();
 
+				remove(gfGroup);
+				remove(dadGroup);
+				remove(boyfriendGroup);
 				var newStage:BaseStage = getStage(value1);
 				if (newStage != null) {
 					var oldGF:String = PlayState.SONG.gfVersion;
 					stage?.destroy();
-					remove(gfGroup);
-					remove(dadGroup);
-					remove(boyfriendGroup);
 					stage = newStage;
 					add(gfGroup);
 					add(dadGroup);
