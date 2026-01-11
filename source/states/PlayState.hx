@@ -1521,7 +1521,7 @@ class PlayState extends MusicBeatState
 
 			case 'Change Stage':
 				var oldGF:String = PlayState.SONG.gfVersion;
-				var stage:BaseStage = getStage(value1);
+				var stage:BaseStage = getStage(event.value1);
 				stage?.createPost();
 				if (oldGF != PlayState.SONG.gfVersion && gf != null) {
 					addCharacterToList(PlayState.SONG.gfVersion, 2);
