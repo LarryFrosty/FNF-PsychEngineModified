@@ -1518,6 +1518,13 @@ class PlayState extends MusicBeatState
 
 			case 'Play Sound':
 				Paths.sound(event.value1); //Precache sound
+
+			case 'Change Stage':
+				var oldGF:String = PlayState.SONG.gfVersion;
+				var stage:BaseStage = getStage(value1);
+				stage?.createPost();
+				if (oldGF != PlayState.SONG.gfVersion && gf != null) addCharacterToList(PlayState.SONG.gfVersion, 2);
+				stage?.destroy();
 		}
 		stagesFunc(function(stage:BaseStage) stage.eventPushedUnique(event));
 	}
@@ -2409,8 +2416,27 @@ class PlayState extends MusicBeatState
 
 				var newStage:BaseStage = getStage(value1);
 				if (newStage != null) {
+					var oldGF:String = PlayState.SONG.gfVersion;
 					stage?.destroy();
+					remove(gfGroup);
+					remove(dadGroup);
+					remove(boyfriendGroup);
 					stage = newStage;
+					add(gfGroup);
+					add(dadGroup);
+					add(boyfriendGroup);
+					stage.createPost();
+					if (oldGF != PlayState.SONG.gfVersion && gf != null) {
+						if (!gfMap.exists(PlayState.SONG.gfVersion)) {
+							addCharacterToList(PlayState.SONG.gfVersion, 2);
+						}
+
+						var lastAlpha:Float = gf.alpha;
+						gf.alpha = 0.00001;
+						gf = gfMap.get(PlayState.SONG.gfVersion);
+						gf.alpha = lastAlpha;
+						setOnScripts('gfName', gf.curCharacter);
+					}
 				}
 				else {
 					// uhh something for lua stages idfk LMFAO
