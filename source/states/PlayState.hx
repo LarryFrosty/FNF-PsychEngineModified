@@ -311,7 +311,7 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		// Gameplay settings
-		opponentMode = ClientPrefs.getGameplaySetting('opponentmode');
+		opponentMode = (!PlayState.isStoryMode && ClientPrefs.getGameplaySetting('opponentmode'));
 		healthGain = ClientPrefs.getGameplaySetting('healthgain');
 		healthLoss = ClientPrefs.getGameplaySetting('healthloss');
 		instakillOnMiss = ClientPrefs.getGameplaySetting('instakill');
