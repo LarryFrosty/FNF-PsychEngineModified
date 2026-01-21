@@ -22,4 +22,14 @@ class DebugText extends TextField
 		x = FlxG.game.x + 10;
 		y = FlxG.game.y + 10;
 	}
+
+	override function __enterFrame(deltaTime:Int) {
+		disableTime -= deltaTime / 1000;
+		if (disableTime < 1) alpha = disableTime;
+		if (disableTime < 0) {
+			disableTime = 0;
+			parent?.removeChild(this);
+		}
+		super.__enterFrame(deltaTime);
+	}
 }
