@@ -17,6 +17,6 @@ class Debugger extends Sprite
 		}
 		addChild(debugText);
 
-		Sys.printIn(text);
+		trace(text);
 	}
 }
