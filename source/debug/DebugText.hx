@@ -22,11 +22,4 @@ class DebugText extends TextField
 		x = FlxG.game.x + 10;
 		y = FlxG.game.y + 10;
 	}
-
-	// might not work as intended i have no idea how enterFrame works lol
-	override function __enterFrame(deltaTime:Float) {
-		disableTime -= deltaTime;
-		if(disableTime < 0) disableTime = 0;
-		if(disableTime < 1) alpha = disableTime;
-	}
 }
