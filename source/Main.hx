@@ -86,6 +86,18 @@ class Main extends Sprite
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 		Highscore.load();
 
+		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end
+		Controls.instance = new Controls();
+		Debugger.instance = new Debugger();
+		ClientPrefs.loadDefaultKeys();
+		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
+		#if mobile
+		FlxG.signals.postGameStart.addOnce(() -> {
+			FlxG.scaleMode = new MobileScaleMode();
+		});
+		#end
+		addChild(new FlxGame(game.width, game.height, #if COPYSTATE_ALLOWED !CopyState.checkExistingFiles() ? CopyState : #end game.initialState, game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
+
 		#if HSCRIPT_ALLOWED
 		Iris.warn = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(WARN, x, pos);
@@ -102,8 +114,7 @@ class Main extends Sprite
 				msgInfo += '${newPos.lineNumber}:';
 			}
 			msgInfo += ' $x';
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('WARNING: $msgInfo', FlxColor.YELLOW);
+			Debugger.instance.print('WARNING: $msgInfo', FlxColor.YELLOW);
 		}
 		Iris.error = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(ERROR, x, pos);
@@ -120,8 +131,7 @@ class Main extends Sprite
 				msgInfo += '${newPos.lineNumber}:';
 			}
 			msgInfo += ' $x';
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('ERROR: $msgInfo', FlxColor.RED);
+			Debugger.instance.print('ERROR: $msgInfo', FlxColor.RED);
 		}
 		Iris.fatal = function(x, ?pos:haxe.PosInfos) {
 			Iris.logLevel(FATAL, x, pos);
@@ -138,21 +148,9 @@ class Main extends Sprite
 				msgInfo += '${newPos.lineNumber}:';
 			}
 			msgInfo += ' $x';
-			if (PlayState.instance != null)
-				PlayState.instance.addTextToDebug('FATAL: $msgInfo', 0xFFBB0000);
+			Debugger.instance.print('FATAL: $msgInfo', 0xFFBB0000);
 		}
 		#end
-
-		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end
-		Controls.instance = new Controls();
-		ClientPrefs.loadDefaultKeys();
-		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
-		#if mobile
-		FlxG.signals.postGameStart.addOnce(() -> {
-			FlxG.scaleMode = new MobileScaleMode();
-		});
-		#end
-		addChild(new FlxGame(game.width, game.height, #if COPYSTATE_ALLOWED !CopyState.checkExistingFiles() ? CopyState : #end game.initialState, game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
 
 		fpsVar = new FPSCounter(10, 3, 0xFFFFFF);
 		addChild(fpsVar);

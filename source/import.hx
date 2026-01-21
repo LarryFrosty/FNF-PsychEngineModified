@@ -59,7 +59,9 @@ import backend.Mods;
 import backend.Language;
 import mobile.backend.StorageUtil;
 
-import backend.ui.*; //Psych-UI
+import backend.ui.*; //Psych-U
+
+import debug.Debugger;
 
 import objects.Alphabet;
 import objects.BGSprite;
