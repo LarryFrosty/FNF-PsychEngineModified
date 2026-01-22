@@ -36,7 +36,7 @@ class ScriptHandler
 		}
 
 		FlxG.signals.postStateSwitch.add(function() {
-			ScriptHandler.callOnLuas('onStateSwitch', [Type.getClassName(FlxG.state)]);
+			ScriptHandler.callOnLuas('onStateSwitch', [Type.getClassName(Type.getClass(FlxG.state))]);
 			ScriptHandler.callOnHScript('onStateSwitch', [FlxG.state]);
 		});
 		#end
