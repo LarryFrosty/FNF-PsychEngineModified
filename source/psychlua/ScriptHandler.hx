@@ -224,8 +224,8 @@ class ScriptHandler
 	}
 
 	public static function findExtension(path:String, isHaxe:Bool = false) {
-		if (isHaxe) return hscriptExtensions.contains(path.substring(path.lastIndexOf('.'));
-		else return luaExtensions.contains(path.substring(path.lastIndexOf('.'));
+		if (isHaxe) return hscriptExtensions.contains(path.substring(path.lastIndexOf('.')));
+		else return luaExtensions.contains(path.substring(path.lastIndexOf('.')));
 	}
 }
 #end
