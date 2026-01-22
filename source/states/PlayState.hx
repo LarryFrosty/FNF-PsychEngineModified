@@ -48,6 +48,7 @@ import psychlua.*;
 import psychlua.LuaUtils;
 import psychlua.HScript;
 #end
+import psychlua.ScriptHandler.ReturnValue;
 
 /**
  * This is where all the Gameplay stuff happens and is managed

@@ -1591,7 +1591,7 @@ class FunkinLua
 					onComplete: function(twn:FlxTween)
 					{
 						variables.remove(tag);
-						if(PlayState.instance != null) PlayState.instance.callOnLuas('onTweenCompleted', [originalTag, vars]);
+						if(PlayState.instance != null) ScriptHandler.callOnLuas('onTweenCompleted', [originalTag, vars]);
 					}
 				}));
 			}
@@ -1620,7 +1620,7 @@ class FunkinLua
 				onComplete: function(twn:FlxTween)
 				{
 					variables.remove(tag);
-					if(PlayState.instance != null) PlayState.instance.callOnLuas('onTweenCompleted', [originalTag]);
+					if(PlayState.instance != null) ScriptHandler.callOnLuas('onTweenCompleted', [originalTag]);
 				}
 			}));
 			return tag;

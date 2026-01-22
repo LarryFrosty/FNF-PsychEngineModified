@@ -2,6 +2,8 @@ package substates;
 
 import backend.WeekData;
 
+import psychlua.ScriptHandler;
+
 import objects.Character;
 import flixel.FlxObject;
 import flixel.FlxSubState;
@@ -87,7 +89,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		FlxG.camera.follow(camFollow, LOCKON, 0.01);
 		add(camFollow);
 		
-		PlayState.instance.setOnScripts('inGameOver', true);
+		ScriptHandler.setOnScripts('inGameOver', true);
 		ScriptHandler.callOnScripts('onGameOverStart', []);
 		FlxG.sound.music.loadEmbedded(Paths.music(loopSoundName), true);
 
