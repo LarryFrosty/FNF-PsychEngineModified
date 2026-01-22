@@ -228,4 +228,3 @@ class ScriptHandler
 		else return luaExtensions.contains(path.substring(path.lastIndexOf('.')));
 	}
 }
-#end
