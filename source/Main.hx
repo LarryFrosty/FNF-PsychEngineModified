@@ -13,6 +13,7 @@ import states.TitleState;
 import crowplexus.iris.Iris;
 import psychlua.HScript.HScriptInfos;
 #end
+import psychlua.ScriptHandler;
 import mobile.backend.MobileScaleMode;
 import openfl.events.KeyboardEvent;
 import lime.system.System as LimeSystem;
@@ -207,6 +208,8 @@ class Main extends Sprite
 			if (FlxG.game != null)
 			resetSpriteCache(FlxG.game);
 		});
+
+		ScriptHandler.init();
 	}
 
 	static function resetSpriteCache(sprite:Sprite):Void {

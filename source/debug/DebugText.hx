@@ -9,7 +9,7 @@ class DebugText extends TextField
 	public var disableTime:Float = 6;
 	public function new(newText:String, color:Int) {
 		super();
-		defaultTextFormat = new TextFormat(Assets.getFont(Paths.font('vcr.ttf')).fontName, 28, color);
+		defaultTextFormat = new TextFormat(Assets.getFont(Paths.font('vcr.ttf')).fontName, 24, color);
 		width = FlxG.width - 20;
 		wordWrap = true;
 		multiline = true;
@@ -24,11 +24,11 @@ class DebugText extends TextField
 	}
 
 	override function __enterFrame(deltaTime:Int) {
-		disableTime -= deltaTime / 1000;
-		if (disableTime < 1) alpha = disableTime;
-		if (disableTime < 0) {
-			disableTime = 0;
-			parent?.removeChild(this);
+		@:privateAccess
+		if (!FlxG.game._lostFocus || !FlxG.autoPause) {
+			disableTime -= deltaTime / 1000;
+			if (disableTime < 1) alpha = disableTime;
+			if (disableTime < 0 || y <= FlxG.height * 2) parent?.removeChild(this);
 		}
 		super.__enterFrame(deltaTime);
 	}

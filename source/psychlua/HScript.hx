@@ -30,6 +30,7 @@ typedef HScriptInfos = {
 
 class HScript extends Iris
 {
+	public static var curScripts:Array<HScript> = [];
 	public static var globalVariables:Map<String, Dynamic> = new Map();
 
 	public var filePath:String;
@@ -134,10 +135,14 @@ class HScript extends Iris
 			try {
 				var ret:Dynamic = execute();
 				returnValue = ret;
+				if (this.exists('onCreate')) this.call('onCreate');
+				trace('initialized hscript interp successfully: $file');
+				HScript.curScripts.push(this);
 			} catch(e:IrisError) {
+				var pos:HScriptInfos = cast {fileName: file, showLine: false};
+				Iris.error(Printer.errorToString(e, false), pos);
 				returnValue = null;
 				this.destroy();
-				throw e;
 			}
 		}
 	}
@@ -205,7 +210,7 @@ class HScript extends Iris
 		});
 		set('debugPrint', function(text:String, ?color:FlxColor = null) {
 			if(color == null) color = FlxColor.WHITE;
-			PlayState.instance.addTextToDebug(text, color);
+			Debugger.instance.print(text, color);
 		});
 		set('getModSetting', function(saveTag:String, ?modName:String = null) {
 			if(modName == null)
@@ -467,6 +472,7 @@ class HScript extends Iris
 	{
 		origin = null;
 		#if LUA_ALLOWED parentLua = null; #end
+		HScript.curScripts.remove(this);
 		super.destroy();
 	}
 
@@ -646,15 +652,15 @@ class HScript
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua) {
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			Debugger.instance.print('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			Debugger.instance.print('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
-			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			Debugger.instance.print('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 	}
