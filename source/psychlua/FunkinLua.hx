@@ -326,7 +326,7 @@ class FunkinLua
 							return;
 						}
 
-				PlayState.instance.initHScript(scriptPath);
+				new HScript(null, scriptPath);
 				return;
 			}
 			luaTrace("addHScript: Script doesn't exist!", false, false, FlxColor.RED);
@@ -335,11 +335,11 @@ class FunkinLua
 			#end
 		});
 		Lua_helper.add_callback(lua, "removeLuaScript", function(luaFile:String) {
-			var luaPath:String = findScript(luaFile);
+			var luaPath:String = ScriptHandler.findScript(luaFile);
 			if(luaPath != null)
 			{
 				var foundAny:Bool = false;
-				for (luaInstance in game.luaArray)
+				for (luaInstance in FunkinLua.curScripts)
 				{
 					if(luaInstance.scriptName == luaPath)
 					{
@@ -356,11 +356,11 @@ class FunkinLua
 		});
 		Lua_helper.add_callback(lua, "removeHScript", function(scriptFile:String) {
 			#if HSCRIPT_ALLOWED
-			var scriptPath:String = findScript(scriptFile, '.hx');
+			var scriptPath:String = ScriptHandler.findScript(scriptFile, '.hx');
 			if(scriptPath != null)
 			{
 				var foundAny:Bool = false;
-				for (script in game.hscriptArray)
+				for (script in HScript.curScripts)
 				{
 					if(script.origin == scriptPath)
 					{
@@ -516,14 +516,14 @@ class FunkinLua
 							loopDelay: myOptions.loopDelay,
 	
 							onUpdate: function(twn:FlxTween) {
-								if(myOptions.onUpdate != null) game.callOnLuas(myOptions.onUpdate, [originalTag, vars]);
+								if(myOptions.onUpdate != null) ScriptHandler.callOnLuas(myOptions.onUpdate, [originalTag, vars]);
 							},
 							onStart: function(twn:FlxTween) {
-								if(myOptions.onStart != null) game.callOnLuas(myOptions.onStart, [originalTag, vars]);
+								if(myOptions.onStart != null) ScriptHandler.callOnLuas(myOptions.onStart, [originalTag, vars]);
 							},
 							onComplete: function(twn:FlxTween) {
 								if(twn.type == FlxTweenType.ONESHOT || twn.type == FlxTweenType.BACKWARD) variables.remove(tag);
-								if(myOptions.onComplete != null) game.callOnLuas(myOptions.onComplete, [originalTag, vars]);
+								if(myOptions.onComplete != null) ScriptHandler.callOnLuas(myOptions.onComplete, [originalTag, vars]);
 							}
 						} : null));
 						return tag;
@@ -535,13 +535,13 @@ class FunkinLua
 						loopDelay: myOptions.loopDelay,
 
 						onUpdate: function(twn:FlxTween) {
-							if(myOptions.onUpdate != null) game.callOnLuas(myOptions.onUpdate, [null, vars]);
+							if(myOptions.onUpdate != null) ScriptHandler.callOnLuas(myOptions.onUpdate, [null, vars]);
 						},
 						onStart: function(twn:FlxTween) {
-							if(myOptions.onStart != null) game.callOnLuas(myOptions.onStart, [null, vars]);
+							if(myOptions.onStart != null) ScriptHandler.callOnLuas(myOptions.onStart, [null, vars]);
 						},
 						onComplete: function(twn:FlxTween) {
-							if(myOptions.onComplete != null) game.callOnLuas(myOptions.onComplete, [null, vars]);
+							if(myOptions.onComplete != null) ScriptHandler.callOnLuas(myOptions.onComplete, [null, vars]);
 						}
 					} : null);
 				}
@@ -592,7 +592,7 @@ class FunkinLua
 						onComplete: function(twn:FlxTween)
 						{
 							variables.remove(tag);
-							if (game != null) game.callOnLuas('onTweenCompleted', [originalTag, vars]);
+							if (game != null) ScriptHandler.callOnLuas('onTweenCompleted', [originalTag, vars]);
 						}
 					}));
 					return tag;
@@ -664,7 +664,7 @@ class FunkinLua
 			variables.set(tag, new FlxTimer().start(time, function(tmr:FlxTimer)
 			{
 				if(tmr.finished) variables.remove(tag);
-				game.callOnLuas('onTimerCompleted', [originalTag, tmr.loops, tmr.loopsLeft]);
+				ScriptHandler.callOnLuas('onTimerCompleted', [originalTag, tmr.loops, tmr.loopsLeft]);
 				//trace('Timer Completed: ' + tag);
 			}, loops));
 			return tag;
@@ -849,15 +849,15 @@ class FunkinLua
 		});
 		Lua_helper.add_callback(lua, "setRatingPercent", function(value:Float) {
 			game.ratingPercent = value;
-			game.setOnScripts('rating', game.ratingPercent);
+			ScriptHandler.setOnScripts('rating', game.ratingPercent);
 		});
 		Lua_helper.add_callback(lua, "setRatingName", function(value:String) {
 			game.ratingName = value;
-			game.setOnScripts('ratingName', game.ratingName);
+			ScriptHandler.setOnScripts('ratingName', game.ratingName);
 		});
 		Lua_helper.add_callback(lua, "setRatingFC", function(value:String) {
 			game.ratingFC = value;
-			game.setOnScripts('ratingFC', game.ratingFC);
+			ScriptHandler.setOnScripts('ratingFC', game.ratingFC);
 		});
 		Lua_helper.add_callback(lua, "updateScoreText", function() game.updateScoreText());
 		Lua_helper.add_callback(lua, "getMouseX", function(?camera:String = 'game') {
@@ -1230,7 +1230,7 @@ class FunkinLua
 				variables.set(tag, FlxG.sound.play(Paths.sound(sound), volume, loop, null, true, function()
 				{
 					if(!loop) variables.remove(tag);
-					if(game != null) game.callOnLuas('onSoundFinished', [originalTag]);
+					if(game != null) ScriptHandler.callOnLuas('onSoundFinished', [originalTag]);
 				}));
 				return tag;
 			}

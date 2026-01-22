@@ -1449,7 +1449,12 @@ class PlayState extends MusicBeatState
 	}
 
 	function eventEarlyTrigger(event:EventNote):Float {
-		var returnedValue:Null<Float> = ScriptHandler.callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true);
+		var v:ReturnValue = ScriptHandler.callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true);
+		var returnedValue:Null<Float> = v.luaValue;
+		if(returnedValue != null && returnedValue != 0) {
+			return returnedValue;
+		}
+		returnedValue = v.hscriptValue;
 		if(returnedValue != null && returnedValue != 0) {
 			return returnedValue;
 		}
@@ -3600,7 +3605,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 			#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-			addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
+			Debugger.instance.print('Missing shader $name .frag AND .vert files!', FlxColor.RED);
 			#else
 			FlxG.log.warn('Missing shader $name .frag AND .vert files!');
 			#end
