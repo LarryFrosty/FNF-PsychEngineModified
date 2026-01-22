@@ -28,7 +28,7 @@ class DebugText extends TextField
 		if (!FlxG.game._lostFocus || !FlxG.autoPause) {
 			disableTime -= deltaTime / 1000;
 			if (disableTime < 1) alpha = disableTime;
-			if (disableTime < 0 || y <= FlxG.height * 2) parent?.removeChild(this);
+			if (disableTime < 0 || y >= FlxG.height * 2) parent?.removeChild(this);
 		}
 		super.__enterFrame(deltaTime);
 	}
