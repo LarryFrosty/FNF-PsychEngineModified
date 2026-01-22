@@ -35,7 +35,6 @@ import psychlua.LuaUtils.LuaTweenOptions;
 #if HSCRIPT_ALLOWED
 import psychlua.HScript;
 #end
-import psychlua.DebugLuaText;
 import psychlua.ModchartSprite;
 
 import flixel.input.keyboard.FlxKey;

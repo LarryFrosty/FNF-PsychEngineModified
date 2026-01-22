@@ -123,9 +123,9 @@ class ScriptHandler
 		}
 		path = Paths.getPath(file, TEXT);
 		#if MODS_ALLOWED
-		else if(FileSystem.exists(path))
+		if(FileSystem.exists(path))
 		#else
-		else if(Assets.exists(path, TEXT))
+		if(Assets.exists(path, TEXT))
 		#end
 		{
 			return path;
