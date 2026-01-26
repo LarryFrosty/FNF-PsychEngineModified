@@ -28,6 +28,8 @@ package mobile.backend;
  */
 class StorageUtil
 {
+	public static final EXT_NAME:String = FlxG.stage.application.meta.get('file');
+
 	#if sys
 	public static function getStorageDirectory():String
 		return #if android haxe.io.Path.addTrailingSlash(StorageUtil.getExternalStorageDirectory()) #elseif ios lime.system.System.documentsDirectory #else Sys.getCwd() #end;
@@ -54,7 +56,7 @@ class StorageUtil
 	#if android
 	// always force path due to haxe
 	public static function getExternalStorageDirectory():String
-		return '/storage/emulated/0/.PsychEngineModified/';
+		return '/storage/emulated/0/.${EXT_NAME}/';
 
 	public static function requestPermissions():Void
 	{
