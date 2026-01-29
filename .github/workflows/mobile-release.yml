@@ -38,7 +38,7 @@ jobs:
         if: matrix.config.install
         run: |
           haxelib git hxcpp https://github.com/kittycathy233/hxcpp --quiet
-          haxelib git lime https://github.com/kittycathy233/lime --quiet
+          haxelib git lime https://github.com/LarryFrosty/lime-archive --quiet --skip-dependencies
           haxelib install openfl 9.4.1 --quiet
           haxelib git flixel https://github.com/kittycathy233/flixel --quiet
           haxelib install flixel-addons 3.3.2 --quiet
