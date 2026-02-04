@@ -30,7 +30,7 @@ typedef HScriptInfos = {
 
 class HScript extends Iris
 {
-	public static var globalVariables:HScriptGlobalMap = new HScriptGlobalMap();
+	public static var globalVariables:Map<String, Dynamic> = new Map();
 
 	public var filePath:String;
 	public var modFolder:String;
