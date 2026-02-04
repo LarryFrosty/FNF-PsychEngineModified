@@ -652,6 +652,7 @@ class CustomInterp extends crowplexus.hscript.Interp
 // from SScript
 @:transitive
 @:multiType(@:followWithAbstracts K)
+@:access(crowplexus.iris.Iris)
 abstract HScriptTypedGlobalMap<K, V>(IMap<K, V>) 
 {
 	public function new();
@@ -664,7 +665,7 @@ abstract HScriptTypedGlobalMap<K, V>(IMap<K, V>)
 		var value:Dynamic = cast value;
 		for (i in Iris.instances)
 		{
-			if (!i.interp != null)
+			if (i.interp != null)
 				i.set(key, value);
 		}
 	}
@@ -703,7 +704,7 @@ abstract HScriptTypedGlobalMap<K, V>(IMap<K, V>)
 		var value:Dynamic = cast v;
 		for (i in Iris.instances)
 		{
-			if (!i.interp != null)
+			if (i.interp != null)
 				i.set(key, value);
 		}
 		return v;
