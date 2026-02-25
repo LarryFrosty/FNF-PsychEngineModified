@@ -1,5 +1,7 @@
 ![PsychionalEngineLogo](docs/img/PsychEngineMobileLogoTweak.png)
 
+Baldiplier Engine is not an actual engine, this is a joke name for a Psych fork. I pretty much just add random stuff here.
+
 Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
 ## Customization:
