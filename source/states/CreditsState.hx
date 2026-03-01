@@ -40,7 +40,7 @@ class CreditsState extends MusicBeatState
 		var desc:String = '"Yummy yum"';
 		var color:String = '81d7ff';
 		var larryCred:Array<String> = ['larryfrosty'];
-		if (FlxG.random.bool(0.1)) {
+		if (FlxG.random.bool(10)) {
 			larryCred = FlxG.random.getObject(baldipliers, [90, 25, 5]) ?? ['larryfrosty'];
 			if (larryCred.length > 1) {
 				desc = '"your pliers are ${larryCred[1]}."';
