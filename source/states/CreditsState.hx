@@ -9,6 +9,7 @@ class CreditsState extends MusicBeatState
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private var iconArray:Array<AttachedSprite> = [];
 	private var creditsStuff:Array<Array<String>> = [];
+	private var baldipliers:Array<Array<String>> = [['baldiplier', 'bald', '577099'], ['daldiplier', 'dark', '3f3f3f'], ['golden-baldiplier', 'golden', 'ffff48']];
 
 	var bg:FlxSprite;
 	var descText:FlxText;
@@ -36,8 +37,20 @@ class CreditsState extends MusicBeatState
 		#if MODS_ALLOWED
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
-
+		var desc:String = '"Yummy yum"';
+		var color:String = '81d7ff';
+		var larryCred:Array<String> = ['larryfrosty'];
+		if (FlxG.random.bool(0.1)) {
+			larryCred = FlxG.random.getObject(baldipliers, [90, 25, 5]) ?? ['larryfrosty'];
+			if (larryCred.length > 1) {
+				desc = '"your pliers are ${larryCred[1]}."';
+				color = larryCred[2];
+			}
+		}
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+			['Credits Test'],
+			['LarryFrosty', larryCred[0], 'Psych Spoon\n${desc}', 'https://youtube.com/@larryfrosty', color],
+			[''],
 			['Mobile Porting Team'],
 			['HomuHomu833',			'homura',             'Head Porter of Psych Engine and Author of linc_luajit-rewriten',                       'https://youtube.com/@HomuHomu833',		'FFE7C0'],
 			['Karim Akra',			'karim',			'Second Porter of Psych Engine',						'https://youtube.com/@Karim0690',		'FFB4F0'],
