@@ -8,6 +8,8 @@ import shaders.RGBPalette.RGBShaderReference;
 
 import objects.StrumNote;
 
+import states.editors.content.EditorPlayState;
+
 import flixel.math.FlxRect;
 
 using StringTools;
@@ -86,6 +88,7 @@ class Note extends FlxSprite
 	public var rgbShader:RGBShaderReference;
 	public static var globalRgbShaders:Array<RGBPalette> = [];
 	public var inEditor:Bool = false;
+	public var editorOpponentMode:Bool = false;
 
 	public var animSuffix:String = '';
 	public var gfNote:Bool = false;
@@ -233,7 +236,7 @@ class Note extends FlxSprite
 		return value;
 	}
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?createdFrom:Dynamic = null, ?editorOpponentMode:Bool = false)
 	{
 		super();
 
@@ -248,6 +251,7 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
 		this.inEditor = inEditor;
+		this.editorOpponentMode = editorOpponentMode;
 		this.moves = false;
 
 		x += (ClientPrefs.data.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
@@ -471,7 +475,7 @@ class Note extends FlxSprite
 	{
 		super.update(elapsed);
 
-		if (mustPress != PlayState.opponentMode)
+		if (mustPress != (inEditor ? editorOpponentMode : PlayState.opponentMode))
 		{
 			canBeHit = (strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * lateHitMult) &&
 						strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult));
