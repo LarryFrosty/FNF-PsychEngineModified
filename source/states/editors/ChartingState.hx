@@ -2651,10 +2651,10 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		mouseSnapCheckBox = new PsychUICheckBox(objX, objY, 'Mouse Scroll Snap', 75, function() chartEditorSave.data.mouseScrollSnap = mouseSnapCheckBox.checked);
 		mouseSnapCheckBox.checked = chartEditorSave.data.mouseScrollSnap;
 
-		ignoreProgressCheckBox = new PsychUICheckBox(objX + 75, objY, 'Ignore Progress Warnings', 75, function() chartEditorSave.data.ignoreProgressWarns = ignoreProgressCheckBox.checked);
+		ignoreProgressCheckBox = new PsychUICheckBox(objX + 125, objY, 'Ignore Progress Warnings', 75, function() chartEditorSave.data.ignoreProgressWarns = ignoreProgressCheckBox.checked);
 		ignoreProgressCheckBox.checked = chartEditorSave.data.ignoreProgressWarns;
 
-		opponentModeCheckBox = new PsychUICheckBox(objX + 150, objY, 'Play As Opponent', 75, function() opponentMode = opponentModeCheckBox.checked);
+		opponentModeCheckBox = new PsychUICheckBox(objX + 175, objY, 'Play As Opponent', 75, function() opponentMode = opponentModeCheckBox.checked);
 
 		objY += 50;
 		hitsoundPlayerStepper = new PsychUINumericStepper(objX, objY, 0.2, 0, 0, 1, 1);
