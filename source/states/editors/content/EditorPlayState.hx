@@ -758,7 +758,7 @@ class EditorPlayState extends MusicBeatSubstate
 		//more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 		Conductor.songPosition = lastTime;
 
-		var spr:StrumNote = !opponentMode ? playerStrums : opponentStrums;
+		var spr:StrumNote = !opponentMode ? playerStrums.members[key] : opponentStrums.members[key];
 		if(spr != null && spr.animation.curAnim.name != 'confirm')
 		{
 			spr.playAnim('pressed');
@@ -777,7 +777,7 @@ class EditorPlayState extends MusicBeatSubstate
 
 	private function keyReleased(key:Int)
 	{
-		var spr:StrumNote = !opponentMode ? playerStrums : opponentStrums;
+		var spr:StrumNote = !opponentMode ? playerStrums.members[key] : opponentStrums.members[key];
 		if(spr != null)
 		{
 			spr.playAnim('static');
@@ -923,7 +923,7 @@ class EditorPlayState extends MusicBeatSubstate
 		if(spr != null)
 		{
 			spr.playAnim('confirm', true);
-			if (opponentMode) strum.resetAnim = Conductor.stepCrochet * 1.25 / 1000 / playbackRate;
+			if (opponentMode) spr.resetAnim = Conductor.stepCrochet * 1.25 / 1000 / playbackRate;
 		}
 		vocals.volume = 1;
 
