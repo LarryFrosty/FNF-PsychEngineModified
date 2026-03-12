@@ -868,7 +868,7 @@ class FunkinLua {
 
 		Lua_helper.add_callback(lua, "getMidpointX", function(variable:String) {
 			var obj:FlxObject = LuaUtils.getObjectLoop(variable);
-			if(obj != null) return obj.getMidpoint().y;
+			if(obj != null) return obj.getMidpoint().x;
 
 			return 0;
 		});
